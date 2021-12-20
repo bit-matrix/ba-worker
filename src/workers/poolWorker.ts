@@ -19,13 +19,15 @@ export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxD
      **/
     await findNewCtxWorker(pool, newBmBlockInfo, newTxDetails);
 
-    const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
     /**
      *
      * 2. create pool tx
      *
      **/
-    await createPoolTxWorker(pool, newBmBlockInfo, newCtxs);
+    if (newBmBlockInfo.block_height === recentBlockheight) {
+      const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
+      await createPoolTxWorker(pool, newBmBlockInfo, newCtxs);
+    }
 
     /**
      *
