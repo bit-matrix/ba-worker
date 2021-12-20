@@ -1,5 +1,5 @@
 // import { CommitmentTxData } from "../../business/data/models/CommitmentTxData";
-import { Pool } from "../../business/data/models/Pool";
+import { Pool } from "@bitmatrix/models";
 
 /* export const spentWorkerForTx = async (pool: Pool, newBlockheight: number, burnBlockHash: string, txid: string, data: CommitmentTxData): Promise<string | undefined> => {
   console.log(

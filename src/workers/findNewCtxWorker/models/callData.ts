@@ -1,4 +1,4 @@
-import { CALL_METHOD } from "../../../business/data/models/BmTx";
+import { CALL_METHOD } from "@bitmatrix/models";
 
 export const CALL_METHODS = ["01", "02", "03", "04"];
 

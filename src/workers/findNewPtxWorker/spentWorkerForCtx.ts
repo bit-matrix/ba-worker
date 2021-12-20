@@ -1,5 +1,5 @@
 // import { CommitmentTx } from "../../business/data/models/CommitmentTx";
-import { Pool } from "../../business/data/models/Pool";
+import { Pool } from "@bitmatrix/models";
 // import { spentWorkerForTx } from "./spentWorkerForTx";
 
 /* export const spentWorkerForCtx = async (pool: Pool, newBlockheight: number, ctx: CommitmentTx) => {

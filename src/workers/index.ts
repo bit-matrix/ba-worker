@@ -1,8 +1,8 @@
 import { pools } from "../business/data";
 import { init, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { poolWorker } from "./poolWorker";
-import { BmBlockInfo } from "../business/data/models/BmInfo";
 import { WORKER_DELAY } from "../env";
+import { BmBlockInfo } from "@bitmatrix/models";
 
 const worker = async () => {
   try {
