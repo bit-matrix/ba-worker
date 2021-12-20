@@ -1,40 +1,93 @@
 import axios from "axios";
 import { DB_URL } from "../../env";
-
+import { BmConfig } from "./models/BmConfig";
+import { BmCtxMempool, BmCtxNew, BmPtx } from "./models/BmTx";
 import { Pool } from "./models/Pool";
-import { AssetBlockheight } from "./models/AssetBlockheight";
-import { CommitmentTx } from "./models/CommitmentTx";
+
+export const clear = (): Promise<void> => axios.delete<void>(DB_URL + "clear").then((res) => res.data);
 
 export const pools = (): Promise<Pool[]> => axios.get<Pool[]>(DB_URL + "pools").then((res) => res.data);
+export const pool = (asset: string): Promise<Pool> => axios.get<Pool>(DB_URL + "pools/" + asset).then((res) => res.data);
 
-export const assetBlockheight = (asset: string): Promise<{ ctx: AssetBlockheight; ptx: AssetBlockheight }> =>
+export const config = (asset: string): Promise<BmConfig> => axios.get<BmConfig>(DB_URL + "config/" + asset).then((res) => res.data);
+
+export const ctxsNew = (asset: string): Promise<BmCtxNew[]> =>
   axios
-    .get<{ ctx: AssetBlockheight; ptx: AssetBlockheight }>(DB_URL + "height/" + asset)
+    .get<BmCtxNew[]>(DB_URL + "ctx/" + asset)
     .then((res) => res.data)
     .catch((res) => {
-      console.error("assetBlockheight", res);
+      console.error("ctxsNew", res);
       throw res.message;
     });
 
-// export const assetBlockheightType = (asset: string, txType = "CTX" || "PTX"): Promise<AssetBlockheight | undefined> =>
-//  axios.get<AssetBlockheight | undefined>(DB_URL + "height/" + asset + "/" + txType).then((res) => (res.data?.block_height ? res.data : undefined));
-
-export const activeCtx = (asset: string): Promise<CommitmentTx[]> =>
+export const ctxNew = (asset: string, ctxid: string): Promise<BmCtxNew[]> =>
   axios
-    .get<CommitmentTx[]>(DB_URL + "ctx/" + asset)
+    .get<BmCtxNew[]>(DB_URL + "ctx/" + asset + "/" + ctxid)
     .then((res) => res.data)
     .catch((res) => {
-      console.error("activeCtx", res);
+      console.error("ctxsNew", res);
       throw res.message;
     });
 
-export const saveCtx = (asset: string, key: string, value: CommitmentTx): Promise<void> =>
+export const ctxsMempool = (asset: string): Promise<BmCtxMempool[]> =>
   axios
-    .post(DB_URL + "ctx/" + asset, { key, value })
+    .get<BmCtxMempool[]>(DB_URL + "ctx/" + asset + "?mempool=true")
     .then((res) => res.data)
     .catch((res) => {
-      console.error("saveCtx", res.message);
+      console.error("ctxsMempool", res);
       throw res.message;
     });
 
-// export const savePtx = (asset: string): Promise<CommitmentTx[]> => axios.get<CommitmentTx[]>(DB_URL + asset + "/ctx").then((res) => res.data);
+export const ctxMempool = (asset: string, ctxid: string): Promise<BmCtxMempool> =>
+  axios
+    .get<BmCtxMempool>(DB_URL + "ctx/" + asset + "/" + ctxid + "?mempool=true")
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxsMempool", res);
+      throw res.message;
+    });
+
+export const ptxs = (asset: string): Promise<BmPtx[]> =>
+  axios
+    .get<BmPtx[]>(DB_URL + "ptx/" + asset)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxsMempool", res);
+      throw res.message;
+    });
+
+export const ptx = (asset: string, ptxid: string): Promise<BmPtx> =>
+  axios
+    .get<BmPtx>(DB_URL + "ptx/" + asset + "/" + ptxid)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxsMempool", res);
+      throw res.message;
+    });
+
+export const ctxNewSave = (asset: string, value: BmCtxNew): Promise<void> =>
+  axios
+    .post(DB_URL + "ctx/" + asset, value)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxNewSave", res.message);
+      throw res.message;
+    });
+
+export const ctxMempoolSave = (asset: string, value: BmCtxMempool): Promise<void> =>
+  axios
+    .post(DB_URL + "ctx/" + asset, value)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxMempoolSave", res.message);
+      throw res.message;
+    });
+
+export const ptxSave = (asset: string, value: BmPtx): Promise<void> =>
+  axios
+    .post(DB_URL + "ptx/" + asset, value)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxMempoolSave", res.message);
+      throw res.message;
+    });
