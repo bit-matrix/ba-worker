@@ -1,4 +1,4 @@
-import { CALL_METHOD } from "../../../business/data/models/CALL_METHOD";
+import { CALL_METHOD } from "../../../business/data/models/BmTx";
 
 export interface STEP_0_DATA {
   CALL_METHOD: CALL_METHOD;

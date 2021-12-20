@@ -1,4 +1,4 @@
-import { CALL_METHOD } from "../../../business/data/models/CALL_METHOD";
+import { CALL_METHOD } from "../../../business/data/models/BmTx";
 
 export const CALL_METHODS = ["01", "02", "03", "04"];
 

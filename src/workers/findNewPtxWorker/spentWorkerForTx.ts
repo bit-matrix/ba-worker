@@ -1,7 +1,7 @@
-import { CommitmentTxData } from "../../business/data/models/CommitmentTxData";
+// import { CommitmentTxData } from "../../business/data/models/CommitmentTxData";
 import { Pool } from "../../business/data/models/Pool";
 
-export const spentWorkerForTx = async (pool: Pool, newBlockheight: number, burnBlockHash: string, txid: string, data: CommitmentTxData): Promise<string | undefined> => {
+/* export const spentWorkerForTx = async (pool: Pool, newBlockheight: number, burnBlockHash: string, txid: string, data: CommitmentTxData): Promise<string | undefined> => {
   console.log(
     "Spent worker for Tx started for pool: " +
       pool.asset +
@@ -16,4 +16,4 @@ export const spentWorkerForTx = async (pool: Pool, newBlockheight: number, burnB
   );
 
   return "";
-};
+}; */

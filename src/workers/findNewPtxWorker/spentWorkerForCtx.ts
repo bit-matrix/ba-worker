@@ -1,8 +1,8 @@
-import { CommitmentTx } from "../../business/data/models/CommitmentTx";
+// import { CommitmentTx } from "../../business/data/models/CommitmentTx";
 import { Pool } from "../../business/data/models/Pool";
-import { spentWorkerForTx } from "./spentWorkerForTx";
+// import { spentWorkerForTx } from "./spentWorkerForTx";
 
-export const spentWorkerForCtx = async (pool: Pool, newBlockheight: number, ctx: CommitmentTx) => {
+/* export const spentWorkerForCtx = async (pool: Pool, newBlockheight: number, ctx: CommitmentTx) => {
   console.log(
     "Spent worker for Ctx started for pool: " + pool.asset + ". newBlockheight: " + newBlockheight + ", ctx.block_height:" + ctx.block_height + ", txs.length: " + ctx.txs.length
   );
@@ -15,4 +15,4 @@ export const spentWorkerForCtx = async (pool: Pool, newBlockheight: number, ctx:
       console.log("Tx is still unspent :(  txid: " + tx.txid);
     }
   });
-};
+}; */

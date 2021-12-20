@@ -1,6 +1,6 @@
-import { Tx, TxDetail } from "@bitmatrix/esplora-api-client";
+import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { hexLE } from "@script-wiz/wiz-data";
-import { CALL_METHOD } from "../../../business/data/models/CALL_METHOD";
+import { CALL_METHOD } from "../../../business/data/models/BmTx";
 import { CALL_DATA_BYTE_LENGTH, TX_INPUT_LENGTH, TX_OUTPUT_LENGTH } from "../../../const";
 import { positiveNumber32, positiveNumber64 } from "../../../helper/valid64Number";
 import { CALL_METHODS } from "../models/callData";

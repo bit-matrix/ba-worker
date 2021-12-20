@@ -1,16 +1,61 @@
-import { Pool } from "../business/data/models/Pool";
-import { newCtxWorker } from "./newCtxWorker";
-import { spentWorker } from "./spentWorker";
+import { TxDetail } from "@bitmatrix/esplora-api-client";
+import { ctxsNew, poolUpdate } from "../business/data";
+import { BmBlockInfo } from "../business/data/models/BmInfo";
+import { BmCtxNew, BmPtx } from "../business/data/models/BmTx";
+import { Pool, PoolValues } from "../business/data/models/Pool";
+import { createPoolTxWorker } from "./createPoolTxWorker";
+import { findNewCtxWorker } from "./findNewCtxWorker";
+import { findNewPtxWorker } from "./findNewPtxWorker";
 
-export const poolWorker = async (pool: Pool, newBlockheightCTX?: number, newBlockheightPTX?: number) => {
-  console.log("Pool worker started for " + pool.asset + ". ctx: " + newBlockheightCTX + ", ptx: " + newBlockheightPTX);
+export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[], recentBlockheight: number) => {
+  console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
 
-  if (newBlockheightPTX) {
-    await spentWorker(pool, newBlockheightPTX);
-  }
+  try {
+    /**
+     *
+     * 1. new commitment txs
+     *
+     **/
+    await findNewCtxWorker(pool, newBmBlockInfo, newTxDetails);
 
-  if (newBlockheightCTX) {
-    await newCtxWorker(pool, newBlockheightCTX);
+    const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
+    /**
+     *
+     * 2. create pool tx
+     *
+     **/
+    await createPoolTxWorker(pool, newBmBlockInfo, newCtxs);
+
+    /**
+     *
+     * 3. find new pool tx
+     *
+     **/
+    const poolValues: PoolValues | undefined = await findNewPtxWorker(pool, newBmBlockInfo, newTxDetails);
+
+    /**
+     *
+     * 4. update pool data
+     *
+     **/
+    const newPool: Pool = { ...pool };
+
+    newPool.syncedBlock = newBmBlockInfo;
+    newPool.synced = newBmBlockInfo.block_height === recentBlockheight;
+
+    newPool.recentBlockHeight = recentBlockheight;
+
+    if (poolValues) {
+      newPool.quote.value = poolValues.quote;
+      newPool.token.value = poolValues.token;
+      newPool.lp.value = poolValues.lp;
+
+      newPool.unspentTx = poolValues.unspentTx;
+    }
+    console.log("Pool update: ", newPool);
+    await poolUpdate(newPool);
+  } catch (error) {
+    console.error("poolWorker.error", error);
   }
 
   return;
