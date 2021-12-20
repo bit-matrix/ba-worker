@@ -1,8 +1,6 @@
 import axios from "axios";
 import { DB_URL } from "../../env";
-import { BmConfig } from "./models/BmConfig";
-import { BmCtxMempool, BmCtxNew, BmPtx } from "./models/BmTx";
-import { Pool } from "./models/Pool";
+import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, Pool } from "@bitmatrix/models";
 
 export const clear = (): Promise<void> => axios.delete<void>(DB_URL + "clear").then((res) => res.data);
 

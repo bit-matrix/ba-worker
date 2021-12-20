@@ -1,4 +1,4 @@
-import { CALL_METHOD } from "../../../business/data/models/BmTx";
+import { CALL_METHOD } from "@bitmatrix/models";
 import {
   BASE_FEE,
   COMMITMENT_SCRIPTPUBKEY_BYTE_LENGTH,

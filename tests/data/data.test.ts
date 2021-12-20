@@ -1,8 +1,6 @@
-import { Pool } from "../../src/business/data/models/Pool";
 import { pools, config, ctxsNew, ctxNewSave, ctxsMempool, ctxNew, ctxMempoolSave, ctxMempool, ptxs, ptxSave, ptx } from "../../src/business/data";
-import { BmConfig } from "../../src/business/data/models/BmConfig";
-import { BmCtxMempool, BmCtxNew, BmPtx, CallData, CALL_METHOD } from "../../src/business/data/models/BmTx";
 import { clear } from "console";
+import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 
 const POOLS: Pool[] = [
   {
@@ -37,7 +35,7 @@ const POOLS: Pool[] = [
     },
     synced: false,
     syncedBlock: { block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69", block_height: 131275 },
-    recentBlock: { block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69", block_height: 131275 },
+    recentBlockHeight: 131275,
     active: true,
   },
 ];
