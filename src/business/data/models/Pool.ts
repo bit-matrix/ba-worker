@@ -11,6 +11,13 @@ export type Pool = {
   unspentTx: BmTxInfo;
   synced: boolean;
   syncedBlock: BmBlockInfo;
-  recentBlock: BmBlockInfo;
+  recentBlockHeight: number;
   active: boolean;
+};
+
+export type PoolValues = {
+  quote: string;
+  token: string;
+  lp: string;
+  unspentTx: BmTxInfo;
 };
