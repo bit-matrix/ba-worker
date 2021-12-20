@@ -1,5 +1,6 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmBlockInfo, Pool } from "@bitmatrix/models";
+import { BmBlockInfo, BmCtxNew, CallData, Pool } from "@bitmatrix/models";
+import { ctxNewSave } from "../../business/db-client";
 import { isCtxWorker } from "./isCtxWorker";
 
 export const findNewCtxWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[]) => {
@@ -12,7 +13,13 @@ export const findNewCtxWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, 
 
     for (let i = 1; i < newTxDetails.length; i++) {
       const newTxDetail = newTxDetails[i];
-      isCtxWorker(pool, newBmBlockInfo, newTxDetail);
+      const callData: CallData | undefined = await isCtxWorker(pool, newBmBlockInfo, newTxDetail);
+      if (callData) {
+        console.log("Found call data!", callData);
+
+        const bmCtxNew: BmCtxNew = { callData, commitmentTx: { txid: newTxDetail.txid, ...newBmBlockInfo } };
+        await ctxNewSave(pool.id, bmCtxNew);
+      }
     }
   } catch (error) {
     console.error("findNewCtxWorker.error", error);
