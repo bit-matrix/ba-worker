@@ -1,6 +1,4 @@
-import { BmBlockInfo } from "../../business/data/models/BmInfo";
-import { BmCtxNew } from "../../business/data/models/BmTx";
-import { Pool } from "../../business/data/models/Pool";
+import { BmBlockInfo, BmCtxNew, Pool } from "@bitmatrix/models";
 
 export const createPoolTxWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newCtxs: BmCtxNew[]) => {
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height + ", newCtxs.count: " + newCtxs.length);
