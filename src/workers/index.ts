@@ -1,4 +1,4 @@
-import { pools } from "../business/data";
+import { pools } from "../business/db-client";
 import { init, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { poolWorker } from "./poolWorker";
 import { WORKER_DELAY } from "../env";

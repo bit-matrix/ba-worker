@@ -1,6 +1,6 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BmBlockInfo, BmCtxMempool, Pool, PoolValues } from "@bitmatrix/models";
-import { ctxsMempool, ctxsNew } from "../../business/data";
+import { ctxsMempool, ctxsNew } from "../../business/db-client";
 // import { spentWorkerForCtx } from "./spentWorkerForCtx";
 
 export const findNewPtxWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[]) => {

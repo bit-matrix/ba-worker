@@ -1,6 +1,6 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BmBlockInfo, BmCtxNew, Pool, PoolValues } from "@bitmatrix/models";
-import { ctxsNew, poolUpdate } from "../business/data";
+import { ctxsNew, poolUpdate } from "../business/db-client";
 import { createPoolTxWorker } from "./createPoolTxWorker";
 import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
