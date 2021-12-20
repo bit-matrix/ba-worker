@@ -8,7 +8,8 @@ import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
 
 export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[], recentBlockheight: number) => {
-  console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
+  // console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
+  console.log("Pool worker started");
 
   try {
     /**
@@ -52,7 +53,7 @@ export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxD
 
       newPool.unspentTx = poolValues.unspentTx;
     }
-    console.log("Pool update: ", newPool);
+    // console.log("Pool update: ", newPool);
     await poolUpdate(newPool);
   } catch (error) {
     console.error("poolWorker.error", error);

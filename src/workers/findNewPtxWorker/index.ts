@@ -6,11 +6,13 @@ import { Pool, PoolValues } from "../../business/data/models/Pool";
 // import { spentWorkerForCtx } from "./spentWorkerForCtx";
 
 export const findNewPtxWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[]) => {
-  console.log("Find new ptx worker started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height);
+  // console.log("Find new ptx worker started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height);
+  console.log("Find new ptx worker started");
   let poolValues: PoolValues;
 
   const mempoolCtxs: BmCtxMempool[] = await ctxsMempool(pool.id);
-  console.log(mempoolCtxs.length + " new mempool ctxs found for asset: " + pool.id);
+  // console.log(mempoolCtxs.length + " new mempool ctxs found for asset: " + pool.id);
+  console.log("mempool ctxs: ", mempoolCtxs.length);
 
   // If I didn't create a pool tx, I don't interest with it !!!
   if (mempoolCtxs.length === 0) return;
