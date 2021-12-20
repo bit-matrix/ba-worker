@@ -1,17 +1,15 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { hexLE } from "@script-wiz/wiz-data";
-import { CALL_METHOD } from "@bitmatrix/models";
+import { CallDataBase, CALL_METHOD } from "@bitmatrix/models";
 import { CALL_DATA_BYTE_LENGTH, TX_INPUT_LENGTH, TX_OUTPUT_LENGTH } from "../../../const";
 import { positiveNumber32, positiveNumber64 } from "../../../helper/valid64Number";
-import { CALL_METHODS } from "../models/callData";
-import { STEP_0_DATA } from "../models/STEP_0_DATA";
 
 /**
  *
  * https://docs.google.com/document/d/1ysGu-IXJbACz3-EdxynIlQwQxTvdx4tSvXcok9N1Jc8/edit?usp=sharing
  *
  */
-export const step0 = async (assetId: string, tx: TxDetail): Promise<STEP_0_DATA> => {
+export const getCallDataBase = (assetId: string, tx: TxDetail): CallDataBase => {
   try {
     // 1. check tx inputs length
     if (tx.vin.length !== TX_INPUT_LENGTH) throw new Error("tx inputs length is not equal to " + TX_INPUT_LENGTH);
@@ -29,7 +27,7 @@ export const step0 = async (assetId: string, tx: TxDetail): Promise<STEP_0_DATA>
       throw new Error("first output's scriptpubkey length is not equal to " + 2 * (CALL_DATA_BYTE_LENGTH + 3));
 
     // create step_data_0 object for return
-    const result: STEP_0_DATA = { CALL_METHOD: CALL_METHOD.SWAP_QUOTE_FOR_TOKEN, RECIPIENT_PUBLIC_KEY: "", SLIPPAGE_TOLERANCE: "", ORDERING_FEE: 0 };
+    const result: CallDataBase = { method: CALL_METHOD.SWAP_QUOTE_FOR_TOKEN, recipientPublicKey: "", slippageTolerance: "", orderingFee: 0 };
 
     // 4. get call data
     const CALL_DATA: string = tx.vout[0].scriptpubkey_asm.split(" ")[2];
@@ -39,27 +37,27 @@ export const step0 = async (assetId: string, tx: TxDetail): Promise<STEP_0_DATA>
 
     // 5.2. check METHOD_CALL (1 byte)
     const result_METHOD_CALL: string = CALL_DATA.substring(64, 66);
-    if (!CALL_METHODS.includes(result_METHOD_CALL)) throw new Error("wrong call_method");
-    result.CALL_METHOD = <CALL_METHOD>result_METHOD_CALL;
+    if (!["01", "02", "03", "04"].includes(result_METHOD_CALL)) throw new Error("wrong call_method");
+    result.method = <CALL_METHOD>result_METHOD_CALL;
 
     // 5.3. check RECIPIENT_PUBLIC_KEY starts with '02' or '03' (33 byte)
     const result_RECIPIENT_PUBLIC_KEY: string = CALL_DATA.substring(66, 132);
     if (!result_RECIPIENT_PUBLIC_KEY.startsWith("02") && !result_RECIPIENT_PUBLIC_KEY.startsWith("03")) throw new Error("wrong recipient_public_key");
-    result.RECIPIENT_PUBLIC_KEY = result_RECIPIENT_PUBLIC_KEY;
+    result.recipientPublicKey = result_RECIPIENT_PUBLIC_KEY;
 
     // 5.4. check SLIPPAGE_TOLERANCE (64 bit LE number)
     const result_SLIPPAGE_TOLERANCE = CALL_DATA.substring(132, 148);
-    if (result.CALL_METHOD === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN || result.CALL_METHOD === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
+    if (result.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN || result.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
       const result_SLIPPAGE_TOLERANCE_NUMBER = positiveNumber64(result_SLIPPAGE_TOLERANCE, "slippage_tolerange is out of range");
-      result.SLIPPAGE_TOLERANCE = result_SLIPPAGE_TOLERANCE_NUMBER;
+      result.slippageTolerance = result_SLIPPAGE_TOLERANCE_NUMBER;
     } else {
-      result.SLIPPAGE_TOLERANCE = "0";
+      result.slippageTolerance = "0";
     }
 
     // 5.5. check ORDERING_FEE (32 bit LE number)
     const result_ORDERING_FEE = CALL_DATA.substring(148);
     const result_ORDERING_FEE_NUMBER: number = positiveNumber32(result_ORDERING_FEE, "ordering_fee is out of range");
-    result.ORDERING_FEE = result_ORDERING_FEE_NUMBER;
+    result.orderingFee = result_ORDERING_FEE_NUMBER;
 
     // 6.1. check tx is a segwit tx
     // const hex = await txidToRaw(tx.txid);
