@@ -6,27 +6,25 @@ docker build -t ba-worker .
 
 docker run -d --network="host" ba-worker
 
+## container list
+
+docker ps
+
+## Delete all stopped containers:
+
+docker rm $(docker ps -a -q)
+
+## Stop all running containers
+
+docker stop $(docker ps -a -q)
+
 ## image list
 
-docker image ls
+docker images
 
 # Remove all images at once
 
 docker rmi $(docker images -q)
-
-### Container
-
-## list active images
-
-docker ps
-
-## Stop all running containers
-
-docker stop $(docker ps -a -q)
-
-## Delete all stopped containers:
-
-docker rm $(docker ps -a -q)
 
 ### bitmatrix-aggregate-worker
 
