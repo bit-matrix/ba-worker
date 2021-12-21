@@ -1,5 +1,5 @@
 import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmBlockInfo, BmConfig, BmCtxNew, CallData, Pool } from "@bitmatrix/models";
+import { BmConfig, BmCtxNew, CallData, Pool } from "@bitmatrix/models";
 import { config, ctxNewSave } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { isCtxWorker } from "./isCtxWorker";
@@ -16,7 +16,7 @@ export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
 
     for (let i = 1; i < newTxDetails.length; i++) {
       const newTxDetail = newTxDetails[i];
-      const callData: CallData | undefined = await isCtxWorker(pool, poolConfig, newBlock, newTxDetail);
+      const callData: CallData | undefined = await isCtxWorker(pool, poolConfig, newTxDetail);
       if (callData) {
         console.log("Found call data!", callData);
 

@@ -1,5 +1,5 @@
 import { Block } from "@bitmatrix/esplora-api-client";
-import { BmBlockInfo, BmCtxNew, Pool } from "@bitmatrix/models";
+import { BmCtxNew, Pool } from "@bitmatrix/models";
 
 export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]) => {
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
