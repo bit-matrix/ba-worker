@@ -1,34 +1,65 @@
 import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmCtxMempool, Pool, PoolValues } from "@bitmatrix/models";
-import { ctxsMempool } from "../../business/db-client";
-// import { spentWorkerForCtx } from "./spentWorkerForCtx";
+import { BmPtx, BmPtxCtx, Pool, PoolValues } from "@bitmatrix/models";
+import { ctxMempool, ptxCtx, ptxSave } from "../../business/db-client";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
 export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[]) => {
-  // console.log("Find new ptx worker started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height);
   console.log("Find new ptx worker started");
-  let poolValues: PoolValues;
 
-  const mempoolCtxs: BmCtxMempool[] = await ctxsMempool(pool.id);
-  // console.log(mempoolCtxs.length + " new mempool ctxs found for asset: " + pool.id);
-  console.log("mempool ctxs: ", mempoolCtxs.length);
+  const newTxDetail = newTxDetails[0];
+  if (newTxDetail.vout[0].asset !== pool.id) return;
+
+  console.log("Found pool tx!", newTxDetail.txid);
+  sendTelegramMessage("New ptx: https://blockstream.info/liquidtestnet/tx/" + newTxDetail.txid);
+
+  let poolValues: PoolValues = {
+    quote: newTxDetail.vout[3].value?.toString() || pool.quote.value,
+    token: newTxDetail.vout[1].value?.toString() || pool.token.value,
+    lp: newTxDetail.vout[2].value?.toString() || pool.lp.value,
+    unspentTx: {
+      txid: newTxDetail.txid,
+      block_hash: newBlock.id,
+      block_height: newBlock.height,
+    },
+  };
+  sendTelegramMessage("New pool values: " + pool.quote.ticker + " = " + poolValues.quote + ", " + pool.token.ticker + " = " + poolValues.token + ", LP = " + poolValues.lp);
+
+  const bmPtxCtx: BmPtxCtx = await ptxCtx(pool.id, newTxDetail.txid);
+  if (bmPtxCtx) {
+    for (let i = 0; i < bmPtxCtx.commitmentTxs.length; i++) {
+      const ctxid = bmPtxCtx.commitmentTxs[i];
+      const ctxMem = await ctxMempool(pool.id, ctxid);
+
+      if (ctxMem) {
+        try {
+          const bmPtx: BmPtx = {
+            callData: ctxMem.callData,
+            commitmentTx: ctxMem.commitmentTx,
+            poolTx: { txid: newTxDetail.txid, block_hash: newBlock.id, block_height: newBlock.height },
+          };
+
+          await ptxSave(pool.id, bmPtx);
+          sendTelegramMessage("ctx spent: https://blockstream.info/liquidtestnet/tx/" + bmPtx.commitmentTx.txid);
+        } catch (error) {
+          console.error("ptxSave.error: Ptx: " + newTxDetail.txid + " Ctx: " + ctxid + ". ctxMem: " + ctxMem);
+          throw error;
+        }
+      } else {
+        console.warn("Ptx found, ptx-ctxs found but ctxMempool not found!. Ptx: " + newTxDetail.txid + " Ctx: " + ctxid);
+      }
+    }
+  } else {
+    console.warn("Ptx found but ptx-ctxs not found!. Ptx: " + newTxDetail.txid);
+  }
+
+  return poolValues;
 
   // If I didn't create a pool tx, I don't interest with it !!!
-  if (mempoolCtxs.length === 0) return;
+  // const mempoolCtxs: BmCtxMempool[] = await ctxsMempool(pool.id);
+  // console.log("mempool ctxs: ", mempoolCtxs.length);
+  // if (mempoolCtxs.length === 0) return;
 
   /* ctxs.forEach(async (ctx) => {
     await spentWorkerForCtx(pool, newBlockheight, ctx);
   }); */
-
-  poolValues = {
-    quote: "1005000",
-    token: "49753000000",
-    lp: "1999990000",
-    unspentTx: {
-      txid: "3d9bc4c1b203536406c129a24c3a14475d781972e4edd861eaad279358637954",
-      block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69",
-      block_height: 131275,
-    },
-  };
-
-  return poolValues;
 };
