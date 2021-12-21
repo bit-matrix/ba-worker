@@ -15,7 +15,8 @@ const worker = async () => {
     const ps = await pools();
     const promises: Promise<void>[] = [];
 
-    ps.forEach(async (p) => {
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
       const diff = recentBlock.height - p.syncedBlock.block_height;
       if (diff === 0) return;
 
@@ -30,7 +31,7 @@ const worker = async () => {
 
       const poolWorkerPromise = poolWorker(p, newBlock, recentBlock);
       promises.push(poolWorkerPromise);
-    });
+    }
 
     await Promise.all(promises);
   } catch (error) {

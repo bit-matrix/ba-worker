@@ -14,6 +14,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block
   let newTxDetails: TxDetail[] = [];
   if (newBlock.tx_count > 1) {
     newTxDetails = await esploraClient.blockTxs(newBlock.id);
+    newTxDetails = newTxDetails.slice(1);
   }
 
   try {
