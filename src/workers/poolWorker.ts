@@ -1,13 +1,20 @@
-import { TxDetail } from "@bitmatrix/esplora-api-client";
+import { Block, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { BmBlockInfo, BmCtxNew, Pool, PoolValues } from "@bitmatrix/models";
 import { ctxsNew, poolUpdate } from "../business/db-client";
 import { createPoolTxWorker } from "./createPoolTxWorker";
 import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
 
-export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxDetails: TxDetail[], recentBlockheight: number) => {
+export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block) => {
   // console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
   console.log("Pool worker started");
+
+  const synced = newBlock.height === recentBlock.height;
+
+  let newTxDetails: TxDetail[] = [];
+  if (newBlock.tx_count > 1) {
+    newTxDetails = await esploraClient.blockTxs(newBlock.id);
+  }
 
   try {
     /**
@@ -15,16 +22,18 @@ export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxD
      * 1. new commitment txs
      *
      **/
-    await findNewCtxWorker(pool, newBmBlockInfo, newTxDetails);
+    if (newBlock.tx_count > 1) {
+      await findNewCtxWorker(pool, newBlock, newTxDetails);
+    }
 
     /**
      *
      * 2. create pool tx
      *
      **/
-    if (newBmBlockInfo.block_height === recentBlockheight) {
+    if (synced) {
       const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
-      await createPoolTxWorker(pool, newBmBlockInfo, newCtxs);
+      await createPoolTxWorker(pool, newBlock, newCtxs);
     }
 
     /**
@@ -32,8 +41,10 @@ export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxD
      * 3. find new pool tx
      *
      **/
-    const poolValues: PoolValues | undefined = await findNewPtxWorker(pool, newBmBlockInfo, newTxDetails);
-
+    let poolValues: PoolValues | undefined;
+    if (newBlock.tx_count > 1) {
+      poolValues = await findNewPtxWorker(pool, newBlock, newTxDetails);
+    }
     /**
      *
      * 4. update pool data
@@ -41,10 +52,10 @@ export const poolWorker = async (pool: Pool, newBmBlockInfo: BmBlockInfo, newTxD
      **/
     const newPool: Pool = { ...pool };
 
-    newPool.syncedBlock = newBmBlockInfo;
-    newPool.synced = newBmBlockInfo.block_height === recentBlockheight;
+    newPool.syncedBlock = { block_height: newBlock.height, block_hash: newBlock.id };
+    newPool.synced = synced;
 
-    newPool.recentBlockHeight = recentBlockheight;
+    newPool.recentBlockHeight = recentBlock.height;
 
     if (poolValues) {
       newPool.quote.value = poolValues.quote;
