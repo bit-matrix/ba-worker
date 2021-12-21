@@ -10,11 +10,9 @@ export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
     console.log("Find new ctx worker started");
     console.log("Tx count: " + newTxDetails.length);
 
-    if (newTxDetails.length === 1) return;
-
     const poolConfig: BmConfig = await config(pool.id);
 
-    for (let i = 1; i < newTxDetails.length; i++) {
+    for (let i = 0; i < newTxDetails.length; i++) {
       const newTxDetail = newTxDetails[i];
       const callData: CallData | undefined = await isCtxWorker(pool, poolConfig, newTxDetail);
       if (callData) {
@@ -22,7 +20,14 @@ export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
 
         const bmCtxNew: BmCtxNew = { callData, commitmentTx: { txid: newTxDetail.txid, block_height: newBlock.height, block_hash: newBlock.id } };
         await ctxNewSave(pool.id, bmCtxNew);
-        sendTelegramMessage("new ctx: https://db.bitmatrix-aggregate.com/ctx/43a2f4ef8ce286e57ab3e39e6da3741382ba542854a1b28231a7a5b8ba337fcd/" + bmCtxNew.commitmentTx.txid);
+        sendTelegramMessage(
+          "New ctx: https://db.bitmatrix-aggregate.com/ctx/43a2f4ef8ce286e57ab3e39e6da3741382ba542854a1b28231a7a5b8ba337fcd/" +
+            bmCtxNew.commitmentTx.txid +
+            " Method: " +
+            callData.method +
+            ", value: " +
+            callData.value
+        );
       }
     }
   } catch (error) {
