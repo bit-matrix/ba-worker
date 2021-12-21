@@ -1,35 +1,37 @@
 import { pools } from "../business/db-client";
-import { init, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
+import { init, esploraClient, Block } from "@bitmatrix/esplora-api-client";
 import { poolWorker } from "./poolWorker";
 import { WORKER_DELAY } from "../env";
-import { BmBlockInfo } from "@bitmatrix/models";
 
 const worker = async () => {
   try {
     console.log("worker started..");
 
-    // recentBlockheight
-    const recentBlockheight = await esploraClient.blockTipHeight();
-    console.log("recentBlockheight: ", recentBlockheight);
+    // recentBlock
+    const recentBlock10 = await esploraClient.blocks();
+    const recentBlock = recentBlock10[0];
+    console.log("recentBlock.height: ", recentBlock.height);
 
     const ps = await pools();
-    // console.log("found pool assets: " + ps.map((p) => p.id).join(","));
-
     const promises: Promise<void>[] = [];
 
-    ps.forEach(async (p) => {
-      const newBlockHeight: number | undefined = p.syncedBlock.block_height < recentBlockheight ? p.syncedBlock.block_height + 1 : undefined;
-      console.log("newBlockHeight: ", newBlockHeight);
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const diff = recentBlock.height - p.syncedBlock.block_height;
+      if (diff === 0) return;
 
-      if (newBlockHeight) {
-        const newBlockHash = await esploraClient.blockheight(newBlockHeight);
-        const txDetails: TxDetail[] = await esploraClient.blockTxs(newBlockHash);
-        const bmBlockInfo: BmBlockInfo = { block_height: newBlockHeight, block_hash: newBlockHash };
-
-        const poolWorkerPromise = poolWorker(p, bmBlockInfo, txDetails, recentBlockheight);
-        promises.push(poolWorkerPromise);
+      let newBlock: Block;
+      if (diff < 10) {
+        newBlock = recentBlock10[diff];
+      } else {
+        const block10 = await esploraClient.blocks(p.syncedBlock.block_height + 1);
+        newBlock = block10[0];
       }
-    });
+      console.log("newBlockHeight: ", newBlock.height);
+
+      const poolWorkerPromise = poolWorker(p, newBlock, recentBlock);
+      promises.push(poolWorkerPromise);
+    }
 
     await Promise.all(promises);
   } catch (error) {

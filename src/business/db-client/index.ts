@@ -1,6 +1,6 @@
 import axios from "axios";
 import { DB_URL } from "../../env";
-import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, Pool } from "@bitmatrix/models";
+import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, BmPtxCtx, Pool } from "@bitmatrix/models";
 
 export const clear = (): Promise<void> => axios.delete<void>(DB_URL + "clear").then((res) => res.data);
 
@@ -81,6 +81,15 @@ export const ctxMempoolSave = (asset: string, value: BmCtxMempool): Promise<void
     .then((res) => res.data)
     .catch((res) => {
       console.error("ctxMempoolSave", res.message);
+      throw res.message;
+    });
+
+export const ptxCtx = (asset: string, ptxid: string): Promise<BmPtxCtx> =>
+  axios
+    .get(DB_URL + "ptx-ctx/" + asset + "/" + ptxid)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ptxCtx", res.message);
       throw res.message;
     });
 
