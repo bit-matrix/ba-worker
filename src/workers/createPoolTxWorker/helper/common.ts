@@ -1,49 +1,96 @@
-import { Pool } from "@bitmatrix/models";
+import { CALL_METHOD, Pool } from "@bitmatrix/models";
 import { crypto } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 
 export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart(16, "0");
 
-/*
- * Kutucuğa 5000 sat yazdım
- *
- * %0.25 LP feesini hesaplıycaz
- * 1. 5000 / 400 = 12 *** a
- * 2. 5000 - 12 = 4988   *** b
- * 3. POOL_LBTC_VALUE_LATEST_STATE + 4988 = 1004988  *** c
- * 4. 1004988 / 16 = 62811 *** d
- * 5. POOL_LBTC_VALUE_LATEST_STATE / 16 = 62500 *** e
- * 6. POOL_TOKEN_VALUE_LATEST_STATE / 2000000 = 25000 *** f
- * 7. 62500 * 25000 = 1562500000 *** g
- * 8. 1562500000 / 62811 = 24876 *** h
- * 9. 24876 * 2000000 = 49752000000 *** i
- * 10. POOL_TOKEN_VALUE_LATEST_STATE - 49752000000 = 248000000 *** j
- * 11. 248000000 - POOL_LBTC_VALUE_LATEST_STATE = 247000000 *** k
- */
-export const calc1 = (pool: Pool, val: number) => {
+const quotePrecisionCoefficient = 16;
+const tokenPrecisionCoefficient = 2000000;
+
+export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD) => {
+  if (method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
+    /*
+     *
+     * Method: 01 // QUOTE FRO TOKEN
+     *
+     * %0.25 LP feesini hesaplıycaz
+     * 1. 5000 / 400 = 12 *** a
+     * 2. 5000 - 12 = 4988   *** b
+     * 3. POOL_LBTC_VALUE_LATEST_STATE + 4988 = 1004988  *** c
+     * 4. 1004988 / 16 = 62811 *** d
+     * 5. POOL_LBTC_VALUE_LATEST_STATE / 16 = 62500 *** e
+     * 6. POOL_TOKEN_VALUE_LATEST_STATE / 2000000 = 25000 *** f
+     * 7. 62500 * 25000 = 1562500000 *** g
+     * 8. 1562500000 / 62811 = 24876 *** h
+     * 9. 24876 * 2000000 = 49752000000 *** i
+     * 10. POOL_TOKEN_VALUE_LATEST_STATE - 49752000000 = 248000000 *** j
+     * 11. 248000000 - 1000000 = 247000000 *** k
+     */
+
+    const a = Math.floor(val / 400);
+    // console.log("a", a);
+    const b = val - a;
+    // console.log("b", b);
+    const c = Number(pool.quote.value) + b;
+    // console.log("c", c);
+    const d = Math.floor(c / quotePrecisionCoefficient);
+    // console.log("d", d);
+    const e = Math.floor(Number(pool.quote.value) / quotePrecisionCoefficient);
+    // console.log("e", e);
+    const f = Math.floor(Number(pool.token.value) / tokenPrecisionCoefficient);
+    // console.log("f", f);
+    const g = e * f;
+    // console.log("g", g);
+    const h = Math.floor(g / d);
+    // console.log("h", h);
+    const i = h * tokenPrecisionCoefficient;
+    // console.log("i", i);
+    const j = Number(pool.token.value) - i;
+    // console.log("j", j);
+    const k = j - 1000000;
+    // console.log("k", k);
+    return k;
+  }
+  // else if (method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
+  /**
+   * Method 02
+   * Swap USDT for LBTC:
+   * Kutuya 20000000000 tether yazdım
+   *
+   * 1. kutudaki tether değeri 50000000 den büyük ya da eşit olmalı
+   * 2. 20000000000 / 400 = 50000000 *** a
+   * 3. 20000000000 - 50000000 = 19950000000 *** b
+   * 3. POOL_TOKEN_VALUE_LATEST_STATE + 19950000000 = 69950000000 *** c
+   * 4. 69950000000 / 2000000 = 34975 *** d
+   * 5. POOL_LBTC_VALUE_LATEST_STATE / 16 = 62500 *** e
+   * 6. POOL_TOKEN_VALUE_LATEST_STATE / 2000000 = 25000 *** f
+   * 7. 62500 * 25000 = 1562500000 *** g
+   * 8. 1562500000 / 34975 = 44674 *** h
+   * 9. 44674 *16 = 714784 *** i
+   * 10. POOL_LBTC_VALUE_LATEST_STATE - 714784 = 285216 *** j
+   */
   const a = Math.floor(val / 400);
-  console.log("a", a);
+  // console.log("a", a);
   const b = val - a;
-  console.log("b", b);
-  const c = Number(pool.quote.value) + b;
-  console.log("c", c);
-  const d = Math.floor(c / 16);
-  console.log("d", d);
-  const e = Math.floor(Number(pool.quote.value) / 16);
-  console.log("e", e);
-  const f = Math.floor(Number(pool.token.value) / 2000000);
-  console.log("f", f);
+  // console.log("b", b);
+  const c = Number(pool.token.value) + b;
+  // console.log("c", c);
+  const d = Math.floor(c / tokenPrecisionCoefficient);
+  // console.log("d", d);
+  const e = Math.floor(Number(pool.quote.value) / quotePrecisionCoefficient);
+  // console.log("e", e);
+  const f = Math.floor(Number(pool.token.value) / tokenPrecisionCoefficient);
+  // console.log("f", f);
   const g = e * f;
-  console.log("g", g);
+  // console.log("g", g);
   const h = Math.floor(g / d);
-  console.log("h", h);
-  const i = h * 2000000;
-  console.log("i", i);
-  const j = Number(pool.token.value) - i;
-  console.log("j", j);
-  const k = j - 1000000;
-  console.log("k", k);
-  return k;
+  // console.log("h", h);
+  const i = h * quotePrecisionCoefficient;
+  // console.log("i", i);
+  const j = Number(pool.quote.value) - i;
+  // console.log("j", j);
+  return j;
+  // }
 };
 
 /* 
