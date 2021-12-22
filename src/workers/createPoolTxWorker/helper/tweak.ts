@@ -49,7 +49,7 @@ const treeHelper = (scripts: WizData[], version: string): string => {
   return treeHelperResultHex;
 };
 
-export const tapRootScriptPubKeyHex = (publicKey: string, scriptByteData: string) => {
+export const tapRootScriptPubKeyHex = (publicKey: string, scriptByteData: string): { scriptPubKey: string; prefix: "c4" | "c5" } => {
   const pubKey = WizData.fromHex(publicKey);
   const scripts = [WizData.fromHex(scriptByteData)];
 
