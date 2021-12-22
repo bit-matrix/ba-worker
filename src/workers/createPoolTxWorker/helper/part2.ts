@@ -17,13 +17,13 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   const poolNewQuoteValue = toHex64BE(Number(pool.quote.value) + callData.value.quote);
   const poolNewTokenValue = toHex64BE(Number(pool.token.value) - c1);
 
-  console.log("c1", c1);
-  console.log("recepientValue", recepientValue);
-  console.log("txFee, serviceCommission", txFee, serviceCommission);
-  console.log("poolNewTokenValue", Number(pool.token.value) - c1, poolNewTokenValue);
-  console.log("poolNewQuoteValue", Number(pool.quote.value) + callData.value.quote, poolNewQuoteValue);
+  // console.log("c1", c1);
+  // console.log("recepientValue", recepientValue);
+  // console.log("txFee, serviceCommission", txFee, serviceCommission);
+  // console.log("poolNewTokenValue", Number(pool.token.value) - c1, poolNewTokenValue);
+  // console.log("poolNewQuoteValue", Number(pool.quote.value) + callData.value.quote, poolNewQuoteValue);
 
-  console.log(
+  /* console.log(
     "Output params: poolAssetLE=" +
       poolAssetLE +
       ", poolNewTokenValue=" +
@@ -40,7 +40,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
       serviceCommission +
       ", txFee=" +
       txFee
-  );
+  ); */
 
   const p2 =
     "08" +
@@ -101,6 +101,6 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "00" +
     "00000000";
 
-  console.log("Output hex: " + p2);
+  // console.log("Output hex: " + p2);
   return p2;
 };

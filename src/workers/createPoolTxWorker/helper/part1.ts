@@ -5,7 +5,7 @@ export const part1 = (unspentTxid: string, commitmentTxid: string): string => {
   const latestPoolTxidLE = hexLE(unspentTxid);
   const ctxidLE = hexLE(commitmentTxid);
 
-  console.log("Inputs params: latestPoolTxidLE=" + latestPoolTxidLE + ", ctxidLE=" + ctxidLE);
+  // console.log("Inputs params: latestPoolTxidLE=" + latestPoolTxidLE + ", ctxidLE=" + ctxidLE);
   const p1 =
     "02000000" +
     "01" +
@@ -35,6 +35,6 @@ export const part1 = (unspentTxid: string, commitmentTxid: string): string => {
     "00" +
     "01000000";
 
-  console.log("Inputs hex: " + p1);
+  // console.log("Inputs hex: " + p1);
   return p1;
 };

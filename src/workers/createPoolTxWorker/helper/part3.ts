@@ -7,7 +7,7 @@ import { getRecepientScriptPubkey, getTxFeeServiceCommission, splitCommitmentTxB
 export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Promise<string> => {
   const txHex = await esploraClient.txHex(ctx.commitmentTx.txid);
   const settlement = await splitCommitmentTxBaseHex(txHex);
-  console.log("settlement", settlement);
+  // console.log("settlement", settlement);
   const tapscript = ctx.output.compiledData;
   const tapscriptPrefix = ctx.output.tweakPrefix;
 
@@ -54,6 +54,6 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
     "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "0000000000000000000000000000000000";
 
-  console.log("witness data", p3);
+  // console.log("witness data", p3);
   return p3;
 };
