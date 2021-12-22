@@ -103,6 +103,8 @@ export const getRecepientScriptPubkey = (recipientPublicKey: string) => {
   const compiledData = "0014" + rip;
   // console.log("compiledData", compiledData);
   // console.log("compiledTest", test_spk);
+
+  return compiledData;
 };
 
 /*
