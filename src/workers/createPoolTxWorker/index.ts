@@ -26,5 +26,7 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
     await method04(pool, poolConfig, ctxNew);
   }
 
+  // const compiledData = "20" + hexLE(targetFlagAssetId) + "766b6b6351b27500c8696c876700c8696c87916960b27521" + recipientPublicKey + "ac68";
+
   // TODO
 };

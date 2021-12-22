@@ -26,10 +26,10 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       // 3.1. check second commitment output asset id is LBTC
       if (tx.vout[2].asset !== pool.quote.asset) return; // throw new Error("second commitment output asset is not LBTC");
       // 3.2. check second commitment output value is equal to service commission (650)
-      if (tx.vout[2].value !== Number(config.serviceFee.number)) return; // throw new Error("second commitment output value is not equal to " + Number(config.serviceFee.number));
+      if (tx.vout[2].value !== config.serviceFee.number) return; // throw new Error("second commitment output value is not equal to " + Number(config.serviceFee.number));
       // 3.2. check first commitment output value - base_fee - ordering_fee is gte remaining_supply
-      result.quote = (tx.vout[1].value || 0) - Number(config.baseFee.number) - callDataBase.orderingFee;
-      if (result.quote < Number(config.minRemainingSupply)) return; // throw new Error("first commitment output value is not enough");
+      result.quote = (tx.vout[1].value || 0) - config.baseFee.number - callDataBase.orderingFee;
+      if (result.quote < config.minRemainingSupply) return; // throw new Error("first commitment output value is not enough");
     }
 
     // 4. SWAP_TOKEN_FOR_LBTC
@@ -38,9 +38,9 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       if (tx.vout[2].asset !== pool.token.asset) return; // throw new Error("second commitment output's asset is not token asset");
       // 4.2. check second commitment output’s value is gte token min value (50000000)
       result.token = tx.vout[2].value || 0;
-      if (result.token < Number(config.minTokenValue)) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      if (result.token < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
       // 4.3. check first commitment output value is equal to base_fee + service_commission + ordering_fee
-      if (tx.vout[1].value !== Number(config.baseFee.number) + Number(config.serviceFee.number) + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to token value");
+      if (tx.vout[1].value !== config.baseFee.number + config.serviceFee.number + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to token value");
     }
     // 5. ADD_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.ADD_LIQUIDITY) {
@@ -48,10 +48,10 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       if (tx.vout[2].asset !== pool.token.asset) return; //throw new Error("second commitment output's asset is not token asset");
       // 5.2. check second commitment output’s value is gte token min value (50000000)
       result.token = tx.vout[2].value || 0;
-      if (result.token < Number(config.minTokenValue)) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      if (result.token < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
       // 5.3. check first commitment output value - base_fee - service_commission - ordering_fee is gte min_remaining_supply
-      result.quote = (tx.vout[1].value || 0) - Number(config.baseFee.number) - Number(config.serviceFee.number) - callDataBase.orderingFee;
-      if (result.quote < Number(config.minRemainingSupply)) return; //throw new Error("first commitment output value is not enough");
+      result.quote = (tx.vout[1].value || 0) - config.baseFee.number - config.serviceFee.number - callDataBase.orderingFee;
+      if (result.quote < config.minRemainingSupply) return; //throw new Error("first commitment output value is not enough");
     }
     // 6. REMOVE_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.REMOVE_LIQUIDITY) {
@@ -61,7 +61,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       result.lp = tx.vout[2].value || 0;
       if (result.lp < 10) return; // throw new Error("second commitment output's value is not gte 1");
       // 6.3. check first commitment output value is equal to base_fee + service_commission + ordering_fee
-      if (tx.vout[1].value !== Number(config.baseFee.number) + Number(config.serviceFee.number) + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to base_fee + service_commission + ordering_fee");
+      if (tx.vout[1].value !== config.baseFee.number + config.serviceFee.number + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to base_fee + service_commission + ordering_fee");
     }
 
     return result;

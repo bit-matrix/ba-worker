@@ -1,4 +1,4 @@
-import { pools, config, ctxsNew, ctxNewSave, ctxsMempool, ctxNew, ctxMempoolSave, ctxMempool, ptxs, ptxSave, ptx } from "../../src/business/data";
+import { pools, config, ctxsNew, ctxNewSave, ctxsMempool, ctxNew, ctxMempoolSave, ctxMempool, ptxs, ptxSave, ptx } from "../../src/business/db-client";
 import { clear } from "console";
 import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 
@@ -42,12 +42,12 @@ const POOLS: Pool[] = [
 
 const BM_CONFIG: BmConfig = {
   id: "",
-  minRemainingSupply: "1000",
-  minTokenValue: "50000000",
-  baseFee: { number: "650", hex: "" },
-  serviceFee: { number: "1200", hex: "" },
-  commitmentTxFee: { number: "100", hex: "0000000000000064" },
-  defaultOrderingFee: { number: "1", hex: "01000000" },
+  minRemainingSupply: 1000,
+  minTokenValue: 50000000,
+  baseFee: { number: 650, hex: "" },
+  serviceFee: { number: 1200, hex: "" },
+  commitmentTxFee: { number: 100, hex: "0000000000000064" },
+  defaultOrderingFee: { number: 1, hex: "01000000" },
   fundingOutputAddress: "tex1qft5p2uhsdcdc3l2ua4ap5qqfg4pjaqlp250x7us7a8qqhrxrxfsqh7creg",
   innerPublicKey: "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624",
 };
@@ -62,6 +62,7 @@ const CALL_DATA: CallData = {
 
 const CTX_NEW: BmCtxNew = {
   callData: CALL_DATA,
+  output: { compiledData: "", tweakPrefix: "c4" },
   commitmentTx: {
     txid: "55d8c6e3802f06ead43b04fe7fdcd07e17344e6b32512de833bb659a59004d19",
     block_height: 1,
@@ -71,6 +72,7 @@ const CTX_NEW: BmCtxNew = {
 
 const CTX_MEMPOOL: BmCtxMempool = {
   callData: CALL_DATA,
+  output: { compiledData: "", tweakPrefix: "c4" },
   commitmentTx: {
     txid: "66d8c6e3802f06ead43b04fe7fdcd07e17344e6b32512de833bb659a59004d19",
     block_height: 1,
@@ -81,6 +83,7 @@ const CTX_MEMPOOL: BmCtxMempool = {
 
 const PTX: BmPtx = {
   callData: CALL_DATA,
+  output: { compiledData: "", tweakPrefix: "c4" },
   commitmentTx: {
     txid: "54d8c6e3802f06ead43b04fe7fdcd07e17344e6b32512de833bb659a59004d19",
     block_height: 1,

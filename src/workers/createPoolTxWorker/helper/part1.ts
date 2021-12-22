@@ -5,7 +5,7 @@ export const part1 = (unspentTxid: string, commitmentTxid: string): string => {
   const latestPoolTxidLE = hexLE(unspentTxid);
   const ctxidLE = hexLE(commitmentTxid);
 
-  return (
+  const p1 =
     "02000000" +
     "01" +
     "06" +
@@ -32,6 +32,7 @@ export const part1 = (unspentTxid: string, commitmentTxid: string): string => {
     ctxidLE +
     "02000000" +
     "00" +
-    "01000000"
-  );
+    "01000000";
+
+  return p1;
 };
