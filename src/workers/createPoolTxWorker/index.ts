@@ -1,6 +1,6 @@
 import { Block } from "@bitmatrix/esplora-api-client";
 import { BmConfig, BmCtxNew, CALL_METHOD, Pool } from "@bitmatrix/models";
-import { config } from "../../business/db-client";
+import { config, ctxMempoolSave } from "../../business/db-client";
 import { method01 } from "./method01";
 import { method02 } from "./method02";
 import { method03 } from "./method03";
@@ -29,6 +29,8 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   } else if (ctxNew.callData.method === CALL_METHOD.REMOVE_LIQUIDITY) {
     ptxid = await method04(pool, poolConfig, ctxNew);
   }
+
+  if (ptxid) await ctxMempoolSave(pool.id, { callData: ctxNew.callData, output: ctxNew.output, commitmentTx: ctxNew.commitmentTx, poolTxid: ptxid });
 
   return ptxid;
 };
