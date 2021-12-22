@@ -5,12 +5,13 @@ import { createPoolTxWorker } from "./createPoolTxWorker";
 import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
 
-export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block) => {
+export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) => {
   // console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
-  console.log("Pool worker started");
+  // console.log("Pool worker started");
 
-  const synced = newBlock.height === recentBlock.height;
+  let synced = newBlock.height === bestBlock.height;
 
+  // console.log("newBlock.tx_count", newBlock.tx_count);
   let newTxDetails: TxDetail[] = [];
   if (newBlock.tx_count > 1) {
     newTxDetails = await esploraClient.blockTxs(newBlock.id);
@@ -32,9 +33,10 @@ export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block
      * 2. create pool tx
      *
      **/
-    if (synced) {
+    let lastSentPtx: string | undefined = pool.lastSentPtx;
+    if (synced && lastSentPtx === undefined) {
       const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
-      await createPoolTxWorker(pool, newBlock, newCtxs);
+      lastSentPtx = await createPoolTxWorker(pool, newBlock, newCtxs);
     }
 
     /**
@@ -46,6 +48,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block
     if (newBlock.tx_count > 1) {
       poolValues = await findNewPtxWorker(pool, newBlock, newTxDetails);
     }
+
     /**
      *
      * 4. update pool data
@@ -53,20 +56,23 @@ export const poolWorker = async (pool: Pool, newBlock: Block, recentBlock: Block
      **/
     const newPool: Pool = { ...pool };
 
-    newPool.syncedBlock = { block_height: newBlock.height, block_hash: newBlock.id };
+    newPool.lastSyncedBlock = { block_height: newBlock.height, block_hash: newBlock.id };
     newPool.synced = synced;
+    newPool.lastSentPtx = lastSentPtx;
 
-    newPool.recentBlockHeight = recentBlock.height;
+    newPool.bestBlockHeight = bestBlock.height;
 
     if (poolValues) {
       newPool.quote.value = poolValues.quote;
       newPool.token.value = poolValues.token;
       newPool.lp.value = poolValues.lp;
 
-      newPool.unspentTx = poolValues.unspentTx;
+      newPool.lastUnspentTx = poolValues.unspentTx;
     }
+
     // console.log("Pool update: ", newPool);
-    await poolUpdate(newPool);
+    const res = await poolUpdate(newPool);
+    // console.log(res);
   } catch (error) {
     console.error("poolWorker.error", error);
   }
