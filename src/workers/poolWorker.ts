@@ -4,6 +4,7 @@ import { ctxsNew, poolUpdate } from "../business/db-client";
 import { createPoolTxWorker } from "./createPoolTxWorker";
 import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
+import { updateConfirmedCtxMempools } from "./updateConfirmedCtxMempools";
 
 export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) => {
   // console.log("Pool worker started for " + pool.id + ". newBlockHeight: " + newBmBlockInfo.block_height);
@@ -68,6 +69,10 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
       newPool.lp.value = poolValues.lp;
 
       newPool.lastUnspentTx = poolValues.unspentTx;
+
+      if (lastSentPtx === newPool.lastUnspentTx.txid) lastSentPtx = undefined;
+
+      await updateConfirmedCtxMempools(pool.id, newPool.lastUnspentTx.txid, newBlock);
     }
 
     // console.log("Pool update: ", newPool);
