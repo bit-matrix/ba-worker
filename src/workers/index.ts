@@ -2,35 +2,27 @@ import { pools } from "../business/db-client";
 import { init, esploraClient, Block } from "@bitmatrix/esplora-api-client";
 import { poolWorker } from "./poolWorker";
 import { WORKER_DELAY } from "../env";
+import { getNewBlock } from "../helper/getNewBlock";
 
 const worker = async () => {
   try {
     console.log("worker started..");
 
-    // recentBlock
-    const recentBlock10 = await esploraClient.blocks();
-    const recentBlock = recentBlock10[0];
-    console.log("recentBlock.height: ", recentBlock.height);
+    const bestBlock10 = await esploraClient.blocks();
 
     const ps = await pools();
     const promises: Promise<void>[] = [];
 
     for (let i = 0; i < ps.length; i++) {
       const p = ps[i];
-      const diff = recentBlock.height - p.syncedBlock.block_height;
-      if (diff === 0) return;
+      const wantedNewBlockHeight = p.lastSyncedBlock.block_height + 1;
+      const blockData = await getNewBlock(bestBlock10, wantedNewBlockHeight);
 
-      let newBlock: Block;
-      if (diff < 10) {
-        newBlock = recentBlock10[diff];
-      } else {
-        const block10 = await esploraClient.blocks(p.syncedBlock.block_height + 1);
-        newBlock = block10[0];
+      if (blockData) {
+        const { newBlock, bestBlock } = blockData;
+        const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
+        promises.push(poolWorkerPromise);
       }
-      console.log("newBlockHeight: ", newBlock.height);
-
-      const poolWorkerPromise = poolWorker(p, newBlock, recentBlock);
-      promises.push(poolWorkerPromise);
     }
 
     await Promise.all(promises);
