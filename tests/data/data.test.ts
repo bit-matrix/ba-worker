@@ -1,41 +1,76 @@
-import { pools, config, ctxsNew, ctxNewSave, ctxsMempool, ctxNew, ctxMempoolSave, ctxMempool, ptxs, ptxSave, ptx } from "../../src/business/db-client";
-import { clear } from "console";
-import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { pools, config, ctxsNew, ctxNewSave, ctxsMempool, ctxNew, ctxMempoolSave, ctxMempool, ptxs, ptxSave, ptx, clear } from "../../src/business/db-client";
+import { BmBlockInfo, BmConfig, BmCtxMempool, BmCtxNew, BmPtx, BmTxInfo, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
+
+const initialPoolBlock: BmBlockInfo = {
+  block_hash: "5ba3c5c59e514db9ce7be1a2fcc2c99693cdc6fe1d649c1d6e261bbe5b9815f6",
+  block_height: 138366,
+};
+
+const initialPoolTx: BmTxInfo = {
+  txid: "c2fe3190fad754e57703344ff6d73c40ddafcc2c4fbddcd659b9ba7e4db25b37",
+  ...initialPoolBlock,
+};
 
 const POOLS: Pool[] = [
   {
-    id: "43a2f4ef8ce286e57ab3e39e6da3741382ba542854a1b28231a7a5b8ba337fcd",
+    /**
+     * pool assets, values
+     */
+    id: "e1ed34f4be34f90408f008c32f932e2b7ebfbfab64ed3e925aab8b635cba5c16",
     quote: {
       ticker: "tL-BTC",
       name: "Liquid Testnet Bitcoin",
       asset: "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49",
-      value: "1005000",
+      value: "1000000000",
     },
     token: {
       ticker: "tL-USDt",
       name: "Liquid Testnet Tether",
-      asset: "213cbc4df83abc230852526b1156877f60324da869f0affaee73b6a6a32ad025",
-      value: "49753000000",
+      asset: "58caa32446839c6befe7bcf483c72d27a92c45429b55ff6f42b3c0a9726aa19e",
+      value: "50000000000000",
     },
     lp: {
       ticker: "tL-BTC:tL-USDt:0",
       name: "Liquid Testnet LP: Bitcoin:Tether:0 Liquidty Provider",
-      asset: "01f4346a807134c6dbe20801864d995b9b4c9a73063b0cd806596cd780c0af39",
+      asset: "772c8f2d8a5426cdc2a483f75b3fc317b67c599f8c8741b90539db48bf47a0f4",
       value: "1999990000",
     },
-    createdTx: {
-      txid: "3d9bc4c1b203536406c129a24c3a14475d781972e4edd861eaad279358637954",
-      block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69",
-      block_height: 131275,
-    },
-    unspentTx: {
-      txid: "3d9bc4c1b203536406c129a24c3a14475d781972e4edd861eaad279358637954",
-      block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69",
-      block_height: 131275,
-    },
+
+    /**
+     * pool creation tx info
+     */
+    initialTx: initialPoolTx,
+
+    /**
+     * last worker checked block info
+     */
+    lastSyncedBlock: initialPoolBlock,
+
+    /**
+     * recent block height on network
+     */
+    bestBlockHeight: 0,
+
+    /**
+     * lastSyncedBlock.height === bestBlockHeight
+     * (if true worker can create pool tx else pass creation pool tx)
+     */
     synced: false,
-    syncedBlock: { block_hash: "721d3a1c587ad367bc8982ba9cb0e36c4136efdd1f240f286c9bc19504f3cb69", block_height: 131275 },
-    recentBlockHeight: 131275,
+
+    /**
+     * recent worker found pool tx (it may be spent, validate "synced")
+     */
+    lastUnspentTx: initialPoolTx,
+
+    /**
+     * if worker broadcast one tx, save here.
+     * when it confirmed (worker found new ptx is equal to this), delete for new creation pool tx
+     */
+    lastSentPtx: undefined,
+
+    /**
+     * pool is active
+     */
     active: true,
   },
 ];
