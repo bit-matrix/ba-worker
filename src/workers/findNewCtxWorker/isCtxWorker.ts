@@ -1,10 +1,10 @@
 import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmConfig, CallData, CallDataBase, CallDataValue, Pool } from "@bitmatrix/models";
+import { BmConfig, CallData, CallDataBase, CallDataValue, CommitmentOutput, Pool } from "@bitmatrix/models";
 import { checkTweakedPubkey } from "./steps/checkTweakedPubkey";
 import { getCallDataBase } from "./steps/getCallDataBase";
 import { getCallDataValue } from "./steps/getCallDataValue";
 
-export const isCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDetail: TxDetail): Promise<CallData | undefined> => {
+export const isCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDetail: TxDetail): Promise<{ callData: CallData; output: CommitmentOutput } | undefined> => {
   // console.log("New ctx worker for tx started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height + ", txid: " + newTxDetails.txid);
   console.log("Is ctx worker started");
 
@@ -16,9 +16,9 @@ export const isCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDetail:
     if (callDataValue) {
       const callData: CallData = { ...callDataBase, value: { ...callDataValue } };
 
-      const isTweaked = checkTweakedPubkey(pool.id, poolConfig.innerPublicKey, callData.recipientPublicKey, newTxDetail.vout[1].scriptpubkey);
-      if (isTweaked) {
-        return callData;
+      const output: CommitmentOutput | undefined = checkTweakedPubkey(pool.id, poolConfig.innerPublicKey, callData.recipientPublicKey, newTxDetail.vout[1].scriptpubkey);
+      if (output) {
+        return { callData, output };
       }
 
       return;
