@@ -39,12 +39,14 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
     "21c51dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "00000003" +
     "0101" +
+    "5c" +
     tapscript + // COMMITMENT_OUTPUT_TAPSCRIPT // 5c20cd7f33bab8a5a73182b2a1542854ba821374a36d9ee3b37ae586e28ceff4a243766b6b6351b27500c8696c876700c8696c87916960b275210253b4443cb73ac1dbe0d0e31c9db5cdce831280fd94ba9c13eb1ea0791819d70eac68
     "21" +
     tapscriptPrefix + // c4-c5 // c5
     "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "00000003" +
     "0101" +
+    "5c" +
     tapscript + // COMMITMENT_OUTPUT_TAPSCRIPT // 5c20cd7f33bab8a5a73182b2a1542854ba821374a36d9ee3b37ae586e28ceff4a243766b6b6351b27500c8696c876700c8696c87916960b275210253b4443cb73ac1dbe0d0e31c9db5cdce831280fd94ba9c13eb1ea0791819d70eac68
     "21" +
     tapscriptPrefix + // c4-c5 // c5

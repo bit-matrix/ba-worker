@@ -37,14 +37,45 @@ export const calc1 = (pool: Pool, val: number) => {
   console.log("g", g);
   const h = Math.floor(g / d);
   console.log("h", h);
-  const i = h + 2000000;
+  const i = h * 2000000;
   console.log("i", i);
   const j = Number(pool.token.value) - i;
   console.log("j", j);
-  const k = j - Number(pool.quote.value);
+  const k = j - 1000000;
   console.log("k", k);
   return k;
 };
+
+/* 
+toHex64BE = (a) => Number(a).toString(16).padStart(16, "0");
+pool = {quote:{value:1005000}, token:{value:49753000000}};
+calc1 = (pool, val) => {
+  const a = Math.floor(val / 400);
+  console.log("a", a);
+  const b = val - a;
+  console.log("b", b);
+  const c = Number(pool.quote.value) + b;
+  console.log("c", c);
+  const d = Math.floor(c / 16);
+  console.log("d", d);
+  const e = Math.floor(Number(pool.quote.value) / 16);
+  console.log("e", e);
+  const f = Math.floor(Number(pool.token.value) / 2000000);
+  console.log("f", f);
+  const g = e * f;
+  console.log("g", g);
+  const h = Math.floor(g / d);
+  console.log("h", h);
+  const i = h * 2000000;
+  console.log("i", i);
+  const j = Number(pool.token.value) - i;
+  console.log("j", j);
+  const k = j - 1000000;
+  console.log("k", k, toHex64BE(k));
+  return k;
+}; 
+calc1(pool, 5000);
+*/
 
 /*
  *    RECEPIENT_SCRIPTPUBKEY calculation:
