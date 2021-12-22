@@ -30,8 +30,8 @@ export const sendRawTransaction = async (txHex: string): Promise<any> => {
       console.error("sendrawtransaction.error", er);
     });
 
-  if (poolTxid && poolTxid.toString() && poolTxid.toString().length === 64) {
-    return poolTxid;
+  if (poolTxid && poolTxid.error === null && poolTxid.result && poolTxid.result.length === 64) {
+    return poolTxid.result.length;
   }
 
   console.error("sendRawTransaction.error. poolTxid: ", poolTxid);
