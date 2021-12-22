@@ -50,34 +50,34 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "0000000000000001" +
     "00" +
     "22" +
-    "5120b73b298773dd2bb55b4411f7ee2882a41bbe83c7cf678937421ca2e3ef39d2ea" +
+    "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55" +
     "01" +
-    "25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21" +
+    "9ea16a72a9c0b3426fff559b42452ca9272dc783f4bce7ef6b9c834624a3ca58" +
     "01" +
     poolNewTokenValue + // 0000000b95828840 // POOL_NEW_TOKEN_VALUE
     "00" +
     "22" +
-    "5120b73b298773dd2bb55b4411f7ee2882a41bbe83c7cf678937421ca2e3ef39d2ea" +
+    "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
     "01" +
-    "39afc080d76c5906d80c3b06739a4c9b5b994d860108e2dbc63471806a34f401" +
+    "f4a047bf48db3905b941878c9f597cb617c33f5bf783a4c2cd26548a2d8f2c77" +
     "01" +
     "0000000077356cf0" +
     "00" +
     "22" +
-    "5120b73b298773dd2bb55b4411f7ee2882a41bbe83c7cf678937421ca2e3ef39d2ea" +
+    "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
     "01" +
     "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
     poolNewQuoteValue + // 00000000000f55c8 // POOL_NEW_LBTC_VALUE
     "00" +
     "22" +
-    "512021c31367d75854531dc45bbab54ed046c81e110f1668713aab9775464cd156d5" +
+    "5120cffae0ae0d452200dd3566085d44887df51f55a2641f775ed1f32954a4506b36" +
     "01" +
     recepientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
     "01" +
     recepientValue + // "RECEPIENT_VALUE" // 000000000eb8ebc0
     "00" +
-    "22" +
+    "16" +
     recepientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
     "01" +
     "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
@@ -92,7 +92,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     serviceCommission + // "_SERVICE_COMISSION_"  // 00000000000005ac
     "00" +
     "16" +
-    "00141ef08948ed902a517d90ef6955c66c183a444afd" +
+    "0014972ca4efa6bac21a771259e77dafabeeb0acbfe0" +
     "01" +
     "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
