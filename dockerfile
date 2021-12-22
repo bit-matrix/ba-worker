@@ -17,8 +17,8 @@ COPY src ./src
 # check files list
 RUN ls -a
 
-RUN apk add --update python make g++\
-   && rm -rf /var/cache/apk/*
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
 
 RUN npm install
 RUN npm run build
