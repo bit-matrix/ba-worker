@@ -10,7 +10,7 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
   if (newTxDetail.vout[0].asset !== pool.id) return;
 
   console.log("Found pool tx!", newTxDetail.txid);
-  sendTelegramMessage("New ptx: https://blockstream.info/liquidtestnet/tx/" + newTxDetail.txid);
+  sendTelegramMessage("Pool: " + pool.id + "\n" + "New ptx: https://blockstream.info/liquidtestnet/tx/" + newTxDetail.txid);
 
   let poolValues: PoolValues = {
     quote: newTxDetail.vout[3].value?.toString() || pool.quote.value,
@@ -22,7 +22,9 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
       block_height: newBlock.height,
     },
   };
-  sendTelegramMessage("New pool values: " + pool.quote.ticker + " = " + poolValues.quote + ", " + pool.token.ticker + " = " + poolValues.token + ", LP = " + poolValues.lp);
+  sendTelegramMessage(
+    "Pool: " + pool.id + "\n" + "New pool values: " + pool.quote.ticker + " = " + poolValues.quote + ", " + pool.token.ticker + " = " + poolValues.token + ", LP = " + poolValues.lp
+  );
 
   const bmPtxCtx: BmPtxCtx = await ptxCtx(pool.id, newTxDetail.txid);
   if (bmPtxCtx) {
@@ -40,7 +42,7 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
           };
 
           await ptxSave(pool.id, bmPtx);
-          sendTelegramMessage("ctx spent: https://blockstream.info/liquidtestnet/tx/" + bmPtx.commitmentTx.txid);
+          sendTelegramMessage("Pool: " + pool.id + "\n" + "ctx spent: https://blockstream.info/liquidtestnet/tx/" + bmPtx.commitmentTx.txid);
         } catch (error) {
           console.error("ptxSave.error: Ptx: " + newTxDetail.txid + " Ctx: " + ctxid + ". ctxMem: " + ctxMem);
           throw error;
