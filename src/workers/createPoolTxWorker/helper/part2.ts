@@ -1,19 +1,27 @@
 import { BmConfig, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
-import { getRecepientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
+import { calc1, getRecepientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
 
 // tx outputs
 export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): string => {
   const poolAssetLE = hexLE(pool.id);
 
-  const poolNewTokenValue = toHex64BE(Number(pool.token.value) + callData.value.token);
-  const poolNewQuoteValue = toHex64BE(Number(pool.quote.value) + callData.value.quote);
+  const recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
-  const recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.quote.asset) : hexLE(pool.token.asset);
-  const recepientValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(callData.value.quote) : hexLE(callData.value.token.toString());
+  const c1 = calc1(pool, callData.value.quote);
+  const recepientValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(c1) : hexLE(callData.value.token.toString());
   const recepientScriptPubkey = getRecepientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???
+
+  const poolNewQuoteValue = toHex64BE(Number(pool.quote.value) + callData.value.quote);
+  const poolNewTokenValue = toHex64BE(Number(pool.token.value) - c1);
+
+  console.log("c1", c1);
+  console.log("recepientValue", recepientValue);
+  console.log("txFee, serviceCommission", txFee, serviceCommission);
+  console.log("poolNewTokenValue", Number(pool.token.value) - c1, poolNewTokenValue);
+  console.log("poolNewQuoteValue", Number(pool.quote.value) + callData.value.quote, poolNewQuoteValue);
 
   const p2 =
     "08" +
