@@ -34,6 +34,7 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
         try {
           const bmPtx: BmPtx = {
             callData: ctxMem.callData,
+            output: ctxMem.output,
             commitmentTx: ctxMem.commitmentTx,
             poolTx: { txid: newTxDetail.txid, block_hash: newBlock.id, block_height: newBlock.height },
           };
