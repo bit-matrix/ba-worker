@@ -23,7 +23,9 @@
 // OP_CHECKSIG // ac
 // OP_ENDIF // 68
 
+import { CommitmentOutput } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
+import { tapRootScriptPubKeyHex } from "../../createPoolTxWorker/helper/tweak";
 
 // const COMMITMENT_OUTPUTS_EX = (publicKey: string, targetFlagAssetId: string, recipientPublicKey: string): string => {
 /**
@@ -48,26 +50,27 @@ TARGET_FLAG_ASSET_ID_REVERSED = cd7f33bab8a5a73182b2a1542854ba821374a36d9ee3b37a
 PUBKEY = 0253b4443cb73ac1dbe0d0e31c9db5cdce831280fd94ba9c13eb1ea0791819d70e
 */
 
-export const COMMITMENT_OUTPUTS = (publicKey: string, targetFlagAssetId: string, recipientPublicKey: string): string => {
+export const COMMITMENT_OUTPUTS = (
+  publicKey: string,
+  targetFlagAssetId: string,
+  recipientPublicKey: string
+): { tweak: { scriptPubKey: string; prefix: "c4" | "c5" }; compiledData: string } => {
   /**
    *
    * 20 [hexLE(TARGET_FLAG_ASSET_ID)] 766b6b6351b27500c8696c876700c8696c87916960b27521 [RECEPIENT_PUBKEY] ac68
    *
    * */
-  // const compiledData = "20" + hexLE(targetFlagAssetId) + "766b6b6351b27500c8696c876700c8696c87916960b27521" + recipientPublicKey + "ac68";
-  // return tapRootScriptPubKeyHex(publicKey, compiledData);
-  return "";
+  const compiledData = "20" + hexLE(targetFlagAssetId) + "766b6b6351b27500c8696c876700c8696c87916960b27521" + recipientPublicKey + "ac68";
+  return { tweak: tapRootScriptPubKeyHex(publicKey, compiledData), compiledData };
 };
 
-export const checkTweakedPubkey = (assetId: string, innerPublicKey: string, recipientPublicKey: string, ctxOutputScriptpubkey: string): boolean => {
+export const checkTweakedPubkey = (assetId: string, innerPublicKey: string, recipientPublicKey: string, ctxOutputScriptpubkey: string): CommitmentOutput | undefined => {
   //, btxc: BitmatrixTxCommitment) => {
   try {
-    // const tapRootScriptPubKeyHexValue: string = COMMITMENT_OUTPUTS(innerPublicKey, assetId, recipientPublicKey);
-    // if (ctxOutputScriptpubkey !== tapRootScriptPubKeyHexValue) throw new Error("commitment txouts' scriptpubkey is diffirent from tweaked pubkey");
-    // return ctxOutputScriptpubkey === tapRootScriptPubKeyHexValue;
+    const taprootDatas = COMMITMENT_OUTPUTS(innerPublicKey, assetId, recipientPublicKey);
+    if (taprootDatas.tweak.scriptPubKey !== ctxOutputScriptpubkey) return;
+    return { compiledData: taprootDatas.compiledData, tweakPrefix: taprootDatas.tweak.prefix };
   } catch (err) {
     throw err;
   }
-
-  return true;
 };
