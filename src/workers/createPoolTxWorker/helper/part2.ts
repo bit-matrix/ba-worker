@@ -1,6 +1,6 @@
 import { BmConfig, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
-import { calc1, getRecepientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
+import { calcRecepientValue, getRecepientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
 
 // tx outputs
 export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): string => {
@@ -8,14 +8,14 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
 
   const recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
-  const c1 = calc1(pool, callData.value.quote);
-  const recepientValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(c1) : hexLE(callData.value.token.toString());
+  const recepientValueNumber = calcRecepientValue(pool, callData.value.quote, callData.method);
+  const recepientValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(recepientValueNumber) : hexLE(callData.value.token.toString());
   const recepientScriptPubkey = getRecepientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???
 
   const poolNewQuoteValue = toHex64BE(Number(pool.quote.value) + callData.value.quote);
-  const poolNewTokenValue = toHex64BE(Number(pool.token.value) - c1);
+  const poolNewTokenValue = toHex64BE(Number(pool.token.value) - recepientValueNumber);
 
   // console.log("c1", c1);
   // console.log("recepientValue", recepientValue);
