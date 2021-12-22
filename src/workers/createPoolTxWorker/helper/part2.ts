@@ -23,6 +23,25 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   console.log("poolNewTokenValue", Number(pool.token.value) - c1, poolNewTokenValue);
   console.log("poolNewQuoteValue", Number(pool.quote.value) + callData.value.quote, poolNewQuoteValue);
 
+  console.log(
+    "Output params: poolAssetLE=" +
+      poolAssetLE +
+      ", poolNewTokenValue=" +
+      poolNewTokenValue +
+      ", poolNewQuoteValue=" +
+      poolNewQuoteValue +
+      ", recepientAssetLE=" +
+      recepientAssetLE +
+      ", recepientValue=" +
+      recepientValue +
+      ", recepientScriptPubkey=" +
+      recepientScriptPubkey +
+      ", serviceCommission=" +
+      serviceCommission +
+      ", txFee=" +
+      txFee
+  );
+
   const p2 =
     "08" +
     "01" +
@@ -82,5 +101,6 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "00" +
     "00000000";
 
+  console.log("Output hex: " + p2);
   return p2;
 };

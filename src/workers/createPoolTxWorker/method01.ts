@@ -1,12 +1,14 @@
 import { BmConfig, BmCtxNew, Pool } from "@bitmatrix/models";
+import axios from "axios";
 import { part1 } from "./helper/part1";
 import { part2 } from "./helper/part2";
 import { part3 } from "./helper/part3";
+import { sendRawTransaction } from "./helper/sendRawTransaction";
 
-export const method01 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew) => {
+export const method01 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Promise<string | undefined> => {
   console.log("Pool tx creating on method 01 for ctx new id: " + ctx.commitmentTx.txid);
 
-  const p1: string = part1(pool.unspentTx.txid, ctx.commitmentTx.txid);
+  const p1: string = part1(pool.lastUnspentTx.txid, ctx.commitmentTx.txid);
   // console.log("part1: " + p1);
 
   const p2: string = part2(pool, poolConfig, ctx.callData);
@@ -15,6 +17,14 @@ export const method01 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew) 
   const p3: string = await part3(pool, poolConfig, ctx);
   // console.log("part3: " + p3);
 
-  console.log("************");
-  console.log('./elements-cli sendrawtransaction "' + p1 + p2 + p3 + '"');
+  const txhex = p1 + p2 + p3;
+
+  const poolTxid = await sendRawTransaction(txhex);
+
+  if (poolTxid) {
+    console.log("poolTxid", poolTxid);
+    return poolTxid;
+  }
+
+  return;
 };

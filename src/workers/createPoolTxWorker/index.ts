@@ -6,9 +6,12 @@ import { method02 } from "./method02";
 import { method03 } from "./method03";
 import { method04 } from "./method04";
 
-export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]) => {
+export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]): Promise<string | undefined> => {
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
   if (newCtxs.length === 0) return;
+
+  // TODO
+  // if(pool.sentPtx)  return;
 
   const sortedNewCtxs = newCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
   const ctxNew: BmCtxNew = sortedNewCtxs[0];
@@ -16,17 +19,16 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
 
   const poolConfig: BmConfig = await config(pool.id);
 
+  let ptxid: string | undefined = "";
   if (ctxNew.callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
-    await method01(pool, poolConfig, ctxNew);
+    ptxid = await method01(pool, poolConfig, ctxNew);
   } else if (ctxNew.callData.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
-    await method02(pool, poolConfig, ctxNew);
+    ptxid = await method02(pool, poolConfig, ctxNew);
   } else if (ctxNew.callData.method === CALL_METHOD.ADD_LIQUIDITY) {
-    await method03(pool, poolConfig, ctxNew);
+    ptxid = await method03(pool, poolConfig, ctxNew);
   } else if (ctxNew.callData.method === CALL_METHOD.REMOVE_LIQUIDITY) {
-    await method04(pool, poolConfig, ctxNew);
+    ptxid = await method04(pool, poolConfig, ctxNew);
   }
 
-  // const compiledData = "20" + hexLE(targetFlagAssetId) + "766b6b6351b27500c8696c876700c8696c87916960b27521" + recipientPublicKey + "ac68";
-
-  // TODO
+  return ptxid;
 };

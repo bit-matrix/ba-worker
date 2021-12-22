@@ -78,10 +78,32 @@ calc1(pool, 5000);
 */
 
 /*
+ *    EX
  *    RECEPIENT_SCRIPTPUBKEY calculation:
- *    00 + 20 + SHA256(04 + 01000000 + b2 + 21 + RECEPIENT_PUBKEY + ac) (edited)
+ *    00 + 20 + SHA256(04 + 01000000 + b2 + 21 + RECEPIENT_PUBKEY + ac)
  */
-export const getRecepientScriptPubkey = (recipientPublicKey: string) => "00" + "20" + crypto.sha256v2(WizData.fromHex("04" + "01000000" + "b2" + "21" + recipientPublicKey + "ac"));
+// export const getRecepientScriptPubkey_EX = (recipientPublicKey: string) => "00" + "20" + crypto.sha256v2(WizData.fromHex("04" + "01000000" + "b2" + "21" + recipientPublicKey + "ac"));
+
+/*
+ *    RECEPIENT_SCRIPTPUBKEY calculation:
+ *    0014 + RIPEMD160(SHA256(33-byte-recepient-pubkey))
+ */
+export const getRecepientScriptPubkey = (recipientPublicKey: string) => {
+  // const test_recipientPublicKey = "0268a18e809e07182802a7063e108b850c6085b2d490126807fb52156eb9ab4de4";
+  // const test_spk = "00141c4b12f9f7c51b4a1284346e55722d8a9a5d1de1";
+
+  // console.log("recipientPublicKey", recipientPublicKey);
+
+  const sha256 = crypto.sha256v2(WizData.fromHex(recipientPublicKey));
+  // console.log("sha256", sha256);
+
+  const rip = crypto.ripemd160(WizData.fromHex(sha256)).toString();
+  // console.log("rip", rip);
+
+  const compiledData = "0014" + rip;
+  // console.log("compiledData", compiledData);
+  // console.log("compiledTest", test_spk);
+};
 
 /*
  * tx fee hesaplama:
