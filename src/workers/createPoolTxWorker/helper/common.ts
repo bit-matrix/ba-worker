@@ -27,7 +27,7 @@ export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD)
      * 11. 248000000 - 1000000 = 247000000 *** k
      */
 
-    const a = Math.floor(val / 400);
+    const a = Math.floor(val / 500);
     // console.log("a", a);
     const b = val - a;
     // console.log("b", b);
@@ -69,7 +69,7 @@ export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD)
    * 9. 44674 *16 = 714784 *** i
    * 10. POOL_LBTC_VALUE_LATEST_STATE - 714784 = 285216 *** j
    */
-  const a = Math.floor(val / 400);
+  const a = Math.floor(val / 500);
   // console.log("a", a);
   const b = val - a;
   // console.log("b", b);
