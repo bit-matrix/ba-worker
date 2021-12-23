@@ -79,7 +79,7 @@ export const isNewCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDeta
       );
       return ctx;
     } else {
-      ptxSave(ctx.commitmentTx.txid, bmPtx);
+      await ptxSave(ctx.commitmentTx.txid, bmPtx);
       return bmPtx;
     }
   }
