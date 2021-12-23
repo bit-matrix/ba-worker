@@ -7,7 +7,9 @@ import { sendRawTransaction } from "./helper/sendRawTransaction";
 export const method02 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Promise<string | undefined> => {
   console.log("Pool tx creating on method 02 for ctx new id: " + ctx.commitmentTx.txid);
 
-  const p1: string = part1(pool.lastUnspentTx.txid, ctx.commitmentTx.txid);
+  if (pool.unspentTx === undefined) throw new Error("Unspent ptx yok!!! Nassi geldin buraya 2??");
+
+  const p1: string = part1(pool.unspentTx.txid, ctx.commitmentTx.txid);
   // console.log("part1: " + p1);
 
   const p2: string = part2(pool, poolConfig, ctx.callData);

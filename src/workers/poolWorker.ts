@@ -34,7 +34,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
      *
      **/
     let lastSentPtx: string | undefined = pool.lastSentPtx;
-    if (synced && lastSentPtx === undefined) {
+    if (synced && pool.unspentTx && lastSentPtx === undefined) {
       const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
       lastSentPtx = await createPoolTxWorker(pool, newBlock, newCtxs);
     }
@@ -46,7 +46,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
      **/
     let poolValues: PoolValues | undefined;
     if (newBlock.tx_count > 1) {
-      poolValues = await findNewPtxWorker(pool, newBlock, newTxDetails);
+      poolValues = await findNewPtxWorker(pool, newBlock, newTxDetails, synced);
     }
 
     /**
@@ -67,12 +67,11 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
       newPool.token.value = poolValues.token;
       newPool.lp.value = poolValues.lp;
 
-      newPool.unspentTx = poolValues.unspentTx;
+      newPool.unspentTx = poolValues.unspent ? poolValues.ptxInfo : undefined;
 
-      if (newPool.lastSentPtx === newPool.unspentTx?.txid) newPool.lastSentPtx = undefined;
+      if (newPool.lastSentPtx === poolValues.ptxInfo.txid) newPool.lastSentPtx = undefined;
     }
 
-    // console.log("Pool update: ", newPool);
     const res = await poolUpdate(newPool);
     // console.log(res);
   } catch (error) {
