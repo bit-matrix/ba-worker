@@ -6,44 +6,29 @@ import { calcRecepientValue, getRecepientScriptPubkey, getTxFeeServiceCommission
 export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): string => {
   const poolAssetLE = hexLE(pool.id);
 
-  const recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
+  let recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
   const ctxInputValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
   const recepientValueNumber = calcRecepientValue(pool, ctxInputValue, callData.method);
-  const recepientValue = toHex64BE(recepientValueNumber);
+  let recepientValue = toHex64BE(recepientValueNumber);
   const recepientScriptPubkey = getRecepientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???
 
-  const poolNewQuoteValue =
+  let poolNewQuoteValue =
     callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.quote.value) + callData.value.quote) : toHex64BE(Number(pool.quote.value) - recepientValueNumber);
-  const poolNewTokenValue =
+  let poolNewTokenValue =
     callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.token.value) - recepientValueNumber) : toHex64BE(Number(pool.token.value) + callData.value.token);
 
-  // console.log("c1", c1);
-  // console.log("recepientValue", recepientValue);
-  // console.log("txFee, serviceCommission", txFee, serviceCommission);
-  // console.log("poolNewTokenValue", Number(pool.token.value) - c1, poolNewTokenValue);
-  // console.log("poolNewQuoteValue", Number(pool.quote.value) + callData.value.quote, poolNewQuoteValue);
+  const isOutOfSlippage: boolean = recepientValueNumber < Number(callData.slippageTolerance);
+  if (isOutOfSlippage) {
+    poolNewQuoteValue = toHex64BE(Number(pool.quote.value));
+    poolNewTokenValue = toHex64BE(Number(pool.token.value));
 
-  /* console.log(
-    "Output params: poolAssetLE=" +
-      poolAssetLE +
-      ", poolNewTokenValue=" +
-      poolNewTokenValue +
-      ", poolNewQuoteValue=" +
-      poolNewQuoteValue +
-      ", recepientAssetLE=" +
-      recepientAssetLE +
-      ", recepientValue=" +
-      recepientValue +
-      ", recepientScriptPubkey=" +
-      recepientScriptPubkey +
-      ", serviceCommission=" +
-      serviceCommission +
-      ", txFee=" +
-      txFee
-  ); */
+    recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.quote.asset) : hexLE(pool.token.asset);
+    const recepientValueNumber = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
+    recepientValue = toHex64BE(recepientValueNumber);
+  }
 
   const p2 =
     "08" +
