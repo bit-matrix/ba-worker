@@ -1,5 +1,5 @@
 import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmConfig, BmCtxNew, CallData, CommitmentOutput, Pool } from "@bitmatrix/models";
+import { BmConfig, BmCtxNew, CallData, CALL_METHOD, CommitmentOutput, Pool } from "@bitmatrix/models";
 import { config, ctxNewSave } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { isCtxWorker } from "./isCtxWorker";
@@ -16,24 +16,26 @@ export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
       const newTxDetail = newTxDetails[i];
       const callDataOutputs: { callData: CallData; output: CommitmentOutput } | undefined = await isCtxWorker(pool, poolConfig, newTxDetail);
       if (callDataOutputs) {
-        console.log("Found call data!", callDataOutputs);
+        // console.log("Found call data!", callDataOutputs);
 
         const bmCtxNew: BmCtxNew = { ...callDataOutputs, commitmentTx: { txid: newTxDetail.txid, block_height: newBlock.height, block_hash: newBlock.id } };
         await ctxNewSave(pool.id, bmCtxNew);
+
+        const val =
+          callDataOutputs.callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN
+            ? callDataOutputs.callData.value.quote
+            : CALL_METHOD.SWAP_TOKEN_FOR_QUOTE
+            ? callDataOutputs.callData.value.token
+            : callDataOutputs.callData.value.lp;
         sendTelegramMessage(
-          "Pool: " +
-            pool.id +
-            "\n" +
-            "New ctx: https://db.bitmatrix-aggregate.com/ctx/" +
-            pool.id +
-            "/" +
+          "Commmitment Tx: <code>" +
             bmCtxNew.commitmentTx.txid +
-            " Method: " +
+            "</code>\n" +
+            "Commmitment Data: <b>Method</b>: <code>" +
             callDataOutputs.callData.method +
-            ", value: " +
-            callDataOutputs.callData.value.quote +
-            ", tweak_prefix: " +
-            callDataOutputs.output.tweakPrefix
+            "</code>, <b>Value</b>: <code>" +
+            val +
+            "</code>"
         );
       }
     }
