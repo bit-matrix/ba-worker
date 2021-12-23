@@ -3,17 +3,10 @@ import { BmPtx, BmPtxCtx, Pool, PoolValues } from "@bitmatrix/models";
 import { ctxMempool, ptxCtx, ptxSave } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
-export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[]) => {
-  console.log("Find new ptx worker started");
-
-  // TODO
-  // foreach
-  const newTxDetail = newTxDetails[0];
+export const isPtxWorker = (pool: Pool, newBlock: Block, newTxDetail: TxDetail): PoolValues | undefined => {
+  // console.log("Is ptx worker started");
 
   if (newTxDetail.vout[0].asset !== pool.id) return;
-
-  console.log("Found pool tx!", newTxDetail.txid);
-  sendTelegramMessage("Pool: " + pool.id + "\n" + "New ptx: https://blockstream.info/liquidtestnet/tx/" + newTxDetail.txid);
 
   let poolValues: PoolValues = {
     quote: newTxDetail.vout[3].value?.toString() || pool.quote.value,
@@ -25,13 +18,46 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
       block_height: newBlock.height,
     },
   };
+
+  return poolValues;
+};
+
+export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[]) => {
+  console.log("Find new ptx worker started");
+
+  let poolValues: PoolValues | undefined = undefined;
+  for (let i = 0; i < newTxDetails.length; i++) {
+    if (poolValues === undefined) {
+      const ntx = newTxDetails[i];
+      poolValues = isPtxWorker(pool, newBlock, ntx);
+    } else {
+      break;
+    }
+  }
+
+  if (poolValues === undefined) return;
+
+  // console.log("Found pool tx!", poolValues.unspentTx.txid);
   sendTelegramMessage(
-    "Pool: " + pool.id + "\n" + "New pool values: " + pool.quote.ticker + " = " + poolValues.quote + ", " + pool.token.ticker + " = " + poolValues.token + ", LP = " + poolValues.lp
+    "Pool Tx: <code>" +
+      poolValues.unspentTx.txid +
+      "</code>\n" +
+      "Pool Values: <b>" +
+      pool.quote.ticker +
+      "</b>:<code>" +
+      poolValues.quote +
+      "</code>, <b>" +
+      pool.token.ticker +
+      "</b>:<code>" +
+      poolValues.token +
+      "</code>, <b>LP</b>:<code>" +
+      poolValues.lp +
+      "</code>"
   );
 
-  const bmPtxCtx: BmPtxCtx = await ptxCtx(pool.id, newTxDetail.txid);
+  const bmPtxCtx: BmPtxCtx = await ptxCtx(pool.id, poolValues.unspentTx.txid);
   // console.log("bmPtxCtx: ", pool.id, newTxDetail.txid);
-  console.log("bmPtxCtx: ", bmPtxCtx);
+  // console.log("bmPtxCtx: ", bmPtxCtx);
 
   if (bmPtxCtx) {
     for (let i = 0; i < bmPtxCtx.commitmentTxs.length; i++) {
@@ -44,21 +70,21 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
             callData: ctxMem.callData,
             output: ctxMem.output,
             commitmentTx: ctxMem.commitmentTx,
-            poolTx: { txid: newTxDetail.txid, block_hash: newBlock.id, block_height: newBlock.height },
+            poolTx: { txid: poolValues.unspentTx.txid, block_hash: newBlock.id, block_height: newBlock.height },
           };
 
           await ptxSave(pool.id, bmPtx);
-          sendTelegramMessage("Pool: " + pool.id + "\n" + "ctx spent: https://blockstream.info/liquidtestnet/tx/" + bmPtx.commitmentTx.txid);
+          sendTelegramMessage("Swap completed.\nCommitment txid: <code>" + bmPtx.commitmentTx.txid + "</code>\nPool txid: <code>" + poolValues.unspentTx.txid + "</code>");
         } catch (error) {
-          console.error("ptxSave.error: Ptx: " + newTxDetail.txid + " Ctx: " + ctxid + ". ctxMem: " + ctxMem);
+          console.error("ptxSave.error: Ptx: " + poolValues.unspentTx.txid + " Ctx: " + ctxid + ". ctxMem: " + ctxMem);
           throw error;
         }
       } else {
-        console.warn("Ptx found, ptx-ctxs found but ctxMempool not found!. Ptx: " + newTxDetail.txid + " Ctx: " + ctxid);
+        console.warn("Ptx found, ptx-ctxs found but ctxMempool not found!. Ptx: " + poolValues.unspentTx.txid + " Ctx: " + ctxid);
       }
     }
   } else {
-    console.warn("Ptx found but ptx-ctxs not found!. Ptx: " + newTxDetail.txid);
+    console.warn("Ptx found but ptx-ctxs not found!. Ptx: " + poolValues.unspentTx.txid);
   }
 
   return poolValues;
