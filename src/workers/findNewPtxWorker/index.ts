@@ -6,7 +6,10 @@ import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[]) => {
   console.log("Find new ptx worker started");
 
+  // TODO
+  // foreach
   const newTxDetail = newTxDetails[0];
+
   if (newTxDetail.vout[0].asset !== pool.id) return;
 
   console.log("Found pool tx!", newTxDetail.txid);
@@ -27,6 +30,9 @@ export const findNewPtxWorker = async (pool: Pool, newBlock: Block, newTxDetails
   );
 
   const bmPtxCtx: BmPtxCtx = await ptxCtx(pool.id, newTxDetail.txid);
+  // console.log("bmPtxCtx: ", pool.id, newTxDetail.txid);
+  console.log("bmPtxCtx: ", bmPtxCtx);
+
   if (bmPtxCtx) {
     for (let i = 0; i < bmPtxCtx.commitmentTxs.length; i++) {
       const ctxid = bmPtxCtx.commitmentTxs[i];
