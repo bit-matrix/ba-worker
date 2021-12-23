@@ -24,7 +24,7 @@ const isCtxSpend = async (ctx: BmCtxNew): Promise<BmPtx | undefined> => {
 
 export const isCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDetail: TxDetail, newBlock: Block): Promise<BmCtxNew | undefined> => {
   // console.log("New ctx worker for tx started for pool: " + pool.id + ". newBlockheight: " + newBmBlockInfo.block_height + ", txid: " + newTxDetails.txid);
-  console.log("Is ctx worker started");
+  // console.log("Is ctx worker started");
 
   const callDataBase: CallDataBase | undefined = getCallDataBase(pool.id, newTxDetail);
   if (callDataBase) {
