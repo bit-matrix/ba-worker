@@ -70,7 +70,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
 
       newPool.lastUnspentTx = poolValues.unspentTx;
 
-      if (lastSentPtx === newPool.lastUnspentTx.txid) lastSentPtx = undefined;
+      if (newPool.lastSentPtx === newPool.lastUnspentTx.txid) newPool.lastSentPtx = undefined;
 
       await updateConfirmedCtxMempools(pool.id, newPool.lastUnspentTx.txid, newBlock);
     }
