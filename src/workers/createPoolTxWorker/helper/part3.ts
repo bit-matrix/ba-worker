@@ -10,6 +10,7 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
   // console.log("settlement", settlement);
   const tapscript = ctx.output.compiledData;
   const tapscriptPrefix = ctx.output.tweakPrefix;
+  const tapscriptPrefixBase = tapscriptPrefix === "c4" ? "02" : "03";
 
   const p3 =
     "000002" +
@@ -22,7 +23,8 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
     "2520165cba5c638bab5a923eed64abbfbf7e2b2e932fc308f00804f934bef434ede100c86987" +
     "21c41dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "00000009" +
-    "0103" +
+    "01" +
+    tapscriptPrefixBase +
     "50" +
     settlement[0] + // 1ST_SETTLEMENT //
     "50" +
