@@ -31,7 +31,7 @@ export const sendRawTransaction = async (txHex: string): Promise<any> => {
     });
 
   if (poolTxid && poolTxid.error === null && poolTxid.result && poolTxid.result.length === 64) {
-    return poolTxid.result.length;
+    return poolTxid.result;
   }
 
   console.error("sendRawTransaction.error. poolTxid: ", poolTxid);
