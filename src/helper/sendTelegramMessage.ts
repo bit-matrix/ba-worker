@@ -6,7 +6,7 @@ const BITMATRIX_WATCHTOWER = {
 };
 
 export const sendTelegramMessage = (message: string) => {
-  console.log("sendTelegramMessage", message + "\n ------------- ");
+  console.log("Message", message + "\n ------------- ");
 
   try {
     const url = "https://api.telegram.org/bot2145331675:" + BITMATRIX_WATCHTOWER.token + "/sendMessage?chat_id=" + BITMATRIX_WATCHTOWER.chatId + "&parse_mode=html";
