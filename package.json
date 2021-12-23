@@ -23,7 +23,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@bitmatrix/esplora-api-client": "^0.0.7",
+    "@bitmatrix/esplora-api-client": "^0.0.8",
     "@bitmatrix/models": "^0.0.4",
     "@script-wiz/lib-core": "^0.0.17",
     "@script-wiz/wiz-data": "^1.0.0",
