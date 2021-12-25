@@ -1,6 +1,6 @@
 ## live logs
 
-docker logs -f -n 20 12a42254063c
+docker logs -f -n 20 f84baf512554
 
 ## build
 
