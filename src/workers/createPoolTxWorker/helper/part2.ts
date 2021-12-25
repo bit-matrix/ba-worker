@@ -5,6 +5,9 @@ import { calcRecepientValue, getRecepientScriptPubkey, getTxFeeServiceCommission
 // tx outputs
 export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): string => {
   const poolAssetLE = hexLE(pool.id);
+  const tokenAssetLE = hexLE(pool.token.asset);
+  const lpAssetLE = hexLE(pool.lp.asset);
+  const qouteAssetLE = hexLE(pool.quote.asset);
 
   let recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
@@ -30,6 +33,10 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     recepientValue = toHex64BE(recepientValueNumber);
   }
 
+  const tokenHolderCovenantScriptPubkey: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
+  const lpHolderCovenantScriptPubkey: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
+  const mainHolderCovenantScriptPubkey: string = "512037c891a23b0951555bf631585169edea145649f916a521397facfd7b8ab2b0de";
+
   const p2 =
     "08" +
     "01" +
@@ -40,26 +47,26 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "22" +
     "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55" +
     "01" +
-    "9ea16a72a9c0b3426fff559b42452ca9272dc783f4bce7ef6b9c834624a3ca58" +
+    tokenAssetLE + // "9ea16a72a9c0b3426fff559b42452ca9272dc783f4bce7ef6b9c834624a3ca58" +
     "01" +
     poolNewTokenValue + // 0000000b95828840 // POOL_NEW_TOKEN_VALUE
     "00" +
     "22" +
-    "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
+    tokenHolderCovenantScriptPubkey + // "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
     "01" +
-    "f4a047bf48db3905b941878c9f597cb617c33f5bf783a4c2cd26548a2d8f2c77" +
+    lpAssetLE + // "f4a047bf48db3905b941878c9f597cb617c33f5bf783a4c2cd26548a2d8f2c77" +
     "01" +
     "0000000077356cf0" +
     "00" +
     "22" +
-    "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
+    lpHolderCovenantScriptPubkey + // "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
     "01" +
-    "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
+    qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
     poolNewQuoteValue + // 00000000000f55c8 // POOL_NEW_LBTC_VALUE
     "00" +
     "22" +
-    "5120cffae0ae0d452200dd3566085d44887df51f55a2641f775ed1f32954a4506b36" +
+    mainHolderCovenantScriptPubkey + // "5120cffae0ae0d452200dd3566085d44887df51f55a2641f775ed1f32954a4506b36" +
     "01" +
     recepientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
     "01" +
@@ -68,21 +75,21 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "16" +
     recepientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
     "01" +
-    "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
+    qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
     "0000000000000000" +
     "00" +
     "03" +
     "6a01ff" +
     "01" +
-    "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
+    qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
     serviceCommission + // "_SERVICE_COMISSION_"  // 00000000000005ac
     "00" +
     "16" +
     "0014972ca4efa6bac21a771259e77dafabeeb0acbfe0" +
     "01" +
-    "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
+    qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
     txFee + // "_TX_FEE_" // 00000000000001b6
     "00" +
