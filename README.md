@@ -1,3 +1,7 @@
+## live logs
+
+docker logs -f -n 20 12a42254063c
+
 ## build
 
 docker build -t ba-worker .
