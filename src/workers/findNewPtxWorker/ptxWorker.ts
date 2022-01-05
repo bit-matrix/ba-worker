@@ -28,7 +28,10 @@ export const isPtxWorker = async (pool: Pool, newBlock: Block, newTxDetail: TxDe
 
   // console.log("Found pool tx!", poolValues.unspentTx.txid);
   sendTelegramMessage(
-    "Pool Tx: <code>" +
+    "Pool: " +
+      pool.id +
+      "\n" +
+      "New Pool Tx: <code>" +
       poolValues.ptxInfo.txid +
       "</code>\n" +
       "Pool Values: <b>" +
@@ -58,7 +61,9 @@ export const isPtxWorker = async (pool: Pool, newBlock: Block, newTxDetail: TxDe
           const bmPtx: BmPtx = { ...ctxMem, poolTx: poolValues.ptxInfo };
 
           await ptxSave(pool.id, bmPtx);
-          sendTelegramMessage("Swap completed.\nCommitment txid: <code>" + bmPtx.commitmentTx.txid + "</code>\nPool txid: <code>" + poolValues.ptxInfo.txid + "</code>");
+          sendTelegramMessage(
+            "Pool: " + pool.id + "\n" + "Swap completed.\nCommitment txid: <code>" + bmPtx.commitmentTx.txid + "</code>\nPool txid: <code>" + poolValues.ptxInfo.txid + "</code>"
+          );
         } catch (error) {
           console.error("ptxSave.error: Ptx: " + poolValues.ptxInfo.txid + " Ctx: " + ctxid + ". ctxMem: " + ctxMem);
           throw error;

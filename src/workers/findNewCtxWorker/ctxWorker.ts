@@ -68,10 +68,13 @@ export const isNewCtxWorker = async (pool: Pool, poolConfig: BmConfig, newTxDeta
       const val =
         ctx.callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? ctx.callData.value.quote : CALL_METHOD.SWAP_TOKEN_FOR_QUOTE ? ctx.callData.value.token : ctx.callData.value.lp;
       sendTelegramMessage(
-        "Commmitment Tx: <code>" +
+        "Pool: " +
+          pool.id +
+          "\n" +
+          "New Commitment Tx: <code>" +
           ctx.commitmentTx.txid +
           "</code>\n" +
-          "Commmitment Data: <b>Method</b>: <code>" +
+          "Commitment Data: <b>Method</b>: <code>" +
           ctx.callData.method +
           "</code>, <b>Value</b>: <code>" +
           val +
