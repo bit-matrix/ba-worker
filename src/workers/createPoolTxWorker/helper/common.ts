@@ -7,7 +7,7 @@ export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart
 const quotePrecisionCoefficient = 16;
 const tokenPrecisionCoefficient = 2000000;
 
-export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD, recipientMinus: number) => {
+export const calcRecipientValue = (pool: Pool, val: number, method: CALL_METHOD, recipientValueMinus: number) => {
   if (method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
     /*
      *
@@ -47,7 +47,7 @@ export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD,
     // console.log("i", i);
     const j = Number(pool.token.value) - i;
     // console.log("j", j);
-    const k = j - (pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? 1000000 : 3000000);
+    const k = j - recipientValueMinus;
     // console.log("k", k);
     return k;
   }
@@ -129,13 +129,13 @@ calc1(pool, 5000);
  *    RECEPIENT_SCRIPTPUBKEY calculation:
  *    00 + 20 + SHA256(04 + 01000000 + b2 + 21 + RECEPIENT_PUBKEY + ac)
  */
-// export const getRecepientScriptPubkey_EX = (recipientPublicKey: string) => "00" + "20" + crypto.sha256v2(WizData.fromHex("04" + "01000000" + "b2" + "21" + recipientPublicKey + "ac"));
+// export const getRecipientScriptPubkey_EX = (recipientPublicKey: string) => "00" + "20" + crypto.sha256v2(WizData.fromHex("04" + "01000000" + "b2" + "21" + recipientPublicKey + "ac"));
 
 /*
  *    RECEPIENT_SCRIPTPUBKEY calculation:
- *    0014 + RIPEMD160(SHA256(33-byte-recepient-pubkey))
+ *    0014 + RIPEMD160(SHA256(33-byte-recipient-pubkey))
  */
-export const getRecepientScriptPubkey = (recipientPublicKey: string) => {
+export const getRecipientScriptPubkey = (recipientPublicKey: string) => {
   // const test_recipientPublicKey = "0268a18e809e07182802a7063e108b850c6085b2d490126807fb52156eb9ab4de4";
   // const test_spk = "00141c4b12f9f7c51b4a1284346e55722d8a9a5d1de1";
 

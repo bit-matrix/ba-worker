@@ -1,7 +1,7 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
 import { BmConfig, BmCtxNew, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
-import { getRecepientScriptPubkey, getTxFeeServiceCommission, splitCommitmentTxBaseHex, toHex64BE } from "./common";
+import { getRecipientScriptPubkey, getTxFeeServiceCommission, splitCommitmentTxBaseHex, toHex64BE } from "./common";
 
 // tx outputs
 export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Promise<string> => {

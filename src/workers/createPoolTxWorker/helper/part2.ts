@@ -1,6 +1,6 @@
 import { BmConfig, CallData, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
-import { calcRecepientValue, getRecepientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
+import { calcRecipientValue, getRecipientScriptPubkey, getTxFeeServiceCommission, toHex64BE } from "./common";
 
 // tx outputs
 export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): string => {
@@ -9,29 +9,29 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   const lpAssetLE = hexLE(pool.lp.asset);
   const qouteAssetLE = hexLE(pool.quote.asset);
 
-  let recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
+  let recipientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
   const ctxInputValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
-  const recepientValueNumber = calcRecepientValue(pool, ctxInputValue, callData.method, 1000000);
-  let recepientValue = toHex64BE(recepientValueNumber);
-  const recepientScriptPubkey = getRecepientScriptPubkey(callData.recipientPublicKey);
+  const recipientValueNumber = calcRecipientValue(pool, ctxInputValue, callData.method, 1000000);
+  let recipientValue = toHex64BE(recipientValueNumber);
+  const recipientScriptPubkey = getRecipientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???
 
   let poolNewQuoteValue =
-    callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.quote.value) + callData.value.quote) : toHex64BE(Number(pool.quote.value) - recepientValueNumber);
+    callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.quote.value) + callData.value.quote) : toHex64BE(Number(pool.quote.value) - recipientValueNumber);
   let poolNewTokenValue =
-    callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.token.value) - recepientValueNumber) : toHex64BE(Number(pool.token.value) + callData.value.token);
+    callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.token.value) - recipientValueNumber) : toHex64BE(Number(pool.token.value) + callData.value.token);
   let poolNewLPValue = toHex64BE(Number(pool.lp.value));
 
-  const isOutOfSlippage: boolean = recepientValueNumber < Number(callData.slippageTolerance);
+  const isOutOfSlippage: boolean = recipientValueNumber < Number(callData.slippageTolerance);
   if (isOutOfSlippage) {
     poolNewQuoteValue = toHex64BE(Number(pool.quote.value));
     poolNewTokenValue = toHex64BE(Number(pool.token.value));
 
-    recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.quote.asset) : hexLE(pool.token.asset);
-    const recepientValueNumber = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
-    recepientValue = toHex64BE(recepientValueNumber);
+    recipientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.quote.asset) : hexLE(pool.token.asset);
+    const recipientValueNumber = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
+    recipientValue = toHex64BE(recipientValueNumber);
   }
 
   // db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3
@@ -82,12 +82,12 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "22" +
     mainHolderCovenantScriptPubkey + // "5120cffae0ae0d452200dd3566085d44887df51f55a2641f775ed1f32954a4506b36" +
     "01" +
-    recepientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
+    recipientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
     "01" +
-    recepientValue + // "RECEPIENT_VALUE" // 000000000eb8ebc0
+    recipientValue + // "RECEPIENT_VALUE" // 000000000eb8ebc0
     "00" +
     "16" +
-    recepientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
+    recipientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
     "01" +
     qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
