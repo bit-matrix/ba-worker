@@ -22,6 +22,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.quote.value) + callData.value.quote) : toHex64BE(Number(pool.quote.value) - recepientValueNumber);
   let poolNewTokenValue =
     callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? toHex64BE(Number(pool.token.value) - recepientValueNumber) : toHex64BE(Number(pool.token.value) + callData.value.token);
+  let poolNewLPValue = toHex64BE(Number(pool.lp.value));
 
   const isOutOfSlippage: boolean = recepientValueNumber < Number(callData.slippageTolerance);
   if (isOutOfSlippage) {
@@ -33,9 +34,22 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     recepientValue = toHex64BE(recepientValueNumber);
   }
 
-  const tokenHolderCovenantScriptPubkey: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
-  const lpHolderCovenantScriptPubkey: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
-  const mainHolderCovenantScriptPubkey: string = "512037c891a23b0951555bf631585169edea145649f916a521397facfd7b8ab2b0de";
+  // db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3
+  const tokenHolderCovenantScriptPubkey_0: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
+  const lpHolderCovenantScriptPubkey_0: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
+  const mainHolderCovenantScriptPubkey_0: string = "512037c891a23b0951555bf631585169edea145649f916a521397facfd7b8ab2b0de";
+
+  // ece73cb2f0b240dd6772898215ead8266383dafb76672e9d6bbbdcd772a55a5f
+  const tokenHolderCovenantScriptPubkey_1: string = "5120eb2a03f2a4c60ba70d07623e444166f90eaf693d1177712bac621f28d933ebea";
+  const lpHolderCovenantScriptPubkey_1: string = "5120eb2a03f2a4c60ba70d07623e444166f90eaf693d1177712bac621f28d933ebea";
+  const mainHolderCovenantScriptPubkey_1: string = "5120470629e65cc4e11bfb0883246325575894993eaf8b6b152c67e823981ff766e4";
+
+  const tokenHolderCovenantScriptPubkey: string =
+    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? tokenHolderCovenantScriptPubkey_0 : tokenHolderCovenantScriptPubkey_1;
+  const lpHolderCovenantScriptPubkey: string =
+    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? lpHolderCovenantScriptPubkey_0 : lpHolderCovenantScriptPubkey_1;
+  const mainHolderCovenantScriptPubkey: string =
+    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? mainHolderCovenantScriptPubkey_0 : mainHolderCovenantScriptPubkey_1;
 
   const p2 =
     "08" +
@@ -56,7 +70,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "01" +
     lpAssetLE + // "f4a047bf48db3905b941878c9f597cb617c33f5bf783a4c2cd26548a2d8f2c77" +
     "01" +
-    "0000000077356cf0" +
+    poolNewLPValue + // "0000000077356cf0" +
     "00" +
     "22" +
     lpHolderCovenantScriptPubkey + // "5120600f3c5efcfe1cb0bd7039af754347255d4146a1b32ed603bc1021f23b85a6d7" +
