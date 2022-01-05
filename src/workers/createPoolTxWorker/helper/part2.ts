@@ -12,7 +12,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   let recipientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
   const ctxInputValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
-  const recipientValueNumber = calcRecipientValue(pool, ctxInputValue, callData.method, 1000000);
+  const recipientValueNumber = calcRecipientValue(pool, ctxInputValue, callData.method, poolConfig.recipientValueMinus);
   let recipientValue = toHex64BE(recipientValueNumber);
   const recipientScriptPubkey = getRecipientScriptPubkey(callData.recipientPublicKey);
 
@@ -34,22 +34,9 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     recipientValue = toHex64BE(recipientValueNumber);
   }
 
-  // db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3
-  const tokenHolderCovenantScriptPubkey_0: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
-  const lpHolderCovenantScriptPubkey_0: string = "512008a6b29465d1a82023e8d6317fb114d6b8e0e21f574c9fc7947c99bbdd0ba087";
-  const mainHolderCovenantScriptPubkey_0: string = "512037c891a23b0951555bf631585169edea145649f916a521397facfd7b8ab2b0de";
-
-  // ece73cb2f0b240dd6772898215ead8266383dafb76672e9d6bbbdcd772a55a5f
-  const tokenHolderCovenantScriptPubkey_1: string = "5120eb2a03f2a4c60ba70d07623e444166f90eaf693d1177712bac621f28d933ebea";
-  const lpHolderCovenantScriptPubkey_1: string = "5120eb2a03f2a4c60ba70d07623e444166f90eaf693d1177712bac621f28d933ebea";
-  const mainHolderCovenantScriptPubkey_1: string = "5120470629e65cc4e11bfb0883246325575894993eaf8b6b152c67e823981ff766e4";
-
-  const tokenHolderCovenantScriptPubkey: string =
-    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? tokenHolderCovenantScriptPubkey_0 : tokenHolderCovenantScriptPubkey_1;
-  const lpHolderCovenantScriptPubkey: string =
-    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? lpHolderCovenantScriptPubkey_0 : lpHolderCovenantScriptPubkey_1;
-  const mainHolderCovenantScriptPubkey: string =
-    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? mainHolderCovenantScriptPubkey_0 : mainHolderCovenantScriptPubkey_1;
+  const tokenHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.token;
+  const lpHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.lp;
+  const mainHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.main;
 
   const p2 =
     "08" +
