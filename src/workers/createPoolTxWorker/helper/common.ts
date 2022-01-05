@@ -47,7 +47,7 @@ export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD)
     // console.log("i", i);
     const j = Number(pool.token.value) - i;
     // console.log("j", j);
-    const k = j - 1000000;
+    const k = j - (pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? 1000000 : 3000000);
     // console.log("k", k);
     return k;
   }
