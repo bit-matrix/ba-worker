@@ -12,7 +12,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   let recepientAssetLE = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? hexLE(pool.token.asset) : hexLE(pool.quote.asset);
 
   const ctxInputValue = callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN ? callData.value.quote : callData.value.token;
-  const recepientValueNumber = calcRecepientValue(pool, ctxInputValue, callData.method);
+  const recepientValueNumber = calcRecepientValue(pool, ctxInputValue, callData.method, 1000000);
   let recepientValue = toHex64BE(recepientValueNumber);
   const recepientScriptPubkey = getRecepientScriptPubkey(callData.recipientPublicKey);
 

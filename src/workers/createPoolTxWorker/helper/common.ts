@@ -7,7 +7,7 @@ export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart
 const quotePrecisionCoefficient = 16;
 const tokenPrecisionCoefficient = 2000000;
 
-export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD) => {
+export const calcRecepientValue = (pool: Pool, val: number, method: CALL_METHOD, recipientMinus: number) => {
   if (method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
     /*
      *
