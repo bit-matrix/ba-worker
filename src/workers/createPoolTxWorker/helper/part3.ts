@@ -14,6 +14,17 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
   const tapscriptPrefix = ctx.output.tweakPrefix;
   const tapscriptPrefixBase = tapscriptPrefix === "c4" ? "02" : "03";
 
+  const tokenHolderCovenantControlBlockPrefix_0: string = "c5";
+  const lpHolderCovenantControlBlockPrefix_0: string = "c5";
+
+  const tokenHolderCovenantControlBlockPrefix_1: string = "c4";
+  const lpHolderCovenantControlBlockPrefix_1: string = "c4";
+
+  const tokenHolderCovenantControlBlockPrefix: string =
+    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? tokenHolderCovenantControlBlockPrefix_0 : tokenHolderCovenantControlBlockPrefix_1;
+  const lpHolderCovenantControlBlockPrefix: string =
+    pool.id === "db7a0fa02b9649bb70d084f24412028a8b4157c91d07715a56870a161f041cb3" ? lpHolderCovenantControlBlockPrefix_0 : lpHolderCovenantControlBlockPrefix_1;
+
   const p3 =
     "000002" +
     "34cd008800c7010088040000000088767651c70100880401000000888852c70100880402000000888853c701008804030000008887" +
@@ -22,12 +33,16 @@ export const part3 = async (pool: Pool, poolConfig: BmConfig, ctx: BmCtxNew): Pr
     "2520" +
     poolAssetLE + // "165cba5c638bab5a923eed64abbfbf7e2b2e932fc308f00804f934bef434ede1" +
     "00c86987" +
-    "21c51dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
+    "21" +
+    tokenHolderCovenantControlBlockPrefix +
+    "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "00000002" +
     "2520" +
     poolAssetLE + // "165cba5c638bab5a923eed64abbfbf7e2b2e932fc308f00804f934bef434ede1" +
     "00c86987" +
-    "21c51dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
+    "21" +
+    lpHolderCovenantControlBlockPrefix +
+    "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624" +
     "00000009" +
     "01" +
     tapscriptPrefixBase +
