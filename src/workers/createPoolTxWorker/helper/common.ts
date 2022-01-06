@@ -94,12 +94,12 @@ export const calcRecipientValue = (pool: Pool, val: number, method: CALL_METHOD,
 };
 
 export const calcRecipientValueB = (pool: Pool, valQuote: number, valToken: number) => {
-  let user_provided_remaining_lbtc_supply = valQuote;
-  user_provided_remaining_lbtc_supply = Math.floor(user_provided_remaining_lbtc_supply / 16);
+  const user_provided_remaining_lbtc_supply = valQuote;
+  const user_provided_remaining_lbtc_supply_16 = Math.floor(user_provided_remaining_lbtc_supply / 16);
 
   const pool_lp_supply = Number(pool.lp.value);
   const pool_lp_circulation = 2000000000 - pool_lp_supply;
-  const mul_circ = user_provided_remaining_lbtc_supply * pool_lp_circulation;
+  const mul_circ = user_provided_remaining_lbtc_supply_16 * pool_lp_circulation;
   const pool_lbtc_supply = Number(pool.quote.value);
   const pool_lbtc_supply_down = Math.floor(pool_lbtc_supply / 16);
 
