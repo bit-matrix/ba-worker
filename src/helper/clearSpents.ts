@@ -3,7 +3,7 @@ import { ctxNewDelete } from "../business/db-client";
 import { BmCtxNew, Pool } from "@bitmatrix/models";
 
 export const clearCtxSpents = async (pool: Pool, ctxs: BmCtxNew[]): Promise<BmCtxNew[]> => {
-  let newCtxs = [...ctxs];
+  let newCtxs = [];
 
   for (let i = 0; i < ctxs.length; i++) {
     const ctx = ctxs[i];
@@ -12,7 +12,8 @@ export const clearCtxSpents = async (pool: Pool, ctxs: BmCtxNew[]): Promise<BmCt
 
     if (outSpend.spent) {
       await ctxNewDelete(pool.id, ctx.commitmentTx.txid);
-      newCtxs.splice(i, 1);
+    } else {
+      newCtxs.push(ctx);
     }
   }
 
