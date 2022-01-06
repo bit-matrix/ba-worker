@@ -30,12 +30,12 @@ export const ctxNew = (asset: string, ctxid: string): Promise<BmCtxNew[]> =>
       throw res.message;
     });
 
-export const ctxSpentClear = (asset: string, ctxid: string): Promise<void> =>
+export const ctxNewDelete = (asset: string, ctxid: string): Promise<void> =>
   axios
     .delete<void>(DB_URL + "ctx/" + asset + "/" + ctxid)
     .then((res) => res.data)
     .catch((res) => {
-      console.error("ctxSpentClear", res);
+      console.error("ctxNewDelete", res);
       throw res.message;
     });
 
