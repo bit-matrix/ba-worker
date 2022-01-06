@@ -115,11 +115,11 @@ export const calcRecipientValueB = (pool: Pool, valQuote: number, valToken: numb
 
   const user_lp_received = Math.min(user_lp_receiving_1, user_lp_receiving_2);
 
-  const newPoolQuoteValue = pool_lbtc_supply + user_provided_remaining_lbtc_supply;
-  const newPoolTokenValue = pool_token_supply + user_provided_token_supply;
-  const newPoolLpValue = pool_lp_supply - user_lp_received;
+  const newPoolQuoteValue = toHex64BE(pool_lbtc_supply + user_provided_remaining_lbtc_supply);
+  const newPoolTokenValue = toHex64BE(pool_token_supply + user_provided_token_supply);
+  const newPoolLpValue = toHex64BE(pool_lp_supply - user_lp_received);
 
-  return { user_lp_received, newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
+  return { user_lp_received: toHex64BE(user_lp_received), newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
 };
 
 /* 

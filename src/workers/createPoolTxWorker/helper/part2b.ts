@@ -13,7 +13,6 @@ export const part2b = (pool: Pool, poolConfig: BmConfig, callData: CallData): st
 
   let recipientAssetLE = hexLE(pool.lp.asset);
   const { user_lp_received, newPoolQuoteValue, newPoolTokenValue, newPoolLpValue } = calcRecipientValueB(pool, callData.value.quote, callData.value.token);
-  let recipientValue = toHex64BE(user_lp_received);
   const recipientScriptPubkey = getRecipientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???
@@ -55,7 +54,7 @@ export const part2b = (pool: Pool, poolConfig: BmConfig, callData: CallData): st
     "01" +
     recipientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
     "01" +
-    recipientValue + // "RECEPIENT_VALUE" // 000000000eb8ebc0
+    user_lp_received + // "RECEPIENT_VALUE" // 000000000eb8ebc0
     "00" +
     "16" +
     recipientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
