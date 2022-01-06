@@ -30,6 +30,15 @@ export const ctxNew = (asset: string, ctxid: string): Promise<BmCtxNew[]> =>
       throw res.message;
     });
 
+export const ctxSpentClear = (asset: string, ctxid: string): Promise<void> =>
+  axios
+    .delete<void>(DB_URL + "ctx/" + asset + "/" + ctxid)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxSpentClear", res);
+      throw res.message;
+    });
+
 export const ctxsMempool = (asset: string): Promise<BmCtxMempool[]> =>
   axios
     .get<BmCtxMempool[]>(DB_URL + "ctx/" + asset + "?mempool=true")
