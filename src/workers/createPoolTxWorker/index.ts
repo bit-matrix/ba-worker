@@ -8,13 +8,13 @@ import { method04 } from "./method04";
 
 export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]): Promise<string | undefined> => {
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
-  const filteredNewCtxs = newCtxs.filter((c) => c.callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN || c.callData.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE);
-  if (filteredNewCtxs.length === 0) return;
+
+  if (newCtxs.length === 0) return;
 
   // TODO
   // if(pool.sentPtx)  return;
 
-  const sortedNewCtxs = filteredNewCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
+  const sortedNewCtxs = newCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
   const ctxNew: BmCtxNew = sortedNewCtxs[0];
   console.log("bestCtx for pool tx: ", ctxNew.commitmentTx.txid);
 
@@ -28,7 +28,7 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   } else if (ctxNew.callData.method === CALL_METHOD.ADD_LIQUIDITY) {
     ptxid = await method03(pool, poolConfig, ctxNew);
   } else if (ctxNew.callData.method === CALL_METHOD.REMOVE_LIQUIDITY) {
-    ptxid = await method04(pool, poolConfig, ctxNew);
+    // ptxid = await method04(pool, poolConfig, ctxNew);
   }
 
   if (ptxid) await ctxMempoolSave(pool.id, { callData: ctxNew.callData, output: ctxNew.output, commitmentTx: ctxNew.commitmentTx, poolTxid: ptxid });

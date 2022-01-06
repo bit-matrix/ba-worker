@@ -93,6 +93,35 @@ export const calcRecipientValue = (pool: Pool, val: number, method: CALL_METHOD,
   // }
 };
 
+export const calcRecipientValueB = (pool: Pool, valQuote: number, valToken: number) => {
+  let user_provided_remaining_lbtc_supply = valQuote;
+  user_provided_remaining_lbtc_supply = Math.floor(user_provided_remaining_lbtc_supply / 16);
+
+  const pool_lp_supply = Number(pool.lp.value);
+  const pool_lp_circulation = 2000000000 - pool_lp_supply;
+  const mul_circ = user_provided_remaining_lbtc_supply * pool_lp_circulation;
+  const pool_lbtc_supply = Number(pool.quote.value);
+  const pool_lbtc_supply_down = Math.floor(pool_lbtc_supply / 16);
+
+  const user_lp_receiving_1 = Math.floor(mul_circ / pool_lbtc_supply_down);
+
+  const user_provided_token_supply = valToken;
+  const user_provided_token_supply_down = Math.floor(user_provided_token_supply / 2000000);
+  const mul_circ2 = user_provided_token_supply_down * pool_lp_circulation;
+  const pool_token_supply = Number(pool.token.value);
+  const pool_token_supply_down = Math.floor(pool_token_supply / 2000000);
+
+  const user_lp_receiving_2 = Math.floor(mul_circ2 / pool_token_supply_down);
+
+  const user_lp_received = Math.min(user_lp_receiving_1, user_lp_receiving_2);
+
+  const newPoolQuoteValue = pool_lbtc_supply + user_provided_remaining_lbtc_supply;
+  const newPoolTokenValue = pool_token_supply + user_provided_token_supply;
+  const newPoolLpValue = pool_lp_supply - user_lp_received;
+
+  return { user_lp_received, newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
+};
+
 /* 
 toHex64BE = (a) => Number(a).toString(16).padStart(16, "0");
 pool = {quote:{value:1005000}, token:{value:49753000000}};
