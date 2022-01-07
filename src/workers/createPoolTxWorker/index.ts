@@ -11,9 +11,6 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
 
   if (newCtxs.length === 0) return;
 
-  // TODO
-  // if(pool.sentPtx)  return;
-
   const sortedNewCtxs = newCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
   const ctxNew: BmCtxNew = sortedNewCtxs[0];
   console.log("bestCtx for pool tx: ", ctxNew.commitmentTx.txid);
