@@ -25,7 +25,7 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   } else if (ctxNew.callData.method === CALL_METHOD.ADD_LIQUIDITY) {
     ptxid = await method03(pool, poolConfig, ctxNew);
   } else if (ctxNew.callData.method === CALL_METHOD.REMOVE_LIQUIDITY) {
-    // ptxid = await method04(pool, poolConfig, ctxNew);
+    ptxid = await method04(pool, poolConfig, ctxNew);
   }
 
   if (ptxid) await ctxMempoolSave(pool.id, { callData: ctxNew.callData, output: ctxNew.output, commitmentTx: ctxNew.commitmentTx, poolTxid: ptxid });

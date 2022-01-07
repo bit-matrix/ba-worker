@@ -122,6 +122,34 @@ export const calcRecipientValueB = (pool: Pool, valQuote: number, valToken: numb
   return { user_lp_received: toHex64BE(user_lp_received), newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
 };
 
+export const calcRecipientValueC = (pool: Pool, valLp: number) => {
+  const user_lp_input = valLp;
+  const pool_lbtc_supply = Number(pool.quote.value);
+  const pool_token_supply = Number(pool.token.value);
+  const pool_lp_supply = Number(pool.lp.value);
+
+  const pool_lbtc_supply_down = Math.floor(pool_lbtc_supply / 16);
+  const mul_1 = user_lp_input * pool_lbtc_supply_down;
+  const lp_circ = 2000000000 - pool_lp_supply;
+  const div_1 = Math.floor(mul_1 / lp_circ);
+
+  const user_lbtc_received = div_1 * 16;
+
+  const pool_token_supply_down = Math.floor(pool_token_supply / 2000000);
+
+  const mul_2 = user_lp_input * pool_token_supply_down;
+  const div_2 = Math.floor(mul_2 / lp_circ);
+  const user_token_received = div_2 * 2000000;
+
+  //
+
+  const newPoolQuoteValue = toHex64BE(pool_lbtc_supply - user_lbtc_received);
+  const newPoolTokenValue = toHex64BE(pool_token_supply - user_token_received);
+  const newPoolLpValue = toHex64BE(pool_lp_supply + user_lp_input);
+
+  return { user_quote_received: toHex64BE(user_lbtc_received), user_token_received: toHex64BE(user_token_received), newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
+};
+
 /* 
 toHex64BE = (a) => Number(a).toString(16).padStart(16, "0");
 pool = {quote:{value:1005000}, token:{value:49753000000}};
