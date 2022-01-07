@@ -1,6 +1,7 @@
 import { Block, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { BmCtxNew, Pool, PoolValues } from "@bitmatrix/models";
 import { ctxsNew, poolUpdate } from "../business/db-client";
+import { clearCtxSpents } from "../helper/clearSpents";
 import { createPoolTxWorker } from "./createPoolTxWorker";
 import { findNewCtxWorker } from "./findNewCtxWorker";
 import { findNewPtxWorker } from "./findNewPtxWorker";
@@ -35,7 +36,8 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
      **/
     let lastSentPtx: string | undefined = pool.lastSentPtx;
     if (synced && pool.unspentTx && lastSentPtx === undefined) {
-      const newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
+      let newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
+      newCtxs = await clearCtxSpents(pool, newCtxs);
       lastSentPtx = await createPoolTxWorker(pool, newBlock, newCtxs);
     }
 
