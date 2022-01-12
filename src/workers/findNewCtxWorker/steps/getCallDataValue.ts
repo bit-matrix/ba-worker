@@ -26,10 +26,12 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       // 3.1. check second commitment output asset id is LBTC
       if (tx.vout[2].asset !== pool.quote.asset) return; // throw new Error("second commitment output asset is not LBTC");
       // 3.2. check second commitment output value is equal to service commission (650)
-      if (tx.vout[2].value !== config.serviceFee.number) return; // throw new Error("second commitment output value is not equal to " + Number(config.serviceFee.number));
-      // 3.2. check first commitment output value - base_fee - ordering_fee is gte remaining_supply
-      result.quote = (tx.vout[1].value || 0) - config.baseFee.number - callDataBase.orderingFee;
-      if (result.quote < config.minRemainingSupply) return; // throw new Error("first commitment output value is not enough");
+      // if (tx.vout[2].value !== config.serviceFee.number) return; // throw new Error("second commitment output value is not equal to " + Number(config.serviceFee.number));
+      // 3.2. check first commitment outputs sum values - base_fee - config.serviceFee.number - ordering_fee is gte remaining_supply
+      const user_lbtc_supply: number = (tx.vout[1].value || 0) + (tx.vout[2].value || 0);
+      const user_lbtc_supply_available: number = user_lbtc_supply - config.serviceFee.number - config.baseFee.number - callDataBase.orderingFee;
+      if (user_lbtc_supply_available < config.minRemainingSupply) return; // throw new Error("first commitment output value is not enough");
+      result.quote = user_lbtc_supply_available;
     }
 
     // 4. SWAP_TOKEN_FOR_LBTC
