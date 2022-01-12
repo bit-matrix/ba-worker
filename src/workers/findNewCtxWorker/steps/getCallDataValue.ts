@@ -39,8 +39,9 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       // 4.1. check second commitment output’s asset is token asset
       if (tx.vout[2].asset !== pool.token.asset) return; // throw new Error("second commitment output's asset is not token asset");
       // 4.2. check second commitment output’s value is gte token min value (50000000)
-      result.token = tx.vout[2].value || 0;
-      if (result.token < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      const user_token_supply: number = tx.vout[2].value || 0;
+      if (user_token_supply < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      result.token = user_token_supply;
       // 4.3. check first commitment output value is equal to base_fee + service_commission + ordering_fee
       if (tx.vout[1].value !== config.baseFee.number + config.serviceFee.number + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to token value");
     }
