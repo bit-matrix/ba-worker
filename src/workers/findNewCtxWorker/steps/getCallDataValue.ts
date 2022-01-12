@@ -45,17 +45,22 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       // 4.3. check first commitment output value is equal to base_fee + service_commission + ordering_fee
       if (tx.vout[1].value !== config.baseFee.number + config.serviceFee.number + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to token value");
     }
+
     // 5. ADD_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.ADD_LIQUIDITY) {
       // 5.1. check second commitment output’s asset is token asset
       if (tx.vout[2].asset !== pool.token.asset) return; //throw new Error("second commitment output's asset is not token asset");
       // 5.2. check second commitment output’s value is gte token min value (50000000)
-      result.token = tx.vout[2].value || 0;
-      if (result.token < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      const user_token_supply: number = tx.vout[2].value || 0;
+      if (user_token_supply < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
+      result.token = user_token_supply;
       // 5.3. check first commitment output value - base_fee - service_commission - ordering_fee is gte min_remaining_supply
-      result.quote = (tx.vout[1].value || 0) - config.baseFee.number - config.serviceFee.number - callDataBase.orderingFee;
-      if (result.quote < config.minRemainingSupply) return; //throw new Error("first commitment output value is not enough");
+      const user_lbtc_supply: number = tx.vout[1].value || 0;
+      const user_lbtc_supply_available: number = user_lbtc_supply - config.baseFee.number - config.serviceFee.number - callDataBase.orderingFee;
+      if (user_lbtc_supply_available < config.minRemainingSupply) return; //throw new Error("first commitment output value is not enough");
+      result.quote = user_lbtc_supply;
     }
+
     // 6. REMOVE_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.REMOVE_LIQUIDITY) {
       // 6.1. check second commitment output’s asset is LP asset
