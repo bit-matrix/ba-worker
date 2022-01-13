@@ -77,6 +77,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     "00" +
     "16" +
     recipientScriptPubkey + // "RECEPIENT_SCRIPTPUBKEY" // 002062b5685478a2648d2d2eac4588fd5e8b51d9bdc34ebf942aa3310575a6227d52
+    // new
     "01" +
     recipientAssetLE + // "RECEPIENT_ASSET_ID_REVERSE (L-BTC or TOKEN)" // 25d02aa3a6b673eefaaff069a84d32607f8756116b52520823bc3af84dbc3c21
     "01" +
@@ -91,6 +92,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
     // "00" +
     // "03" +
     // "6a01ff" +
+    // new
     "01" +
     qouteAssetLE + // "499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c14" +
     "01" +
