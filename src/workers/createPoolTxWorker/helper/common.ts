@@ -149,7 +149,14 @@ export const calcRecipientValueC = (pool: Pool, valLp: number) => {
   const newPoolTokenValue = toHex64BE(pool_token_supply - user_token_received);
   const newPoolLpValue = toHex64BE(pool_lp_supply + user_lp_input);
 
-  return { user_quote_received: toHex64BE(user_lbtc_received), user_token_received: toHex64BE(user_token_received), newPoolQuoteValue, newPoolTokenValue, newPoolLpValue };
+  return {
+    user_quote_received_number: user_lbtc_received,
+    user_quote_received: toHex64BE(user_lbtc_received),
+    user_token_received: toHex64BE(user_token_received),
+    newPoolQuoteValue,
+    newPoolTokenValue,
+    newPoolLpValue,
+  };
 };
 
 /* 

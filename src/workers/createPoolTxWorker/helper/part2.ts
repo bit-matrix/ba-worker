@@ -28,7 +28,7 @@ export const part2 = (pool: Pool, poolConfig: BmConfig, callData: CallData): str
   const user_token_received_first_half_number: number = Math.floor(recipientValueNumber / 2);
   const user_token_received_second_half_numner: number = recipientValueNumber - user_token_received_first_half_number;
 
-  if (user_token_received_first_half_number < 500) throw new Error("user_token_received_first_half_number is not enough");
+  if (user_token_received_first_half_number < 500) throw new Error("user_token_received_first_half_number is not gte 500");
 
   const user_token_received_first_half = toHex64BE(user_token_received_first_half_number);
   const user_token_received_second_half = toHex64BE(user_token_received_second_half_numner);

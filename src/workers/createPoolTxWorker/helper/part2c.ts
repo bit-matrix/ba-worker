@@ -13,7 +13,12 @@ export const part2c = (pool: Pool, poolConfig: BmConfig, callData: CallData): st
 
   const recipientAssetLE_1 = qouteAssetLE;
   const recipientAssetLE_2 = tokenAssetLE;
-  const { user_quote_received, user_token_received, newPoolQuoteValue, newPoolTokenValue, newPoolLpValue } = calcRecipientValueC(pool, callData.value.lp);
+  const { user_quote_received_number, user_quote_received, user_token_received, newPoolQuoteValue, newPoolTokenValue, newPoolLpValue } = calcRecipientValueC(
+    pool,
+    callData.value.lp
+  );
+  if (user_quote_received_number < 500) throw new Error("user_quote_received_number is not gte 500");
+
   const recipientScriptPubkey = getRecipientScriptPubkey(callData.recipientPublicKey);
 
   const { txFee, serviceCommission } = getTxFeeServiceCommission(poolConfig.baseFee.number, poolConfig.serviceFee.number, callData.orderingFee); //  438, 1452   ???

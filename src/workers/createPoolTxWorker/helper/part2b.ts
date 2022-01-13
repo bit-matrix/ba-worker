@@ -17,7 +17,7 @@ export const part2b = (pool: Pool, poolConfig: BmConfig, callData: CallData): st
     callData.value.quote,
     callData.value.token
   );
-  if (user_lp_received < 2) throw new Error("user_token_received_first_half_number is not enough");
+  if (user_lp_received < 2) throw new Error("user_lp_received is not gte 2");
 
   const recipientScriptPubkey = getRecipientScriptPubkey(callData.recipientPublicKey);
 
