@@ -1,4 +1,5 @@
 import { BmConfig, CallData, Pool } from "@bitmatrix/models";
+import { toHex64BE } from "./common";
 
 export const calculateUserRecipientDatas = (
   pool: Pool,
@@ -44,7 +45,19 @@ export const calculateServiceCommissionValueHexTxFeeValueHex = (
   const orderingFees: number[] = callDatas.map((c) => c.orderingFee);
   const result: { serviceCommissionValueHex: string; txFeeValueHex: string } = { serviceCommissionValueHex: "", txFeeValueHex: "" };
 
-  // TODO
+  // sum base fee +  all ordering fees
+  const totalFee = baseFee + orderingFees.reduce((p, c) => p + c, 0);
+
+  const x = Math.floor(totalFee / 3);
+  const txFeeValue = Math.floor(x + (2 * x) / (16 * callDatas.length));
+  const txFeeValueHex = toHex64BE(txFeeValue);
+
+  const remainingTxFee = totalFee - txFeeValue;
+  const serviceCommissionValue = serviceFee + remainingTxFee;
+  const serviceCommissionValueHex = toHex64BE(serviceCommissionValue);
+
+  result.txFeeValueHex = txFeeValueHex;
+  result.serviceCommissionValueHex = serviceCommissionValueHex;
 
   return result;
 };
