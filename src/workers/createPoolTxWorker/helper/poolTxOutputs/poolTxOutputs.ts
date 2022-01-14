@@ -20,7 +20,16 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
    * TODO
    */
 
-  const userRecipientDatas = calculateUserRecipientDatas(pool, poolConfig, callDatas);
+  const userRecipientDatas = calculateUserRecipientDatas(
+    qouteAssetLE,
+    tokenAssetLE,
+    lpAssetLE,
+    Number(pool.quote.value),
+    Number(pool.token.value),
+    Number(pool.lp.value),
+    poolConfig,
+    callDatas
+  );
 
   const { newPoolTokenValueHex, newPoolLpValueHex, newPoolQuoteValueHex } = calculateNewPoolValues();
 
@@ -50,7 +59,7 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
     newPoolQuoteValueHex
   );
 
-  const usersRecipientTxOutputsEncoded = usersRecipientTxOutputs(userRecipientDatas);
+  const usersRecipientTxOutputsEncoded = usersRecipientTxOutputs(userRecipientDatas.userRecipients);
 
   const serviceCommissionTxOutputEncoded = serviceCommissionTxOutput(pool.quote.asset, serviceCommissionValueHex);
 
