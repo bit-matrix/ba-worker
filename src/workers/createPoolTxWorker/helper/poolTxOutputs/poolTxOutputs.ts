@@ -1,6 +1,6 @@
 import { BmConfig, CallData, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
-import { calculateNewPoolValues, calculateServiceCommissionValueHexTxFeeValueHex, calculateUserRecipientDatas } from "../calculations";
+import { calculateServiceCommissionValueHexTxFeeValueHex, calculateUserRecipientDatas } from "../calculations";
 import { newPoolOutputs } from "./newPoolOutputs";
 import { poolTxTxFeeOutput } from "./poolTxTxFeeOutput";
 import { serviceCommissionTxOutput } from "./serviceCommissionTxOutput";
@@ -16,10 +16,6 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
   const lpHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.lp;
   const mainHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.main;
 
-  /**
-   * TODO
-   */
-
   const userRecipientDatas = calculateUserRecipientDatas(
     qouteAssetLE,
     tokenAssetLE,
@@ -31,13 +27,11 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
     callDatas
   );
 
-  const { newPoolTokenValueHex, newPoolLpValueHex, newPoolQuoteValueHex } = calculateNewPoolValues();
+  const newPoolTokenValueHex = userRecipientDatas.quoteSupply;
+  const newPoolLpValueHex = userRecipientDatas.tokenSupply;
+  const newPoolQuoteValueHex = userRecipientDatas.lpSupply;
 
   const { serviceCommissionValueHex, txFeeValueHex } = calculateServiceCommissionValueHexTxFeeValueHex(poolConfig.baseFee.number, poolConfig.serviceFee.number, callDatas);
-
-  /**
-   * TODO
-   */
 
   const newPoolTxOutputsLength =
     4 + // new pool outputs total length

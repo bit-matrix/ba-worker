@@ -335,18 +335,6 @@ export const calculateUserRecipientDatas = (
   };
 };
 
-export const calculateNewPoolValues = (/* TODO */): { newPoolTokenValueHex: string; newPoolLpValueHex: string; newPoolQuoteValueHex: string } => {
-  const result: { newPoolTokenValueHex: string; newPoolLpValueHex: string; newPoolQuoteValueHex: string } = {
-    newPoolTokenValueHex: "",
-    newPoolLpValueHex: "",
-    newPoolQuoteValueHex: "",
-  };
-
-  // TODO
-
-  return result;
-};
-
 export const calculateServiceCommissionValueHexTxFeeValueHex = (
   baseFee: number,
   serviceFee: number,
