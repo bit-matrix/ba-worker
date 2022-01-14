@@ -28,23 +28,15 @@ const userRecipientTxOutputs = (
 
 export const usersRecipientTxOutputs = (
   userRecipients: {
-    userRecipientScriptPubkey: string;
-    userRecipientAssetLE1: string;
-    userRecipientValueHex1: string;
-    userRecipientAssetLE2: string;
-    userRecipientValueHex2: string;
+    scriptPubkey: string;
+    assetLE1: string;
+    valueHex1: string;
+    assetLE2: string;
+    valueHex2: string;
   }[]
 ): string => {
   const usersRecipientTxOutputsEncoded = userRecipients.reduce(
-    (previous, current) =>
-      previous +
-      userRecipientTxOutputs(
-        current.userRecipientScriptPubkey,
-        current.userRecipientAssetLE1,
-        current.userRecipientValueHex1,
-        current.userRecipientAssetLE2,
-        current.userRecipientValueHex2
-      ),
+    (previous, current) => previous + userRecipientTxOutputs(current.scriptPubkey, current.assetLE1, current.valueHex1, current.assetLE2, current.valueHex2),
     ""
   );
 
