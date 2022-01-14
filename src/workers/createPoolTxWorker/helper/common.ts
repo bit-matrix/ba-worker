@@ -1,4 +1,4 @@
-import { CALL_METHOD, Pool } from "@bitmatrix/models";
+import { BmCtxNew, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { crypto } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 
@@ -257,4 +257,22 @@ export const splitCommitmentTxBaseHex = async (txHex: string) => {
   console.log("p6", p6.length);
   const settlement = [p1, p2, p3, p4, p5, p6];
   return settlement;
+};
+
+const lexicographical = (aTxid: string, bTxid: string): number => {
+  if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
+  const a = aTxid.substring(48);
+  const b = bTxid.substring(48);
+
+  return Number("0x" + b) - Number("0x" + a);
+};
+
+export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 2): BmCtxNew[] => {
+  const sortedNewCtxs = newCtxs.sort((a, b) => {
+    const orderingFeeDiff = b.callData.orderingFee - a.callData.orderingFee;
+    const lexicographicalDiff = lexicographical(a.commitmentTx.txid, b.commitmentTx.txid);
+    return orderingFeeDiff || lexicographicalDiff;
+  });
+
+  return sortedNewCtxs.length > limit ? sortedNewCtxs.slice(0, limit) : sortedNewCtxs;
 };

@@ -1,6 +1,7 @@
 import { Block } from "@bitmatrix/esplora-api-client";
 import { BmConfig, BmCtxNew, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { config, ctxMempoolSave } from "../../business/db-client";
+import { topCtxs } from "./helper/common";
 import { method01 } from "./method01";
 import { method02 } from "./method02";
 import { method03 } from "./method03";
@@ -11,7 +12,7 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
 
   if (newCtxs.length === 0) return;
 
-  const sortedNewCtxs = newCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
+  const sortedNewCtxs = topCtxs(newCtxs, 1);
   const ctxNew: BmCtxNew = sortedNewCtxs[0];
   console.log("bestCtx for pool tx: ", ctxNew.commitmentTx.txid);
 
