@@ -43,21 +43,22 @@ export const calculateServiceCommissionValueHexTxFeeValueHex = (
   callDatas: CallData[]
 ): { serviceCommissionValueHex: string; txFeeValueHex: string } => {
   const orderingFees: number[] = callDatas.map((c) => c.orderingFee);
-  const result: { serviceCommissionValueHex: string; txFeeValueHex: string } = { serviceCommissionValueHex: "", txFeeValueHex: "" };
 
-  // sum base fee +  all ordering fees
-  const totalFee = baseFee + orderingFees.reduce((p, c) => p + c, 0);
+  const leafFees = [145, 355, 630, 970, 1375, 1845, 2380, 2980, 3645, 4375, 5170, 6030, 6955, 7945, 9000, 10120];
 
-  const x = Math.floor(totalFee / 3);
-  const txFeeValue = Math.floor(x + (2 * x) / (16 * callDatas.length));
-  const txFeeValueHex = toHex64BE(txFeeValue);
+  // sum of the all ctx ordering fees
+  const totalOrderingFees = orderingFees.reduce((p, c) => p + c, 0);
 
-  const remainingTxFee = totalFee - txFeeValue;
-  const serviceCommissionValue = serviceFee + remainingTxFee;
-  const serviceCommissionValueHex = toHex64BE(serviceCommissionValue);
+  // formula
+  const txFeeValue = totalOrderingFees + leafFees[callDatas.length - 1];
 
-  result.txFeeValueHex = txFeeValueHex;
-  result.serviceCommissionValueHex = serviceCommissionValueHex;
+  // base fee mul ctx count
+  const totalBaseFees = baseFee * callDatas.length;
 
-  return result;
+  // service fee mul ctx count
+  const totalServiceFee = serviceFee * callDatas.length;
+
+  const serviceCommissionValue = totalServiceFee + totalBaseFees + totalOrderingFees - txFeeValue;
+
+  return { serviceCommissionValueHex: toHex64BE(serviceCommissionValue), txFeeValueHex: toHex64BE(txFeeValue) };
 };
