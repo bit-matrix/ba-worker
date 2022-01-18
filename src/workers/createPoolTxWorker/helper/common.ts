@@ -51,21 +51,6 @@ export const getTxFeeServiceCommission = (baseFee: number, serviceFee: number, o
   return { txFee, serviceCommission: toHex64BE(serviceCommission) };
 };
 
-export const splitCommitmentTxBaseHex = async (txHex: string) => {
-  const tx = txHex.substring(0, 8) + "00" + txHex.substring(10);
-
-  const part = 160;
-  const p1 = tx.substring(0, part);
-  const p2 = tx.substring(part, part * 2);
-  const p3 = tx.substring(part * 2, part * 3);
-  const p4 = tx.substring(part * 3, part * 4);
-  const p5 = tx.substring(part * 4, part * 5);
-  const p6 = tx.substring(part * 5, part * 5 + 36);
-  console.log("p6", p6.length);
-  const settlement = [p1, p2, p3, p4, p5, p6];
-  return settlement;
-};
-
 const lexicographical = (aTxid: string, bTxid: string): number => {
   if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
   const a = aTxid.substring(48);
