@@ -1,8 +1,10 @@
 import { BmConfig, BmCtxNew, Pool } from "@bitmatrix/models";
 import { hexLE } from "@script-wiz/wiz-data";
+import { ctxsWitness } from "./ctxsWitness";
 import { flagCovenant } from "./flagCovenant";
 import { lpHolderCovenant } from "./lpHolderCovenant";
 import { numberOfMainCovenantWitnessElements } from "./numberOfMainCovenantWitnessElements";
+import { outputsZeros } from "./outputsZeros";
 import { settlements } from "./settlements";
 import { tokenHolderCovenant } from "./tokenHolderCovenant";
 
@@ -18,6 +20,9 @@ export const poolTxWitness = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCt
   const settlementsEncoded: string = await settlements(ctxs);
   const mainCovenantScript = poolConfig.mainCovenantScript;
 
+  const ctxsWitnessEncoded = ctxsWitness(ctxs);
+  const outputsZerosEncoded = outputsZeros(ctxs.length);
+
   return (
     "0000" +
     flagCovenantEncoded +
@@ -26,6 +31,7 @@ export const poolTxWitness = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCt
     settlementsEncoded +
     numberOfMainCovenantWitnessElementsEncoded +
     mainCovenantScript +
-    "TODO"
+    ctxsWitnessEncoded +
+    outputsZerosEncoded
   );
 };
