@@ -33,8 +33,38 @@ const settlementCtxs = async (ctxs: BmCtxNew[]): Promise<string[][]> => {
   return settlementsArray;
 };
 
+const settlementEncoded = (settlement: string[], tweakPrefix: string): string => {
+  const tapscriptPrefixBase = tweakPrefix === "c4" ? "02" : "03";
+
+  return (
+    "01" + // tapscriptPrefixBase lenght
+    tapscriptPrefixBase +
+    // Commitment tx 1 base-serialization in 5 settlements
+    "50" +
+    settlement[0] + // 1ST_SETTLEMENT //
+    "50" +
+    settlement[1] + // 2ND_SETTLEMENT //
+    "50" +
+    settlement[2] + // 3RD_SETTLEMENT //
+    "50" +
+    settlement[3] + // 4TH_SETTLEMENT //
+    "50" +
+    settlement[4] + // 5TH_SETTLEMENT //
+    "12" +
+    settlement[5] // 6TH_SETTLEMENT //;
+  );
+};
+
 export const settlements = async (ctxs: BmCtxNew[]) => {
-  const settlementsEncoded = await settlementCtxs(ctxs);
-  const settlementsEncodedReversed = settlementsEncoded.reverse();
-  return settlementsEncodedReversed.join("");
+  const settlementsArray = await settlementCtxs(ctxs);
+  const resultsSorted: string[] = [];
+
+  for (let i = 0; i < settlementsArray.length; i++) {
+    const s = settlementsArray[i];
+    const sencoded = settlementEncoded(s, ctxs[i].output.tweakPrefix);
+    resultsSorted.push(sencoded);
+  }
+
+  const settlementsEncoded = resultsSorted.reverse().join("");
+  return settlementsEncoded;
 };
