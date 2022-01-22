@@ -11,7 +11,6 @@ const splitCommitmentTxBaseHex = async (txHex: string) => {
   const p4 = tx.substring(part * 3, part * 4);
   const p5 = tx.substring(part * 4, part * 5);
   const p6 = tx.substring(part * 5, part * 5 + 36);
-  console.log("p6", p6.length);
   const settlement = [p1, p2, p3, p4, p5, p6];
   return settlement;
 };
