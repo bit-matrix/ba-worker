@@ -56,7 +56,7 @@ export const getCallDataBase = (assetId: string, tx: TxDetail): CallDataBase | u
     const slippageToleranceHex = allCallData.substring(132, 148);
     if (result.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN || result.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
       try {
-        const slippageTolerance = positiveNumber64(slippageToleranceHex, "slippage_tolerange is out of range");
+        const slippageTolerance = positiveNumber64(slippageToleranceHex, "slippage_tolerange is out of range", true);
         result.slippageTolerance = slippageTolerance;
       } catch {
         return;
