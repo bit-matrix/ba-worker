@@ -23,7 +23,7 @@ export const createPoolTx = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCtx
     console.log("txWitnessEncoded: " + txWitnessEncoded);
 
     const txEncoded = txInputsEncoded + txOutputsEncoded + txWitnessEncoded;
-    console.log("txEncoded: " + txWitnessEncoded);
+    console.log("txEncoded: " + txEncoded);
 
     const poolTxid = await sendRawTransaction(txEncoded);
 
