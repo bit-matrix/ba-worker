@@ -58,7 +58,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       const user_lbtc_supply: number = tx.vout[1].value || 0;
       const user_lbtc_supply_available: number = user_lbtc_supply - config.baseFee.number - config.serviceFee.number - callDataBase.orderingFee;
       if (user_lbtc_supply_available < config.minRemainingSupply) return; //throw new Error("first commitment output value is not enough");
-      result.quote = user_lbtc_supply;
+      result.quote = user_lbtc_supply_available;
     }
 
     // 6. REMOVE_LIQUIDITY
