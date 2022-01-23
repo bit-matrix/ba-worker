@@ -113,7 +113,7 @@ const calculateUserRecipientData = (
       result.userRecipientValueHex2 = userQuoteReceivedSecondHalf;
 
       result.quoteSupply = result.quoteSupply - recipientValueQuoteNumber;
-      result.tokenSupply = result.tokenSupply - callData.value.token;
+      result.tokenSupply = result.tokenSupply + callData.value.token;
     }
   }
   // Case 3
