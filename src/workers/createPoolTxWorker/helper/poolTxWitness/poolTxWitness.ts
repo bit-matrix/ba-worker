@@ -28,8 +28,8 @@ export const poolTxWitness = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCt
     flagCovenantEncoded +
     tokenHolderCovenantEncoded +
     lpHolderCovenantEncoded +
-    settlementsEncoded +
     numberOfMainCovenantWitnessElementsEncoded +
+    settlementsEncoded +
     mainCovenantScript +
     ctxsWitnessEncoded +
     outputsZerosEncoded
