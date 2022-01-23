@@ -1,3 +1,5 @@
+import { getRecipientScriptPubkey } from "../common";
+
 const userRecipientTxOutputs = (
   userRecipientScriptPubkey: string,
   userRecipientAssetLE1: string,
@@ -35,10 +37,11 @@ export const usersRecipientTxOutputs = (
     valueHex2: string;
   }[]
 ): string => {
-  const usersRecipientTxOutputsEncoded = userRecipients.reduce(
-    (previous, current) => previous + userRecipientTxOutputs(current.scriptPubkey, current.assetLE1, current.valueHex1, current.assetLE2, current.valueHex2),
-    ""
-  );
+  const usersRecipientTxOutputsEncoded = userRecipients.reduce((previous, current) => {
+    const recipientScriptPubkey = getRecipientScriptPubkey(current.scriptPubkey);
+    const userRecipientTxOutput = userRecipientTxOutputs(recipientScriptPubkey, current.assetLE1, current.valueHex1, current.assetLE2, current.valueHex2);
+    return previous + userRecipientTxOutput;
+  }, "");
 
   return usersRecipientTxOutputsEncoded;
 };
