@@ -27,9 +27,9 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
     callDatas
   );
 
-  const newPoolTokenValueHex = userRecipientDatas.quoteSupply;
-  const newPoolLpValueHex = userRecipientDatas.tokenSupply;
-  const newPoolQuoteValueHex = userRecipientDatas.lpSupply;
+  const newPoolQuoteValueHex = userRecipientDatas.quoteSupply;
+  const newPoolTokenValueHex = userRecipientDatas.tokenSupply;
+  const newPoolLpValueHex = userRecipientDatas.lpSupply;
 
   const { serviceCommissionValueHex, txFeeValueHex } = calculateServiceCommissionValueHexTxFeeValueHex(poolConfig.baseFee.number, poolConfig.serviceFee.number, callDatas);
 
