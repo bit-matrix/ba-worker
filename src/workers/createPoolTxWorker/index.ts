@@ -8,16 +8,17 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   if (newCtxs.length === 0) return;
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
 
-  const ctxNews: BmCtxNew[] = topCtxs(newCtxs, 3);
-  console.log(ctxNews.length + " bestCtxs for pool tx: ", ctxNews.map((c) => c.commitmentTx.txid).join(","));
+  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, 3);
+  console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
 
   const poolConfig: BmConfig = await config(pool.id);
 
-  const ptxid: string | undefined = await createPoolTx(pool, poolConfig, newCtxs);
+  const ptxid: string | undefined = await createPoolTx(pool, poolConfig, bestCtxs);
 
   if (ptxid) {
-    for (let i = 0; i < newCtxs.length; i++) {
-      const ctxNew = newCtxs[i];
+    for (let i = 0; i < bestCtxs.length; i++) {
+      const ctxNew = bestCtxs[i];
+
       await ctxMempoolSave(pool.id, { callData: ctxNew.callData, output: ctxNew.output, commitmentTx: ctxNew.commitmentTx, poolTxid: ptxid });
     }
   }
