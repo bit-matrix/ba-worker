@@ -5,12 +5,10 @@ import { topCtxs } from "./helper/common";
 import { createPoolTx } from "./createPoolTx";
 
 export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]): Promise<string | undefined> => {
+  if (newCtxs.length === 0) return;
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
 
-  if (newCtxs.length === 0) return;
-
-  const sortedNewCtxs = topCtxs(newCtxs, 1);
-  const ctxNews: BmCtxNew[] = sortedNewCtxs.slice(0, 2);
+  const ctxNews: BmCtxNew[] = topCtxs(newCtxs, 3);
   console.log(ctxNews.length + " bestCtxs for pool tx: ", ctxNews.map((c) => c.commitmentTx.txid).join(","));
 
   const poolConfig: BmConfig = await config(pool.id);
