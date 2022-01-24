@@ -33,7 +33,5 @@ export const createPoolTx = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCtx
     }
   } catch (error) {
     throw new Error((error as any).message);
-  } finally {
-    return;
   }
 };
