@@ -67,7 +67,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
       if (tx.vout[2].asset !== pool.lp.asset) return; //throw new Error("second commitment output's asset is not LP asset");
       // 6.2. check second commitment output’s value is gte
       const user_lp_supply: number = tx.vout[2].value || 0;
-      if (result.lp < 10) return; // throw new Error("second commitment output's value is not gte 10");
+      if (user_lp_supply < 10) return; // throw new Error("second commitment output's value is not gte 10");
       result.lp = user_lp_supply;
       // 6.3. check first commitment output value is equal to base_fee + service_commission + ordering_fee
       if (tx.vout[1].value !== config.baseFee.number + config.serviceFee.number + callDataBase.orderingFee) return; // throw new Error("first commitment output value is not equal to base_fee + service_commission + ordering_fee");
