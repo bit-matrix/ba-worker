@@ -1,6 +1,5 @@
 import { BmCtxNew } from "@bitmatrix/models";
-import { crypto } from "@script-wiz/lib-core";
-import { greaterThan64 } from "@script-wiz/lib-core/arithmetics64";
+import { arithmetics64, crypto } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 
 export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart(16, "0");
@@ -66,7 +65,7 @@ const lexicographical = (aTxid: string, bTxid: string): number => {
   const b = hexLE(bTxid.substring(48));
 
   if (a === b) return 0;
-  return greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
+  return arithmetics64.greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
 };
 
 export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 3): BmCtxNew[] => {
