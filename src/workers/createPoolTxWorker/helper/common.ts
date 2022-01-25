@@ -75,6 +75,6 @@ export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 3): BmCtxNew[] => {
     return orderingFeeDiff || lexicographicalDiff;
   });
 
-  const result = sortedNewCtxs.length >= limit ? sortedNewCtxs.slice(0, limit - 1) : sortedNewCtxs;
+  const result = sortedNewCtxs.length >= limit ? sortedNewCtxs.slice(0, limit) : sortedNewCtxs;
   return result;
 };
