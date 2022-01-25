@@ -1,7 +1,7 @@
 import { BmCtxNew } from "@bitmatrix/models";
 import { crypto } from "@script-wiz/lib-core";
 import { greaterThan64 } from "@script-wiz/lib-core/arithmetics64";
-import WizData from "@script-wiz/wiz-data";
+import WizData, { hexLE } from "@script-wiz/wiz-data";
 
 export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart(16, "0");
 
@@ -62,9 +62,10 @@ const lexicographicalEx = (aTxid: string, bTxid: string): number => {
 
 const lexicographical = (aTxid: string, bTxid: string): number => {
   if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
-  const a = aTxid.substring(48);
-  const b = bTxid.substring(48);
+  const a = hexLE(aTxid.substring(48));
+  const b = hexLE(bTxid.substring(48));
 
+  if (a === b) return 0;
   return greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
 };
 
