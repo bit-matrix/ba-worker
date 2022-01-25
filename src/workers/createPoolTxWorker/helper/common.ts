@@ -1,5 +1,6 @@
-import { BmCtxNew, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { BmCtxNew } from "@bitmatrix/models";
 import { crypto } from "@script-wiz/lib-core";
+import { greaterThan64 } from "@script-wiz/lib-core/arithmetics64";
 import WizData from "@script-wiz/wiz-data";
 
 export const toHex64BE = (a: string | number) => Number(a).toString(16).padStart(16, "0");
@@ -51,7 +52,7 @@ export const getTxFeeServiceCommission = (baseFee: number, serviceFee: number, o
   return { txFee, serviceCommission: toHex64BE(serviceCommission) };
 };
 
-const lexicographical = (aTxid: string, bTxid: string): number => {
+const lexicographicalEx = (aTxid: string, bTxid: string): number => {
   if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
   const a = aTxid.substring(48);
   const b = bTxid.substring(48);
@@ -59,12 +60,21 @@ const lexicographical = (aTxid: string, bTxid: string): number => {
   return Number("0x" + b) - Number("0x" + a);
 };
 
-export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 2): BmCtxNew[] => {
+const lexicographical = (aTxid: string, bTxid: string): number => {
+  if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
+  const a = aTxid.substring(48);
+  const b = bTxid.substring(48);
+
+  return greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
+};
+
+export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 3): BmCtxNew[] => {
   const sortedNewCtxs = newCtxs.sort((a, b) => {
     const orderingFeeDiff = b.callData.orderingFee - a.callData.orderingFee;
     const lexicographicalDiff = lexicographical(a.commitmentTx.txid, b.commitmentTx.txid);
     return orderingFeeDiff || lexicographicalDiff;
   });
 
-  return sortedNewCtxs.length > limit ? sortedNewCtxs.slice(0, limit) : sortedNewCtxs;
+  const result = sortedNewCtxs.length >= limit ? sortedNewCtxs.slice(0, limit - 1) : sortedNewCtxs;
+  return result;
 };
