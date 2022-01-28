@@ -8,10 +8,10 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   if (newCtxs.length === 0) return;
   console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
 
-  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, 3);
-  console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
-
   const poolConfig: BmConfig = await config(pool.id);
+
+  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, poolConfig.maxLeaf);
+  console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
 
   const ptxid: string | undefined = await createPoolTx(pool, poolConfig, bestCtxs);
 
