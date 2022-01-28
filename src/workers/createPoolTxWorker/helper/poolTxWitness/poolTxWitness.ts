@@ -18,7 +18,9 @@ export const poolTxWitness = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCt
   const numberOfMainCovenantWitnessElementsEncoded = numberOfMainCovenantWitnessElements(ctxs.length);
 
   const settlementsEncoded: string = await settlements(ctxs);
-  const mainCovenantScript = poolConfig.mainCovenantScript[ctxs.length - 1];
+  let mainCovenantScriptIndex: number = ctxs.length - 1;
+  mainCovenantScriptIndex = mainCovenantScriptIndex < 4 ? mainCovenantScriptIndex : 3;
+  const mainCovenantScript = poolConfig.mainCovenantScript[mainCovenantScriptIndex];
 
   const ctxsWitnessEncoded = ctxsWitness(ctxs);
   const outputsZerosEncoded = outputsZeros(ctxs.length);
