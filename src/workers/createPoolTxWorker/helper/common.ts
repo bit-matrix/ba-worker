@@ -68,7 +68,7 @@ const lexicographical = (aTxid: string, bTxid: string): number => {
   return arithmetics64.greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
 };
 
-export const topCtxs = (newCtxs: BmCtxNew[], limit: number = 3): BmCtxNew[] => {
+export const topCtxs = (newCtxs: BmCtxNew[], limit: number): BmCtxNew[] => {
   const sortedNewCtxs = newCtxs.sort((a, b) => {
     const orderingFeeDiff = b.callData.orderingFee - a.callData.orderingFee;
     const lexicographicalDiff = lexicographical(a.commitmentTx.txid, b.commitmentTx.txid);
