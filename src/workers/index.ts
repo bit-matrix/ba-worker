@@ -15,13 +15,15 @@ const worker = async () => {
 
     for (let i = 0; i < ps.length; i++) {
       const p = ps[i];
-      const wantedNewBlockHeight = p.lastSyncedBlock.block_height + 1;
-      const blockData = await getNewBlock(bestBlock10, wantedNewBlockHeight);
+      if (p.active) {
+        const wantedNewBlockHeight = p.lastSyncedBlock.block_height + 1;
+        const blockData = await getNewBlock(bestBlock10, wantedNewBlockHeight);
 
-      if (blockData) {
-        const { newBlock, bestBlock } = blockData;
-        const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
-        promises.push(poolWorkerPromise);
+        if (blockData) {
+          const { newBlock, bestBlock } = blockData;
+          const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
+          promises.push(poolWorkerPromise);
+        }
       }
     }
 
