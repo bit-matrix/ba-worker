@@ -56,7 +56,7 @@ const calculateUserRecipientData = (
       const recipientValueQuoteNumber = callData.value.quote;
 
       const userQuoteReceivedFirstHalfNumber: number = Math.floor(recipientValueQuoteNumber / 2);
-      const userQuoteReceivedSecondHalfNumber: number = userQuoteReceivedFirstHalfNumber - userQuoteReceivedFirstHalfNumber;
+      const userQuoteReceivedSecondHalfNumber: number = recipientValueQuoteNumber - userQuoteReceivedFirstHalfNumber;
       if (userQuoteReceivedFirstHalfNumber < 500) throw new Error("isOutOfSlippage: userQuoteReceivedFirstHalfNumber is not gte 500");
       const userQuoteReceivedFirstHalf = toHex64BE(userQuoteReceivedFirstHalfNumber);
       const userQuoteReceivedSecondHalf = toHex64BE(userQuoteReceivedSecondHalfNumber);
