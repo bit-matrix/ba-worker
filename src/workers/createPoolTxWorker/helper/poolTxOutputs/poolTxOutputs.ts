@@ -6,7 +6,7 @@ import { poolTxTxFeeOutput } from "./poolTxTxFeeOutput";
 import { serviceCommissionTxOutput } from "./serviceCommissionTxOutput";
 import { usersRecipientTxOutputs } from "./usersRecipientTxOutputs";
 
-export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallData[]): string => {
+export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallData[]): { txOutputsEncoded: string; isOutOfSlippages: boolean[] } => {
   const poolAssetLE = hexLE(pool.id);
   const tokenAssetLE = hexLE(pool.token.asset);
   const lpAssetLE = hexLE(pool.lp.asset);
@@ -53,6 +53,8 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
     newPoolQuoteValueHex
   );
 
+  const isOutOfSlippages = userRecipientDatas.userRecipients.map((ur) => ur.isOutOfSlippage);
+
   const usersRecipientTxOutputsEncoded = usersRecipientTxOutputs(userRecipientDatas.userRecipients);
 
   const serviceCommissionTxOutputEncoded = serviceCommissionTxOutput(pool.quote.asset, serviceCommissionValueHex);
@@ -61,5 +63,5 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
 
   const poolTxOutputsEncoded = newPoolTxOutputsLengthHex + newPoolOutputsEncoded + usersRecipientTxOutputsEncoded + serviceCommissionTxOutputEncoded + poolTxTxFeeOutputEncoded;
 
-  return poolTxOutputsEncoded;
+  return { txOutputsEncoded: poolTxOutputsEncoded, isOutOfSlippages };
 };
