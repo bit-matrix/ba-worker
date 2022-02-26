@@ -14,13 +14,10 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
   console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
 
   const bmNewPtxResult: BmNewPtxResult = await createPoolTx(pool, poolConfig, bestCtxs);
-  console.log("bmNewPtxResult", bmNewPtxResult);
 
   if (bmNewPtxResult.poolTx) {
     for (let i = 0; i < bestCtxs.length; i++) {
       const ctxNew = bestCtxs[i];
-
-      console.log("bmNewPtxResult.ctxsResult[" + i + "]", bmNewPtxResult.ctxsResult[i]);
 
       await ctxMempoolSave(pool.id, {
         callData: ctxNew.callData,
