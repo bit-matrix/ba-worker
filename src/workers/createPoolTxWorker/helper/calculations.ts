@@ -25,6 +25,7 @@ const calculateUserRecipientData = (
   userRecipientValueHex1: string;
   userRecipientAssetLE2: string;
   userRecipientValueHex2: string;
+  isOutOfSlippage: boolean;
 } => {
   const result = {
     quoteSupply: quoteSupply,
@@ -36,6 +37,8 @@ const calculateUserRecipientData = (
     userRecipientValueHex1: "",
     userRecipientAssetLE2: "",
     userRecipientValueHex2: "",
+
+    isOutOfSlippage: false,
   };
 
   // Case 1
@@ -53,6 +56,8 @@ const calculateUserRecipientData = (
     const slippageTolerance = Number(callData.slippageTolerance);
     const isOutOfSlippage: boolean = recipientValueTokenNumber < slippageTolerance;
     if (isOutOfSlippage) {
+      result.isOutOfSlippage = true;
+
       const recipientValueQuoteNumber = callData.value.quote;
 
       const userQuoteReceivedFirstHalfNumber: number = Math.floor(recipientValueQuoteNumber / 2);
@@ -88,6 +93,7 @@ const calculateUserRecipientData = (
     const slippageTolerance = Number(callData.slippageTolerance);
     const isOutOfSlippage: boolean = recipientValueQuoteNumber < slippageTolerance;
     if (isOutOfSlippage) {
+      result.isOutOfSlippage = true;
       const recipientValueTokenNumber = callData.value.token;
 
       const userTokenReceivedFirstHalfNumber: number = Math.floor(recipientValueTokenNumber / 2);
@@ -182,6 +188,7 @@ export const calculateUserRecipientDatas = (
     valueHex1: string;
     assetLE2: string;
     valueHex2: string;
+    isOutOfSlippage: boolean;
   }[];
 } => {
   const resultNumber: {
@@ -195,6 +202,7 @@ export const calculateUserRecipientDatas = (
       valueHex1: string;
       assetLE2: string;
       valueHex2: string;
+      isOutOfSlippage: boolean;
     }[];
   } = {
     quoteSupply: quoteSupplyp,
@@ -205,17 +213,26 @@ export const calculateUserRecipientDatas = (
   };
 
   callDatas.forEach((callData) => {
-    const { quoteSupply, tokenSupply, lpSupply, userRecipientScriptPubkey, userRecipientAssetLE1, userRecipientValueHex1, userRecipientAssetLE2, userRecipientValueHex2 } =
-      calculateUserRecipientData(
-        qouteAssetLE,
-        tokenAssetLE,
-        lpAssetLE,
-        resultNumber.quoteSupply,
-        resultNumber.tokenSupply,
-        resultNumber.lpSupply,
-        callData,
-        poolConfig.recipientValueMinus
-      );
+    const {
+      quoteSupply,
+      tokenSupply,
+      lpSupply,
+      userRecipientScriptPubkey,
+      userRecipientAssetLE1,
+      userRecipientValueHex1,
+      userRecipientAssetLE2,
+      userRecipientValueHex2,
+      isOutOfSlippage,
+    } = calculateUserRecipientData(
+      qouteAssetLE,
+      tokenAssetLE,
+      lpAssetLE,
+      resultNumber.quoteSupply,
+      resultNumber.tokenSupply,
+      resultNumber.lpSupply,
+      callData,
+      poolConfig.recipientValueMinus
+    );
 
     resultNumber.quoteSupply = quoteSupply;
     resultNumber.tokenSupply = tokenSupply;
@@ -227,6 +244,7 @@ export const calculateUserRecipientDatas = (
       valueHex1: userRecipientValueHex1,
       assetLE2: userRecipientAssetLE2,
       valueHex2: userRecipientValueHex2,
+      isOutOfSlippage,
     });
   });
 
