@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const sendRawTransaction = async (txHex: string): Promise<any> => {
   /* const test = await axios
-    .post("https://rpc.bitmatrix-aggregate.com/rpc", { jsonrpc: "1.0", id: "t0", method: "getnewblockhex", params: [] }, { headers: { "Content-Type": "application/json" } })
+    .post("https://rpc.basebitmatrix.com/rpc", { jsonrpc: "1.0", id: "t0", method: "getnewblockhex", params: [] }, { headers: { "Content-Type": "application/json" } })
     .then((res) => res.data)
     .catch((er) => {
       console.error("getnewblockhex.error", er);
@@ -20,11 +20,7 @@ export const sendRawTransaction = async (txHex: string): Promise<any> => {
 
   let poolTxid: any = "";
   poolTxid = await axios
-    .post(
-      "https://rpc.bitmatrix-aggregate.com/rpc",
-      { jsonrpc: "1.0", id: "t0", method: "sendrawtransaction", params: [txHex] },
-      { headers: { "Content-Type": "application/json" } }
-    )
+    .post("https://rpc.basebitmatrix.com/rpc", { jsonrpc: "1.0", id: "t0", method: "sendrawtransaction", params: [txHex] }, { headers: { "Content-Type": "application/json" } })
     .then((res) => res.data)
     .catch((er) => {
       console.error("sendrawtransaction.error", er);

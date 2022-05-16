@@ -37,6 +37,6 @@ const worker = async () => {
 
 export const startWorkers = async () => {
   console.log("startWorkers started...");
-  init("https://electrs.bitmatrix-aggregate.com/");
+  init("https://electrs.basebitmatrix.com/");
   worker();
 };
