@@ -1,8 +1,9 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { getAsset } from "../../helper/getAsset";
 import { div, isUniqueArray } from "../../helper/util";
-import { convertion } from "@script-wiz/lib-core";
-import WizData from "@script-wiz/wiz-data";
+import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
+import WizData, { hexLE } from "@script-wiz/wiz-data";
+import { pool } from "@bitmatrix/lib";
 
 const lbtcAsset = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 const usdtAsset = "f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11ff0e820958";
@@ -25,9 +26,10 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
    * toplam sirkülasyonunun “1” olduğunu ve reissuance tokens’ının olmadığını kontrol edelim.
    *
    */
+  const flagOutput = newTxDetail.vout[0];
 
-  if (!newTxDetail.vout[0].asset) return false;
-  const mayPoolAssetId = newTxDetail.vout[0].asset;
+  if (!flagOutput.asset) return false;
+  const mayPoolAssetId = flagOutput.asset;
   const poolAsset = await getAsset(mayPoolAssetId);
 
   if (poolAsset === undefined) return false;
@@ -40,8 +42,10 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
    * toplam sirkülasyonunun “2,000,000,000” olduğunu ve reissuance tokens’ının olmadığını kontrol edelim.
    *
    */
-  if (!newTxDetail.vout[2].asset) return false;
+
   const mayLP = newTxDetail.vout[2];
+  if (!mayLP.asset) return false;
+
   const lpAsset = await getAsset(mayLP.asset || " ");
 
   if (lpAsset === undefined) return false;
@@ -86,10 +90,24 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
 
   if (!mayLP.value) return false;
   const lpCirculation = 2000000000 - mayLP.value; // 10000
+  const pair1_coefficientNumber = convertion.LE32ToNum(WizData.fromHex(pair1_coefficient)).number || 0;
 
-  const pair1Div = div(pair1.value || 0, (convertion.LE32ToNum(WizData.fromHex(pair1_coefficient)).number || 0) * 5);
+  const pair1Div = div(pair1.value || 0, pair1_coefficientNumber * 5);
 
   if (pair1Div != lpCirculation || lpCirculation < 50) return false;
+
+  const script = [WizData.fromHex("20" + hexLE(mayPoolAssetId || "") + "00c86987")];
+  const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
+
+  const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
+  const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
+  const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
+  const mainCovenantScriptPubkey = pool.createCovenants(7, 0, mayPoolAssetId, pair1_coefficientNumber).taprootResult.scriptPubkey.hex;
+
+  if (flagOutput.scriptpubkey !== flagCovenantScriptPubkey) return false;
+  if (pair2.scriptpubkey !== tokenCovenantScriptPubkey) return false;
+  if (mayLP.scriptpubkey !== lpHolderCovenantScriptPubkey) return false;
+  if (pair1.scriptpubkey !== mainCovenantScriptPubkey) return false;
 
   return true;
 };
