@@ -79,6 +79,13 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
   const bitmatrixHex = outputHex.slice(0, 18);
 
   const version = outputHex.slice(18, 20);
+  let leafCount = 0;
+
+  if (version === "01") {
+    leafCount = 1;
+  } else if (version === "02") {
+    leafCount = 16;
+  }
 
   const pair1_coefficient = outputHex.slice(20);
 
@@ -102,7 +109,7 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
   const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
-  const mainCovenantScriptPubkey = pool.createCovenants(7, 0, mayPoolAssetId, pair1_coefficientNumber).taprootResult.scriptPubkey.hex;
+  const mainCovenantScriptPubkey = pool.createCovenants(leafCount - 1, 0, mayPoolAssetId, pair1_coefficientNumber).taprootResult.scriptPubkey.hex;
 
   if (flagOutput.scriptpubkey !== flagCovenantScriptPubkey) return false;
   if (pair2.scriptpubkey !== tokenCovenantScriptPubkey) return false;
