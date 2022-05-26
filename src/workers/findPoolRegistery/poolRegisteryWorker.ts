@@ -10,13 +10,18 @@ const usdtAsset = "f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11ff0e820
 export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
 
-  // maximum 7 output
-  if (newTxDetail.vout.length > 7) return false;
+  // 4 input - 7 output
+  if (newTxDetail.vout.length !== 7) return false;
+  if (newTxDetail.vin.length !== 4) return false;
+
+  console.log("1");
 
   // first 4 outputs asset ids must be different
   const firtOutputAssets = newTxDetail.vout.slice(0, 4).map((out) => out.asset);
   const areOutputAssetsDifferent = isUniqueArray(firtOutputAssets);
   if (!areOutputAssetsDifferent) return false;
+
+  console.log("2");
 
   /*
    * Step 1:
@@ -32,6 +37,8 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
   if (poolAsset.chain_stats.issued_amount !== 1) return false;
   if (poolAsset.chain_stats.reissuance_tokens !== 0) return false;
 
+  console.log("3");
+
   /*
    * Step 2:
    * Üçüncü outputta taşınan LP assetinin (örnekte 382470f8970154abc97374f8ec63a2b2852814e0dffc2339dfa6057aa5747e84)
@@ -39,18 +46,27 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
    *
    */
   if (!newTxDetail.vout[2].asset) return false;
-  const mayLPAssetId = newTxDetail.vout[2].asset;
-  const lpAsset = await getAsset(mayLPAssetId);
+  const mayLPAsset = newTxDetail.vout[2];
+  const lpAsset = await getAsset(mayLPAsset.asset || " ");
   if (lpAsset === undefined) return false;
   if (lpAsset.chain_stats.issued_amount !== 2000000000) return false;
   if (lpAsset.chain_stats.reissuance_tokens !== 0) return false;
+
+  console.log("4");
+
+  const pair1 = newTxDetail.vout[1];
+  const pair2 = newTxDetail.vout[3];
 
   /*
    *İkinci parite (token covenant) asset ID’ sinin L-BTC ya da USDt olmadığını kontrol et (bu bir L-BTC<>USDt havuzu ise istisna).
    *
    */
 
-  // if (newTxDetail.vin[2].prevout?.asset !== lbtcAsset && (newTxDetail.vin[3].prevout?.asset === usdtAsset) return false;
+  if (pair2.asset === lbtcAsset || pair2.asset === usdtAsset) {
+    if (pair1.asset !== lbtcAsset && pair2.asset !== usdtAsset) return false;
+  }
+
+  console.log("5");
 
   /*
    *
@@ -71,17 +87,23 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
   if (bitmatrixHex !== "6269746d6174726978") return false;
   if (version !== "01") return false;
 
-  if (pair1_coefficient === "14000000" && newTxDetail.vin[2].prevout?.asset !== lbtcAsset) return false;
-  if (pair1_coefficient === "40420f00" && newTxDetail.vin[2].prevout?.asset !== usdtAsset) return false;
+  if (pair1_coefficient === "14000000" && pair1.asset !== lbtcAsset) return false;
+  if (pair1_coefficient === "40420f00" && pair1.asset !== usdtAsset) return false;
 
-  if (!newTxDetail.vout[2].value) return false;
-  const lpCirculation = 2000000000 - newTxDetail.vout[2].value; // 10000
+  console.log("6");
 
-  const pair1Amount = newTxDetail.vin[1].prevout?.value;
+  if (!mayLPAsset.value) return false;
+  const lpCirculation = 2000000000 - mayLPAsset.value; // 10000
+
+  const pair1Amount = pair1.value;
 
   const pair1Div = div(pair1Amount || 0, convertion.LE32ToNum(WizData.fromHex(pair1_coefficient)).number || 0 * 5);
 
+  console.log("7");
+
   if (pair1Div != lpCirculation || lpCirculation < 50) return false;
+
+  console.log("8");
 
   return true;
 };

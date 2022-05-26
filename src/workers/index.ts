@@ -1,8 +1,9 @@
 import { pools } from "../business/db-client";
 import { init, esploraClient, Block } from "@bitmatrix/esplora-api-client";
-import { poolWorker } from "./poolWorker";
 import { WORKER_DELAY } from "../env";
 import { getNewBlock } from "../helper/getNewBlock";
+import { poolRegisteryWorker } from "./findPoolRegistery";
+import { poolWorker } from "./poolWorker";
 
 const worker = async () => {
   try {
@@ -22,7 +23,8 @@ const worker = async () => {
         if (blockData) {
           const { newBlock, bestBlock } = blockData;
           const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
-          promises.push(poolWorkerPromise);
+          const poolRegisteryWorkerPromise = poolRegisteryWorker(newBlock);
+          promises.push(poolWorkerPromise, poolRegisteryWorkerPromise);
         }
       }
     }
@@ -37,6 +39,6 @@ const worker = async () => {
 
 export const startWorkers = async () => {
   console.log("startWorkers started...");
-  init("https://electrs.bitmatrix-aggregate.com/");
+  init("https://electrs.basebitmatrix.com/");
   worker();
 };
