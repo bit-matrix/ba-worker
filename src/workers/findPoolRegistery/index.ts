@@ -1,4 +1,5 @@
 import { Block, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { isPoolRegisteryWorker } from "./poolRegisteryWorker";
 
 export const poolRegisteryWorker = async (newBlock: Block) => {
@@ -20,7 +21,19 @@ export const poolRegisteryWorker = async (newBlock: Block) => {
       if (isNewPoolRegister) {
         console.log("block no :", newBlock);
         console.log("txıD", ntx.txid);
-        console.log("insert");
+
+        sendTelegramMessage(
+          "New pool registered " +
+            "\n" +
+            "New Pool Id: <code>" +
+            ntx.vout[0].asset +
+            "</code>\n" +
+            "Block Height: <code>" +
+            newBlock.height +
+            "</code>, <b>Pool Register tx</b>: <code>" +
+            ntx.txid +
+            "</code>"
+        );
       }
     }
     // console.log(res);
