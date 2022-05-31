@@ -219,8 +219,8 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, block: Block)
   };
 
   try {
-    await configAdd(newConfig);
-  } catch {
+    await configAdd(mayPoolAssetId, newConfig);
+  } catch (error) {
     return false;
   }
 
