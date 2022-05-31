@@ -1,8 +1,5 @@
 import { Block, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BmBlockInfo, BmConfig, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
-import { poolUpdate } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
-import { tickerFinder } from "../../helper/util";
 import { isPoolRegisteryWorker } from "./poolRegisteryWorker";
 
 export const poolRegisteryWorker = async (newBlock: Block) => {
