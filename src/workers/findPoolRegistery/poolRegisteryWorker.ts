@@ -5,7 +5,7 @@ import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
 import { BmBlockInfo, BmConfig, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
-import { poolUpdate } from "../../business/db-client";
+import { configAdd, poolUpdate } from "../../business/db-client";
 
 export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, block: Block): Promise<boolean> => {
   console.log("Is pool registery worker started");
@@ -217,6 +217,12 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, block: Block)
       },
     },
   };
+
+  try {
+    await configAdd(newConfig);
+  } catch {
+    return false;
+  }
 
   return true;
 };
