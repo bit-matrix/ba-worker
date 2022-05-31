@@ -1,19 +1,22 @@
-import { TxDetail } from "@bitmatrix/esplora-api-client";
+import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
 import { getAsset } from "../../helper/getAsset";
-import { div, isUniqueArray } from "../../helper/util";
+import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../helper/util";
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
+import { BmBlockInfo, BmConfig, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
+import { poolUpdate } from "../../business/db-client";
 
-const lbtcAsset = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
-const usdtAsset = "f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11ff0e820958";
-
-export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<boolean> => {
+export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, block: Block): Promise<boolean> => {
   console.log("Is pool registery worker started");
+
+  // --------------------------- POOL VALIDATION ---------------------------------
 
   // 4 input - 7 output
   if (newTxDetail.vout.length !== 7) return false;
   if (newTxDetail.vin.length !== 4) return false;
+
+  const innerPublicKey = "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
 
   // first 4 outputs asset ids must be different
   const firtOutputAssets = newTxDetail.vout.slice(0, 4).map((out) => out.asset);
@@ -104,17 +107,116 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail): Promise<bool
   if (pair1Div != lpCirculation || lpCirculation < 50) return false;
 
   const script = [WizData.fromHex("20" + hexLE(mayPoolAssetId || "") + "00c86987")];
-  const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
+  const pubkey = WizData.fromHex(innerPublicKey);
 
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
   const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
-  const mainCovenantScriptPubkey = pool.createCovenants(leafCount - 1, 0, mayPoolAssetId, pair1_coefficientNumber).taprootResult.scriptPubkey.hex;
+  const mainCovenant = pool.createCovenants(leafCount - 1, 0, mayPoolAssetId, pair1_coefficientNumber);
 
   if (flagOutput.scriptpubkey !== flagCovenantScriptPubkey) return false;
   if (pair2.scriptpubkey !== tokenCovenantScriptPubkey) return false;
   if (mayLP.scriptpubkey !== lpHolderCovenantScriptPubkey) return false;
-  if (pair1.scriptpubkey !== mainCovenantScriptPubkey) return false;
+  if (pair1.scriptpubkey !== mainCovenant.taprootResult.scriptPubkey.hex) return false;
+
+  // --------------------------- POOL INSERT ---------------------------------
+
+  const quoteTicker = tickerFinder(pair1.asset || "");
+  const tokenTicker = tickerFinder(pair2.asset || "");
+  const lpTicker = tickerFinder(mayLP.asset || "");
+
+  const quote: PAsset = {
+    ticker: quoteTicker.ticker,
+    name: quoteTicker.name,
+    asset: pair1.asset || "",
+    value: pair1.value?.toString() || "",
+  };
+
+  const token: PAsset = {
+    ticker: tokenTicker.ticker,
+    name: tokenTicker.name,
+    asset: pair2.asset || "",
+    value: pair2.value?.toString() || "",
+  };
+
+  const lPAsset: PAsset = {
+    ticker: lpTicker.ticker,
+    name: lpTicker.name,
+    asset: mayLP.asset || "",
+    value: mayLP.value?.toString() || "",
+  };
+
+  const initialTx: BmTxInfo = {
+    txid: newTxDetail.txid,
+    block_height: block.height,
+    block_hash: block.id,
+  };
+
+  const lastSyncedBlock: BmBlockInfo = {
+    block_height: block.height,
+    block_hash: block.id,
+  };
+
+  const newPool: Pool = {
+    id: mayPoolAssetId,
+    quote,
+    token,
+    lp: lPAsset,
+    initialTx,
+    lastSyncedBlock,
+    bestBlockHeight: block.height,
+    synced: false,
+    unspentTx: initialTx,
+    lastSentPtx: newTxDetail.txid,
+    active: true,
+  };
+
+  try {
+    await poolUpdate(newPool);
+  } catch {
+    return false;
+  }
+
+  // --------------------------- POOL CONFIG INSERT ---------------------------------
+
+  const newConfig: BmConfig = {
+    id: mayPoolAssetId,
+    minRemainingSupply: 1000,
+    minTokenValue: 50000000,
+    baseFee: {
+      number: 650,
+      hex: "",
+    },
+    serviceFee: {
+      number: 50,
+      hex: "",
+    },
+    commitmentTxFee: {
+      number: 100,
+      hex: "0000000000000064",
+    },
+    defaultOrderingFee: {
+      number: 1,
+      hex: "01000000",
+    },
+    fundingOutputAddress: "",
+    innerPublicKey,
+    recipientValueMinus: 3000000,
+    mainCovenantScript: mainCovenant.mainCovenantScript.map((item) => item),
+    maxLeaf: leafCount,
+    holderCovenant: {
+      scriptpubkey: {
+        main: pair1.scriptpubkey,
+        token: pair2.scriptpubkey,
+        lp: mayLP.scriptpubkey,
+      },
+      controlBlockPrefix: {
+        main: mainCovenant.controlBlock.slice(0, 2),
+        token: mainCovenant.controlBlock.slice(0, 2),
+        lp: mainCovenant.controlBlock.slice(0, 2),
+      },
+    },
+  };
 
   return true;
 };
