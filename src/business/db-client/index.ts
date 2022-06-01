@@ -1,6 +1,7 @@
 import axios from "axios";
 import { DB_URL } from "../../env";
 import { BmConfig, BmCtxMempool, BmCtxNew, BmPtx, BmPtxCtx, Pool } from "@bitmatrix/models";
+import { AppSync } from "../../appSync";
 
 export const clear = (): Promise<void> => axios.delete<void>(DB_URL + "clear").then((res) => res.data);
 
@@ -112,3 +113,8 @@ export const ptxSave = (asset: string, value: BmPtx): Promise<void> =>
       console.error("ctxMempoolSave", res.message);
       throw res.message;
     });
+
+// appSync
+export const getLastAppSyncState = (appId: string): Promise<AppSync> => axios.get<AppSync>(DB_URL + "appSync/" + appId).then((res) => res.data);
+
+export const updateAppSyncState = (newState: AppSync): Promise<void> => axios.post<void>(DB_URL + "appSync", newState).then((res) => res.data);

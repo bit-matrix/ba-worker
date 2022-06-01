@@ -1,9 +1,11 @@
-import { pools } from "../business/db-client";
+import { getLastAppSyncState, pools, updateAppSyncState } from "../business/db-client";
 import { init, esploraClient, Block } from "@bitmatrix/esplora-api-client";
 import { WORKER_DELAY } from "../env";
 import { getNewBlock } from "../helper/getNewBlock";
 import { poolRegisteryWorker } from "./findPoolRegistery";
 import { poolWorker } from "./poolWorker";
+import * as nodeCron from "node-cron";
+import { AppSync } from "../appSync";
 
 const worker = async () => {
   try {
@@ -23,8 +25,7 @@ const worker = async () => {
         if (blockData) {
           const { newBlock, bestBlock } = blockData;
           const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
-          const poolRegisteryWorkerPromise = poolRegisteryWorker(newBlock);
-          promises.push(poolWorkerPromise, poolRegisteryWorkerPromise);
+          promises.push(poolWorkerPromise);
         }
       }
     }
@@ -37,8 +38,60 @@ const worker = async () => {
   }
 };
 
+const getFinalBlockDetail = async () => {
+  const bestBlockHeight = await esploraClient.blockTipHeight();
+  const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
+  const appLastState = await getLastAppSyncState("1");
+
+  if (appLastState.synced && bestBlockHeight - appLastState.blockHeight === 1) {
+    await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
+
+    const newDbState: AppSync = { id: "1", blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
+    await updateAppSyncState(newDbState);
+  } else if (appLastState.synced && bestBlockHeight - appLastState.blockHeight > 1) {
+    appWorker();
+  }
+};
+
+nodeCron.schedule("*/10 * * * * *", () => {
+  getFinalBlockDetail();
+});
+
+const appWorker = async () => {
+  console.log("app syncer started..");
+
+  try {
+    const bestblock = await esploraClient.blockTipHeight();
+
+    const appLastState = await getLastAppSyncState("1");
+
+    if (bestblock > appLastState.blockHeight) {
+      console.log("case1", "bestblock : ", bestblock, "lastblock : ", appLastState.blockHeight);
+
+      const nextBlockHeight = appLastState.blockHeight + 1;
+
+      const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
+
+      await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
+
+      const newDbState: AppSync = { id: "1", blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
+
+      await updateAppSyncState(newDbState);
+
+      appWorker();
+    } else if (bestblock === appLastState.blockHeight) {
+      const newDbState: AppSync = { ...appLastState, synced: true };
+
+      await updateAppSyncState(newDbState);
+    }
+  } catch (error) {
+    console.error("appWorker.error", error);
+  }
+};
+
 export const startWorkers = async () => {
   console.log("startWorkers started...");
   init("https://electrs.basebitmatrix.com/");
-  worker();
+  // worker();
+  appWorker();
 };
