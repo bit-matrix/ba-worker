@@ -1,6 +1,5 @@
 import { getLastAppSyncState, pools, updateAppSyncState } from "../business/db-client";
 import { init, esploraClient } from "@bitmatrix/esplora-api-client";
-import { WORKER_DELAY } from "../env";
 import { poolRegisteryWorker } from "./findPoolRegistery";
 import { poolWorker } from "./poolWorker";
 import * as nodeCron from "node-cron";
@@ -34,9 +33,14 @@ const getFinalBlockDetail = async () => {
   const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
   console.log("bestBlockHeight", bestBlockHeight);
-  console.log("bestBlockHash", bestBlockHash);
 
   const appLastState = await getLastAppSyncState("1");
+
+  console.log("appLastState", appLastState.blockHeight);
+
+  if (!appLastState.synced) {
+    appWorker();
+  }
 
   if (appLastState.synced && bestBlockHeight - appLastState.blockHeight === 1) {
     await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
