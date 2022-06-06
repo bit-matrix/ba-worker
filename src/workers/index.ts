@@ -37,6 +37,8 @@ const getFinalBlockDetail = async () => {
     const bestBlockHeight = await esploraClient.blockTipHeight();
     const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
+    if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
+
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
       await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
@@ -64,6 +66,8 @@ const appWorker = async () => {
     if (!appLastState.synced) {
       const bestBlockHeight = await esploraClient.blockTipHeight();
       const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
+
+      if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
 
       if (bestBlockHeight > appLastState.blockHeight) {
         const nextBlockHeight = appLastState.blockHeight + 1;
