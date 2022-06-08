@@ -63,31 +63,29 @@ const appWorker = async () => {
     const appLastState = await getLastAppSyncState("1");
 
     // app unsycned state
-    if (!appLastState.synced) {
-      const bestBlockHeight = await esploraClient.blockTipHeight();
-      const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
+    const bestBlockHeight = await esploraClient.blockTipHeight();
+    const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
-      if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
+    if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
 
-      if (bestBlockHeight > appLastState.blockHeight) {
-        const nextBlockHeight = appLastState.blockHeight + 1;
+    if (bestBlockHeight > appLastState.blockHeight) {
+      const nextBlockHeight = appLastState.blockHeight + 1;
 
-        const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
+      const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
 
-        await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
-        await ctxptxworker(appLastState.blockHash, bestBlockHash);
+      await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
+      await ctxptxworker(appLastState.blockHash, bestBlockHash);
 
-        const newDbState: AppSync = { id: "1", blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
+      const newDbState: AppSync = { id: "1", blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 
-        await updateAppSyncState(newDbState);
+      await updateAppSyncState(newDbState);
 
-        appWorker();
-      } else if (bestBlockHeight === appLastState.blockHeight) {
-        console.log("block çektim eşitledim update ediyorum statei");
-        const newDbState: AppSync = { ...appLastState, synced: true };
+      appWorker();
+    } else if (bestBlockHeight === appLastState.blockHeight) {
+      console.log("block çektim eşitledim update ediyorum statei");
+      const newDbState: AppSync = { ...appLastState, synced: true };
 
-        await updateAppSyncState(newDbState);
-      }
+      await updateAppSyncState(newDbState);
     }
   } catch (error) {
     console.error("appWorker.error", error);
