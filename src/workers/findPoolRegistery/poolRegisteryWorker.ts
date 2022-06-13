@@ -128,21 +128,21 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
   const quote: PAsset = {
     ticker: quoteTicker.ticker,
     name: quoteTicker.name,
-    asset: pair1.asset || "",
+    assetHash: pair1.asset || "",
     value: pair1.value?.toString() || "",
   };
 
   const token: PAsset = {
     ticker: tokenTicker.ticker,
     name: tokenTicker.name,
-    asset: pair2.asset || "",
+    assetHash: pair2.asset || "",
     value: pair2.value?.toString() || "",
   };
 
   const lPAsset: PAsset = {
     ticker: lpTicker.ticker,
     name: lpTicker.name,
-    asset: mayLP.asset || "",
+    assetHash: mayLP.asset || "",
     value: mayLP.value?.toString() || "",
   };
 
@@ -169,6 +169,36 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
     unspentTx: initialTx,
     lastSentPtx: newTxDetail.txid,
     active: true,
+    usdPrice: 0,
+    tvl: {
+      value: 0,
+      rate: {
+        value: "",
+        direction: "",
+      },
+    },
+    volume: {
+      value: 0,
+      rate: {
+        value: "",
+        direction: "",
+      },
+    },
+    fees: {
+      value: 0,
+      rate: {
+        value: "",
+        direction: "",
+      },
+    },
+    price: {
+      value: 0,
+      rate: {
+        value: "",
+        direction: "",
+      },
+      allPriceData: [],
+    },
   };
 
   try {
@@ -199,7 +229,6 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
       number: 1,
       hex: "01000000",
     },
-    fundingOutputAddress: "",
     innerPublicKey,
     recipientValueMinus: 3000000,
     mainCovenantScript: mainCovenant.mainCovenantScript.map((item) => item),

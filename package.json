@@ -12,7 +12,7 @@
   "dependencies": {
     "@bitmatrix/esplora-api-client": "^0.0.8",
     "@bitmatrix/lib": "^0.0.42",
-    "@bitmatrix/models": "^0.1.4",
+    "@bitmatrix/models": "^1.0.0-0",
     "@script-wiz/lib-core": "^0.0.42",
     "@script-wiz/wiz-data": "^1.0.0",
     "axios": "^0.24.0",

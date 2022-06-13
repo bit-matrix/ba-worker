@@ -8,9 +8,9 @@ import { usersRecipientTxOutputs } from "./usersRecipientTxOutputs";
 
 export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallData[]): { txOutputsEncoded: string; isOutOfSlippages: boolean[] } => {
   const poolAssetLE = hexLE(pool.id);
-  const tokenAssetLE = hexLE(pool.token.asset);
-  const lpAssetLE = hexLE(pool.lp.asset);
-  const qouteAssetLE = hexLE(pool.quote.asset);
+  const tokenAssetLE = hexLE(pool.token.assetHash);
+  const lpAssetLE = hexLE(pool.lp.assetHash);
+  const qouteAssetLE = hexLE(pool.quote.assetHash);
 
   const tokenHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.token;
   const lpHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.lp;
@@ -57,9 +57,9 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
 
   const usersRecipientTxOutputsEncoded = usersRecipientTxOutputs(userRecipientDatas.userRecipients);
 
-  const serviceCommissionTxOutputEncoded = serviceCommissionTxOutput(pool.quote.asset, serviceCommissionValueHex);
+  const serviceCommissionTxOutputEncoded = serviceCommissionTxOutput(pool.quote.assetHash, serviceCommissionValueHex);
 
-  const poolTxTxFeeOutputEncoded = poolTxTxFeeOutput(pool.quote.asset, txFeeValueHex);
+  const poolTxTxFeeOutputEncoded = poolTxTxFeeOutput(pool.quote.assetHash, txFeeValueHex);
 
   const poolTxOutputsEncoded = newPoolTxOutputsLengthHex + newPoolOutputsEncoded + usersRecipientTxOutputsEncoded + serviceCommissionTxOutputEncoded + poolTxTxFeeOutputEncoded;
 

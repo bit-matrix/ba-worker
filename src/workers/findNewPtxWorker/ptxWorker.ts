@@ -19,9 +19,9 @@ export const isPtxWorker = async (pool: Pool, newBlock: Block, newTxDetail: TxDe
   const unspent = synced ? true : await unspentPtx(newTxDetail);
 
   let poolValues: PoolValues = {
-    quote: newTxDetail.vout[3].value?.toString() || pool.quote.value,
-    token: newTxDetail.vout[1].value?.toString() || pool.token.value,
-    lp: newTxDetail.vout[2].value?.toString() || pool.lp.value,
+    quote: newTxDetail.vout[3].value?.toString() || pool.quote.value || "",
+    token: newTxDetail.vout[1].value?.toString() || pool.token.value || "",
+    lp: newTxDetail.vout[2].value?.toString() || pool.lp.value || "",
     ptxInfo: { txid: newTxDetail.txid, block_hash: newBlock.id, block_height: newBlock.height },
     unspent,
   };

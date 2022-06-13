@@ -12,7 +12,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
   const result: CallDataValue = { quote: 0, token: 0, lp: 0 };
   try {
     // 1. check first commitment output’s asset is LBTC
-    if (tx.vout[1].asset !== pool.quote.asset) return; // throw new Error("first commitment output's asset is not lbtc");
+    if (tx.vout[1].asset !== pool.quote.assetHash) return; // throw new Error("first commitment output's asset is not lbtc");
 
     // 2.1. check commitment outputs’ scriptpubkeys are equal
     if (tx.vout[1].scriptpubkey !== tx.vout[2].scriptpubkey) return; // throw new Error("commitment outputs' scriptpubkeys are not equal");
@@ -24,7 +24,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
     // 3. SWAP_LBTC_FOR_TOKEN
     if (callDataBase.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
       // 3.1. check second commitment output asset id is LBTC
-      if (tx.vout[2].asset !== pool.quote.asset) return; // throw new Error("second commitment output asset is not LBTC");
+      if (tx.vout[2].asset !== pool.quote.assetHash) return; // throw new Error("second commitment output asset is not LBTC");
       // 3.2. check second commitment output value is equal to service commission (650)
       // if (tx.vout[2].value !== config.serviceFee.number) return; // throw new Error("second commitment output value is not equal to " + Number(config.serviceFee.number));
       // 3.2. check first commitment outputs sum values - base_fee - config.serviceFee.number - ordering_fee is gte remaining_supply
@@ -37,7 +37,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
     // 4. SWAP_TOKEN_FOR_LBTC
     else if (callDataBase.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
       // 4.1. check second commitment output’s asset is token asset
-      if (tx.vout[2].asset !== pool.token.asset) return; // throw new Error("second commitment output's asset is not token asset");
+      if (tx.vout[2].asset !== pool.token.assetHash) return; // throw new Error("second commitment output's asset is not token asset");
       // 4.2. check second commitment output’s value is gte token min value (50000000)
       const user_token_supply: number = tx.vout[2].value || 0;
       if (user_token_supply < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
@@ -49,7 +49,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
     // 5. ADD_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.ADD_LIQUIDITY) {
       // 5.1. check second commitment output’s asset is token asset
-      if (tx.vout[2].asset !== pool.token.asset) return; //throw new Error("second commitment output's asset is not token asset");
+      if (tx.vout[2].asset !== pool.token.assetHash) return; //throw new Error("second commitment output's asset is not token asset");
       // 5.2. check second commitment output’s value is gte token min value (50000000)
       const user_token_supply: number = tx.vout[2].value || 0;
       if (user_token_supply < config.minTokenValue) return; // throw new Error("second commitment output’s value is not gte " + TOKEN_MIN_VALUE);
@@ -64,7 +64,7 @@ export const getCallDataValue = (pool: Pool, config: BmConfig, callDataBase: Cal
     // 6. REMOVE_LIQUIDITY
     else if (callDataBase.method === CALL_METHOD.REMOVE_LIQUIDITY) {
       // 6.1. check second commitment output’s asset is LP asset
-      if (tx.vout[2].asset !== pool.lp.asset) return; //throw new Error("second commitment output's asset is not LP asset");
+      if (tx.vout[2].asset !== pool.lp.assetHash) return; //throw new Error("second commitment output's asset is not LP asset");
       // 6.2. check second commitment output’s value is gte
       const user_lp_supply: number = tx.vout[2].value || 0;
       if (user_lp_supply < 10) return; // throw new Error("second commitment output's value is not gte 10");
