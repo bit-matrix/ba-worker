@@ -152,20 +152,12 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
     block_hash: blockHash,
   };
 
-  const lastSyncedBlock: BmBlockInfo = {
-    block_height: blockHeight,
-    block_hash: blockHash,
-  };
-
   const newPool: Pool = {
     id: mayPoolAssetId,
     quote,
     token,
     lp: lPAsset,
     initialTx,
-    lastSyncedBlock,
-    bestBlockHeight: blockHeight,
-    synced: false,
     unspentTx: initialTx,
     lastSentPtx: newTxDetail.txid,
     active: true,

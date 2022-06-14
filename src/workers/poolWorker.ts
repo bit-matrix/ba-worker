@@ -59,11 +59,7 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
      **/
     const newPool: Pool = { ...pool };
 
-    newPool.lastSyncedBlock = { block_height: newBlock.height, block_hash: newBlock.id };
-    newPool.synced = synced;
     newPool.lastSentPtx = lastSentPtx;
-
-    newPool.bestBlockHeight = bestBlock.height;
 
     if (poolValues) {
       newPool.quote.value = poolValues.quote;
