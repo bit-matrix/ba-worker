@@ -169,7 +169,6 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
     unspentTx: initialTx,
     lastSentPtx: newTxDetail.txid,
     active: true,
-    usdPrice: 0,
     tvl: {
       value: 0,
       rate: {
