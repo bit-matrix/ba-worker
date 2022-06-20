@@ -11,16 +11,16 @@ import { tokenHolderCovenant } from "./tokenHolderCovenant";
 export const poolTxWitness = async (pool: Pool, poolConfig: BmConfig, ctxs: BmCtxNew[]): Promise<string> => {
   const poolAssetLE = hexLE(pool.id);
 
-  const flagCovenantEncoded = flagCovenant(poolConfig.holderCovenant.controlBlockPrefix.main);
-  const tokenHolderCovenantEncoded = tokenHolderCovenant(poolAssetLE, poolConfig.holderCovenant.controlBlockPrefix.token);
-  const lpHolderCovenantEncoded = lpHolderCovenant(poolAssetLE, poolConfig.holderCovenant.controlBlockPrefix.lp);
+  const flagCovenantEncoded = flagCovenant(pool.holderCovenant.controlBlockPrefix.main);
+  const tokenHolderCovenantEncoded = tokenHolderCovenant(poolAssetLE, pool.holderCovenant.controlBlockPrefix.token);
+  const lpHolderCovenantEncoded = lpHolderCovenant(poolAssetLE, pool.holderCovenant.controlBlockPrefix.lp);
 
   const numberOfMainCovenantWitnessElementsEncoded = numberOfMainCovenantWitnessElements(ctxs.length);
 
   const settlementsEncoded: string = await settlements(ctxs);
   let mainCovenantScriptIndex: number = ctxs.length - 1;
   // mainCovenantScriptIndex = mainCovenantScriptIndex < 4 ? mainCovenantScriptIndex : 3;
-  const mainCovenantScript = poolConfig.mainCovenantScript[mainCovenantScriptIndex];
+  const mainCovenantScript = pool.mainCovenantScript[mainCovenantScriptIndex];
 
   const ctxsWitnessEncoded = ctxsWitness(ctxs);
   const outputsZerosEncoded = outputsZeros(ctxs.length);

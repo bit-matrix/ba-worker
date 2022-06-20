@@ -1,11 +1,11 @@
-import { Block, TxDetail } from "@bitmatrix/esplora-api-client";
+import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { getAsset } from "../../helper/getAsset";
 import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../helper/util";
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
-import { BmBlockInfo, BmConfig, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
-import { configAdd, poolUpdate } from "../../business/db-client";
+import { BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
+import { poolUpdate } from "../../business/db-client";
 
 export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: string, blockHeight: number): Promise<boolean> => {
   console.log("Is pool registery worker started");
@@ -190,38 +190,6 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
       },
       allPriceData: [],
     },
-  };
-
-  try {
-    await poolUpdate(newPool);
-  } catch {
-    return false;
-  }
-
-  // --------------------------- POOL CONFIG INSERT ---------------------------------
-
-  const newConfig: BmConfig = {
-    id: mayPoolAssetId,
-    minRemainingSupply: 1000,
-    minTokenValue: 50000000,
-    baseFee: {
-      number: 650,
-      hex: "",
-    },
-    serviceFee: {
-      number: 50,
-      hex: "",
-    },
-    commitmentTxFee: {
-      number: 100,
-      hex: "0000000000000064",
-    },
-    defaultOrderingFee: {
-      number: 1,
-      hex: "01000000",
-    },
-    innerPublicKey,
-    recipientValueMinus: 3000000,
     mainCovenantScript: mainCovenant.mainCovenantScript.map((item) => item),
     maxLeaf: leafCount,
     holderCovenant: {
@@ -239,8 +207,8 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
   };
 
   try {
-    await configAdd(mayPoolAssetId, newConfig);
-  } catch (error) {
+    await poolUpdate(newPool);
+  } catch {
     return false;
   }
 

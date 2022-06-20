@@ -12,9 +12,9 @@ export const poolTxOutputs = (pool: Pool, poolConfig: BmConfig, callDatas: CallD
   const lpAssetLE = hexLE(pool.lp.assetHash);
   const qouteAssetLE = hexLE(pool.quote.assetHash);
 
-  const tokenHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.token;
-  const lpHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.lp;
-  const mainHolderCovenantScriptPubkey: string = poolConfig.holderCovenant.scriptpubkey.main;
+  const tokenHolderCovenantScriptPubkey: string = pool.holderCovenant.scriptpubkey.token;
+  const lpHolderCovenantScriptPubkey: string = pool.holderCovenant.scriptpubkey.lp;
+  const mainHolderCovenantScriptPubkey: string = pool.holderCovenant.scriptpubkey.main;
 
   const userRecipientDatas = calculateUserRecipientDatas(
     qouteAssetLE,

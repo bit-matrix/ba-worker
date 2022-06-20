@@ -10,7 +10,7 @@ export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: B
 
   const poolConfig: BmConfig = await config(pool.id);
 
-  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, poolConfig.maxLeaf);
+  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, pool.maxLeaf);
   console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
 
   const bmNewPtxResult: BmNewPtxResult = await createPoolTx(pool, poolConfig, bestCtxs);
