@@ -3,13 +3,11 @@ import { BmConfig, Pool } from "@bitmatrix/models";
 import { config } from "../../business/db-client";
 import { isNewCtxWorker } from "./ctxWorker";
 
-export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[]) => {
+export const findNewCtxWorker = async (pool: Pool, newBlock: Block, newTxDetails: TxDetail[], poolConfig: BmConfig) => {
   try {
     // console.log("Find new ctx worker started for pool: " + pool.id + ", newBlockheight: " + newBmBlockInfo.block_height);
     // console.log("Find new ctx worker started");
     // console.log("Tx count: " + newTxDetails.length);
-
-    const poolConfig: BmConfig = await config(pool.id);
 
     for (let i = 0; i < newTxDetails.length; i++) {
       const newTxDetail = newTxDetails[i];

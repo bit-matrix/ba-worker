@@ -10,9 +10,9 @@ export const pool = (asset: string): Promise<Pool> => axios.get<Pool>(DB_URL + "
 // TODO
 export const poolUpdate = (newPool: Pool): Promise<void> => axios.post<void>(DB_URL + "pools", newPool).then((res) => res.data);
 
-export const config = (asset: string): Promise<BmConfig> => axios.get<BmConfig>(DB_URL + "config/" + asset).then((res) => res.data);
+export const config = (): Promise<BmConfig> => axios.get<BmConfig>(DB_URL + "config").then((res) => res.data);
 
-export const configAdd = (asset: string, newConfig: BmConfig): Promise<void> => axios.post<void>(DB_URL + "config/" + asset, newConfig).then((res) => res.data);
+export const configAdd = (newConfig: BmConfig): Promise<void> => axios.post<void>(DB_URL + "config", newConfig).then((res) => res.data);
 
 export const ctxsNew = (asset: string): Promise<BmCtxNew[]> =>
   axios
