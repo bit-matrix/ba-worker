@@ -30,7 +30,7 @@ const ctxptxworker = async (newBlockHash: string, bestBlockHash: string) => {
 };
 
 const getFinalBlockDetail = async () => {
-  const appLastState = await getLastAppSyncState("1");
+  const appLastState = await getLastAppSyncState();
 
   // app synced state
   if (appLastState.synced) {
@@ -44,7 +44,7 @@ const getFinalBlockDetail = async () => {
       await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
       await ctxptxworker(appLastState.blockHash, bestBlockHash);
 
-      const newDbState: AppSync = { id: "1", blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
+      const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
 
       console.log("sync completed");
@@ -60,7 +60,7 @@ const appWorker = async () => {
   console.log("app syncer started..");
 
   try {
-    const appLastState = await getLastAppSyncState("1");
+    const appLastState = await getLastAppSyncState();
 
     // app unsycned state
     const bestBlockHeight = await esploraClient.blockTipHeight();
@@ -76,7 +76,7 @@ const appWorker = async () => {
       await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
       await ctxptxworker(appLastState.blockHash, bestBlockHash);
 
-      const newDbState: AppSync = { id: "1", blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
+      const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 
       await updateAppSyncState(newDbState);
 

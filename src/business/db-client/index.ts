@@ -114,6 +114,6 @@ export const ptxSave = (asset: string, value: BmPtx): Promise<void> =>
     });
 
 // appSync
-export const getLastAppSyncState = (appId: string): Promise<AppSync> => axios.get<AppSync>(DB_URL + "appSync/" + appId).then((res) => res.data);
+export const getLastAppSyncState = (): Promise<AppSync> => axios.get<AppSync>(DB_URL + "appSync").then((res) => res.data);
 
 export const updateAppSyncState = (newState: AppSync): Promise<void> => axios.post<void>(DB_URL + "appSync", newState).then((res) => res.data);
