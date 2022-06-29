@@ -161,35 +161,6 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
     unspentTx: initialTx,
     lastSentPtx: newTxDetail.txid,
     active: true,
-    tvl: {
-      value: 0,
-      rate: {
-        value: "",
-        direction: "",
-      },
-    },
-    volume: {
-      value: 0,
-      rate: {
-        value: "",
-        direction: "",
-      },
-    },
-    fees: {
-      value: 0,
-      rate: {
-        value: "",
-        direction: "",
-      },
-    },
-    price: {
-      value: 0,
-      rate: {
-        value: "",
-        direction: "",
-      },
-      allPriceData: [],
-    },
     mainCovenantScript: mainCovenant.mainCovenantScript.map((item) => item),
     maxLeaf: leafCount,
     holderCovenant: {
