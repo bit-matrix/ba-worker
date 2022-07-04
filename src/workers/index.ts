@@ -1,7 +1,7 @@
 import { getLastAppSyncState, pools, updateAppSyncState } from "../business/db-client";
 import { init, esploraClient } from "@bitmatrix/esplora-api-client";
 import { AppSync } from "@bitmatrix/models";
-import { poolRegisteryWorker } from "./findPoolRegistery";
+import { poolRegisteryWorker } from "./v2/findPoolRegistery";
 import { poolWorker } from "./poolWorker";
 import * as nodeCron from "node-cron";
 

@@ -27,7 +27,9 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
      *
      **/
     if (newBlock.tx_count > 1) {
-      await findNewCtxWorker(pool, newBlock, newTxDetails, poolConfig);
+      // old
+      // await findNewCtxWorker(pool, newBlock, newTxDetails, poolConfig);
+      // new
     }
 
     /**

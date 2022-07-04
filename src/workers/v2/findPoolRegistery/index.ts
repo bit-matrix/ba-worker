@@ -1,5 +1,5 @@
 import { Block, esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
-import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
 import { isPoolRegisteryWorker } from "./poolRegisteryWorker";
 
 export const poolRegisteryWorker = async (newBlockHeight: number, newBlockHash: string) => {
