@@ -1,4 +1,4 @@
-import { TxVInRPC } from "./TxVınRPC";
+import { TxVInRPC } from "./TxVInRPC";
 import { TxVOutRPC } from "./TxVOutRPC";
 
 export type TxDetailRPC = {
