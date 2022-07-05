@@ -11,15 +11,17 @@
   },
   "dependencies": {
     "@bitmatrix/esplora-api-client": "^0.0.8",
-    "@bitmatrix/lib": "^0.0.42",
-    "@bitmatrix/models": "^1.0.0-6",
-    "@script-wiz/lib-core": "^0.0.42",
+    "@bitmatrix/lib": "^0.0.46",
+    "@bitmatrix/models": "^1.0.0-8",
+    "@script-wiz/lib-core": "^0.0.46",
     "@script-wiz/wiz-data": "^1.0.0",
     "axios": "^0.24.0",
     "bcrypto": "^5.4.0",
     "bn.js": "^5.2.0",
+    "decimal.js": "^10.3.1",
     "node-cron": "^3.0.0",
     "redis": "^4.1.1",
+    "tiny-secp256k1": "1.1.6",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
