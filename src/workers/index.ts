@@ -4,6 +4,7 @@ import { AppSync } from "@bitmatrix/models";
 import { poolRegisteryWorker } from "./v2/findPoolRegistery";
 import * as nodeCron from "node-cron";
 import { v2CtxPtxWorker } from "./v2/v2CtxPtxWorker";
+import { poolTxWorker } from "./v2/poolTxWorker";
 
 const getFinalBlockDetail = async () => {
   const appLastState = await getLastAppSyncState();
@@ -19,6 +20,7 @@ const getFinalBlockDetail = async () => {
     if (bestBlockHeight - appLastState.blockHeight === 1) {
       await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
       await v2CtxPtxWorker(appLastState.blockHash);
+      await poolTxWorker();
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
@@ -51,6 +53,7 @@ const appWorker = async () => {
 
       await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
       await v2CtxPtxWorker(appLastState.blockHash);
+      await poolTxWorker();
 
       const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 

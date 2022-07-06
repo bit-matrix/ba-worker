@@ -181,5 +181,6 @@ export const commitmentFinder = async (txId: string, pools: Pool[]) => {
     tapTweakedResultPrefix,
     cmtOutput2DecimalValue: cmtOutput2.value,
     poolId,
+    pool,
   };
 };
