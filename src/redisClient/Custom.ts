@@ -1,3 +1,3 @@
 export type Custom = {
-  field: any;
+  poolTxId: string;
 };
