@@ -1,6 +1,7 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { pools } from "../../business/db-client";
 import { commitmentWorker } from "./commitmentWorker";
+import { poolTxWorker } from "./poolTxWorker";
 
 export const v2CtxPtxWorker = async (newBlockHash: string) => {
   try {
@@ -15,8 +16,10 @@ export const v2CtxPtxWorker = async (newBlockHash: string) => {
     if (newTxDetails.length > 0) {
       const ps = await pools();
 
-      return commitmentWorker(ps, newTxDetails);
+      await commitmentWorker(ps, newTxDetails);
     }
+
+    await poolTxWorker(newTxDetails);
 
     // await commitmentFinder(pool, newTxDetails);
 
