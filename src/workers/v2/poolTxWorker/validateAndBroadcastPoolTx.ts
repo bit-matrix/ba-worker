@@ -4,8 +4,8 @@ import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXPTXResult, Pool } from "@bitmatrix/models";
 
-export const poolTxFinder = async (transactionId: string, pools: Pool[]) => {
-  const cof = await commitmentFinder(transactionId, pools);
+export const validateAndBroadcastPoolTx = async (value: any, pools: Pool[]) => {
+  const cof = value;
   const poolData = cof.pool;
   const method = cof.methodCall;
 
@@ -249,5 +249,6 @@ export const poolTxFinder = async (transactionId: string, pools: Pool[]) => {
     lp_liquidty: poolData.lp.value,
     new_lp_liquidty: poolData.lp.value,
     result,
+    txId: "",
   };
 };
