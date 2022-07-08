@@ -1,5 +1,5 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { CALL_METHOD, Pool } from "@bitmatrix/models";
+import { CALL_METHOD, Pool, TxDetailRPC } from "@bitmatrix/models";
 import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
 import { RedisClient } from "../../../redisClient/RedisClient";
 import { commitmentFinder } from "./commitmentFinder";
@@ -7,31 +7,34 @@ import { commitmentFinder } from "./commitmentFinder";
 const redisClient = new RedisClient("redis://localhost:6379");
 
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {
+  let promiseArray = [];
+
   for (let i = 0; i < newTxDetails.length; i++) {
     const newTxDetail = newTxDetails[i];
+    promiseArray.push(commitmentFinder(newTxDetail, pools));
+  }
 
-    commitmentFinder(newTxDetail.txid, pools)
-      .then(async (data) => {
-        console.log(data);
-
-        await redisClient.addKey(newTxDetail.txid, 60000, newTxDetail);
+  return Promise.all(promiseArray)
+    .then(async (values: any[]) => {
+      values.forEach(async (value) => {
+        await redisClient.addKey(value.transaction.txid, 60000, value);
 
         await sendTelegramMessage(
           "Pool: " +
-            data.poolId +
+            value.poolId +
             "\n" +
             "New Commitment Tx V2: <code>" +
-            newTxDetail.txid +
+            value.transaction.txid +
             "</code>\n" +
             "Commitment Data: <b>Method</b>: <code>" +
-            data.methodCall +
+            value.methodCall +
             "</code>, <b>Value</b>: <code>" +
-            data.cmtOutput2DecimalValue +
+            value.cmtOutput2DecimalValue +
             "</code>"
         );
-      })
-      .catch((err) => {
-        console.log(err);
       });
-  }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
