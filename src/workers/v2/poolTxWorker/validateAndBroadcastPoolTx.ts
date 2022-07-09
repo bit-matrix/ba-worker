@@ -1,10 +1,9 @@
-import { commitmentFinder } from "../commitmentWorker/commitmentFinder";
 import Decimal from "decimal.js";
 import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
-import { CTXPTXResult, Pool } from "@bitmatrix/models";
+import { CTXFinderResult, CTXPTXResult, Pool } from "@bitmatrix/models";
 
-export const validateAndBroadcastPoolTx = async (value: any, pools: Pool[]) => {
+export const validateAndBroadcastPoolTx = async (value: CTXFinderResult, pools: Pool[]) => {
   const cof = value;
   const poolData = cof.pool;
   const method = cof.methodCall;

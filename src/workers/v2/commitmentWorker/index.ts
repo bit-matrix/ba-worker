@@ -1,5 +1,5 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { CALL_METHOD, Pool, TxDetailRPC } from "@bitmatrix/models";
+import { CTXFinderResult, Pool } from "@bitmatrix/models";
 import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
 import { RedisClient } from "../../../redisClient/RedisClient";
 import { commitmentFinder } from "./commitmentFinder";
@@ -15,7 +15,7 @@ export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) 
   }
 
   return Promise.all(promiseArray)
-    .then(async (values: any[]) => {
+    .then(async (values: CTXFinderResult[]) => {
       values.forEach(async (value) => {
         await redisClient.addKey(value.transaction.txid, 60000, value);
 

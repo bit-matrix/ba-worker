@@ -1,8 +1,7 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { TxDetailRPC } from "@bitmatrix/models";
+import { CTXFinderResult } from "@bitmatrix/models";
 import { pools } from "../../../business/db-client";
 import { RedisClient } from "../../../redisClient/RedisClient";
-import { findNewPtxWorker } from "../../findNewPtxWorker";
 import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 
 const redisClient = new RedisClient("redis://localhost:6379");
@@ -10,14 +9,13 @@ const redisClient = new RedisClient("redis://localhost:6379");
 export const poolTxWorker = async (txDetails: TxDetail[]) => {
   //redisten ctx'leri cekme.
   //todo: valide etme
-  const values: any = await redisClient.getAllValues();
-
+  const values: CTXFinderResult[] = await redisClient.getAllValues();
   //TODO:Pool transaction Id'leri update etme
 
   //Pool validasyonlarından geçirme
   if (values.length > 0) {
-    const waitingCommitmentList: any[] = values.filter((value: any) => !value.txId);
-    const waitingPoolTxList: any[] = values.filter((value: any) => value.txId);
+    const waitingCommitmentList: CTXFinderResult[] = values.filter((value: CTXFinderResult) => !value.transaction.txid);
+    const waitingPoolTxList: CTXFinderResult[] = values.filter((value: CTXFinderResult) => value.transaction.txid);
 
     if (waitingCommitmentList.length > 0) {
       const ps = await pools();
@@ -27,7 +25,7 @@ export const poolTxWorker = async (txDetails: TxDetail[]) => {
           const commitmentTx = waitingCommitmentList[i];
           const poolTxId = await validateAndBroadcastPoolTx(commitmentTx, ps);
 
-          await redisClient.updateField(commitmentTx.txId, poolTxId.txId);
+          await redisClient.updateField(commitmentTx.transaction.txid, poolTxId.txId);
         }
       }
     }
