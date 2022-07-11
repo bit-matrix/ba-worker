@@ -21,7 +21,6 @@ export class RedisClient implements IRedisClient {
   getConnection() {
     if (this.connected) return this.redisClient;
     else {
-      console.log("url", this.url);
       this.redisClient = redis.createClient({
         url: this.url,
       });
