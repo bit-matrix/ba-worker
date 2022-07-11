@@ -4,14 +4,30 @@ import { Custom } from "./Custom";
 import IRedisClient from "./IRedisClient";
 
 export class RedisClient implements IRedisClient {
-  private redisClient: RedisClientType;
+  private redisClient!: RedisClientType;
+  url: string | undefined;
+  connected: boolean;
 
   constructor(url?: string) {
+    this.url = url;
+    this.connected = false;
     //if url is optional application will start using default redis url
-    this.redisClient = redis.createClient({
-      url,
-    });
-    this.redisClient.connect();
+    // this.redisClient = redis.createClient({
+    //   url,
+    // });
+    // this.redisClient.connect();
+  }
+
+  getConnection() {
+    if (this.connected) return this.redisClient;
+    else {
+      console.log("url", this.url);
+      this.redisClient = redis.createClient({
+        url: this.url,
+      });
+      this.redisClient.connect();
+      return this.redisClient;
+    }
   }
 
   addKey = async (key: string, seconds: number, value: object): Promise<string> => this.redisClient.SETEX(key, seconds, JSON.stringify(value));
