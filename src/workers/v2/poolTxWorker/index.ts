@@ -2,11 +2,10 @@ import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult } from "@bitmatrix/models";
 import { pools } from "../../../business/db-client";
 import { RedisClient } from "../../../redisClient/RedisClient";
+import { redisClient } from "../../../redisClient/redisInit";
 import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 
 export const poolTxWorker = async (txDetails: TxDetail[]) => {
-  const redisClient = new RedisClient("redis://localhost:6379");
-
   //redisten ctx'leri cekme.
   //todo: valide etme
   const values: CTXFinderResult[] = await redisClient.getAllValues();

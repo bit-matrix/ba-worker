@@ -17,9 +17,9 @@ export const v2CtxPtxWorker = async (newBlockHash: string) => {
       const ps = await pools();
 
       await commitmentWorker(ps, newTxDetails);
-    }
 
-    await poolTxWorker(newTxDetails);
+      await poolTxWorker(newTxDetails);
+    }
 
     // await commitmentFinder(pool, newTxDetails);
 
