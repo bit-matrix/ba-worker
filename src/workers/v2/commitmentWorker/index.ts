@@ -4,9 +4,8 @@ import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
 import { RedisClient } from "../../../redisClient/RedisClient";
 import { commitmentFinder } from "./commitmentFinder";
 
-const redisClient = new RedisClient("redis://localhost:6379");
-
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {
+  const redisClient = new RedisClient("redis://localhost:6379");
   let promiseArray = [];
 
   for (let i = 0; i < newTxDetails.length; i++) {

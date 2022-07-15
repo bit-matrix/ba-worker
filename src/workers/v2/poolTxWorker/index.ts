@@ -4,9 +4,9 @@ import { pools } from "../../../business/db-client";
 import { RedisClient } from "../../../redisClient/RedisClient";
 import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 
-const redisClient = new RedisClient("redis://localhost:6379");
-
 export const poolTxWorker = async (txDetails: TxDetail[]) => {
+  const redisClient = new RedisClient("redis://localhost:6379");
+
   //redisten ctx'leri cekme.
   //todo: valide etme
   const values: CTXFinderResult[] = await redisClient.getAllValues();

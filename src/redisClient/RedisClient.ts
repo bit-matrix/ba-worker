@@ -25,6 +25,7 @@ export class RedisClient implements IRedisClient {
         url: this.url,
       });
       this.redisClient.connect();
+
       return this.redisClient;
     }
   }
