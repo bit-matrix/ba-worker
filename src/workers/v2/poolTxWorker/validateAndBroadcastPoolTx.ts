@@ -153,8 +153,6 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult, pools: 
       result.new_pool_pair_2_liquidity = Math.floor(pool_pair_2_liquidity - result.user_received_pair_2);
     }
   } else if (method === "02") {
-    console.log(method);
-
     // 3- Commitment output 2 asset ID’sinin pair_2_asset_id olduğunu kontrol et.
     if (commitmentOutput2AssetId !== pair_2_asset_id) errorMessages.push("Commitment Output 2 AssetId must be equal to pair_1_asset_id");
 

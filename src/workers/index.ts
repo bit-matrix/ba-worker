@@ -68,8 +68,8 @@ const appWorker = async () => {
   }
 };
 
-nodeCron.schedule("*/5 * * * * *", () => {
-  getFinalBlockDetail();
+nodeCron.schedule("*/15 * * * * *", async () => {
+  await getFinalBlockDetail();
 });
 
 export const startWorkers = async () => {
