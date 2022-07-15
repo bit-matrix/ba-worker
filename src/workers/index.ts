@@ -18,7 +18,7 @@ const getFinalBlockDetail = async () => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
-      await v2CtxPtxWorker(appLastState.blockHash);
+      await v2CtxPtxWorker(bestBlockHash);
       await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
@@ -41,7 +41,6 @@ const appWorker = async () => {
 
     // app unsycned state
     const bestBlockHeight = await esploraClient.blockTipHeight();
-    const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
     if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
 
@@ -50,7 +49,7 @@ const appWorker = async () => {
 
       const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
 
-      await v2CtxPtxWorker(appLastState.blockHash);
+      await v2CtxPtxWorker(nextBlockHash);
       await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
 
       const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
