@@ -68,7 +68,7 @@ const appWorker = async () => {
   }
 };
 
-nodeCron.schedule("*/10 * * * * *", () => {
+nodeCron.schedule("*/5 * * * * *", () => {
   getFinalBlockDetail();
 });
 
