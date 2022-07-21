@@ -1,6 +1,7 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { pools } from "../../business/db-client";
 import { commitmentWorker } from "./commitmentWorker";
+import { nftHunterWorker } from "./nftHunterWorker";
 import { poolRegisteryWorker } from "./poolRegisteryWorker";
 import { poolTxWorker } from "./poolTxWorker";
 
@@ -18,6 +19,7 @@ export const bitmatrixWorker = async (newBlockHash: string) => {
       console.log("welcome to new tx ..");
 
       // nft avcısı worker -> pool'u update edecek
+      await nftHunterWorker(newTxDetails);
       // isCTXSpentWorker -> redisi update eder / silecek
 
       const ps = await pools();
