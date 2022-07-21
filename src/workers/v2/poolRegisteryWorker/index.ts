@@ -14,7 +14,16 @@ export const poolRegisteryWorker = async (txDetails: TxDetail[]) => {
 
       if (isNewPoolRegister) {
         sendTelegramMessage(
-          "New pool registered " + "\n" + "New Pool Id: <code>" + ntx.vout[0].asset + "</code>\n" + "</code>, <b>Pool Register tx</b>: <code>" + ntx.txid + "</code>"
+          "New pool registered " +
+            "\n" +
+            "New Pool Id: <code>" +
+            ntx.vout[0].asset +
+            "</code>\n" +
+            "Block Height: <code>" +
+            ntx.status.block_height +
+            "</code>, <b>Pool Register tx</b>: <code>" +
+            ntx.txid +
+            "</code>"
         );
       }
     }
