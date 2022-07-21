@@ -1,9 +1,8 @@
-import { getLastAppSyncState, pools, updateAppSyncState } from "../business/db-client";
+import { getLastAppSyncState, updateAppSyncState } from "../business/db-client";
 import { init, esploraClient } from "@bitmatrix/esplora-api-client";
 import { AppSync } from "@bitmatrix/models";
-import { poolRegisteryWorker } from "./v2/findPoolRegistery";
 import * as nodeCron from "node-cron";
-import { v2CtxPtxWorker } from "./v2/v2CtxPtxWorker";
+import { bitmatrixWorker } from "./v2/bitmatrixWorker";
 import { redisInit } from "../redisClient/redisInit";
 
 const getFinalBlockDetail = async () => {
@@ -18,8 +17,7 @@ const getFinalBlockDetail = async () => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
-      await v2CtxPtxWorker(bestBlockHash);
-      await poolRegisteryWorker(bestBlockHeight, bestBlockHash);
+      await bitmatrixWorker(bestBlockHash);
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
@@ -49,8 +47,7 @@ const appWorker = async () => {
 
       const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
 
-      await v2CtxPtxWorker(nextBlockHash);
-      await poolRegisteryWorker(nextBlockHeight, nextBlockHash);
+      await bitmatrixWorker(nextBlockHash);
 
       const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 

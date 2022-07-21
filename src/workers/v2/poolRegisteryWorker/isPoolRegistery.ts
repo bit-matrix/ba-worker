@@ -7,7 +7,7 @@ import { pool } from "@bitmatrix/lib";
 import { BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
 import { poolUpdate } from "../../../business/db-client";
 
-export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: string, blockHeight: number): Promise<boolean> => {
+export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
 
   // --------------------------- POOL VALIDATION ---------------------------------
@@ -148,8 +148,8 @@ export const isPoolRegisteryWorker = async (newTxDetail: TxDetail, blockHash: st
 
   const initialTx: BmTxInfo = {
     txid: newTxDetail.txid,
-    block_height: blockHeight,
-    block_hash: blockHash,
+    block_height: newTxDetail.status.block_height,
+    block_hash: newTxDetail.status.block_hash,
   };
 
   const newPool: Pool = {

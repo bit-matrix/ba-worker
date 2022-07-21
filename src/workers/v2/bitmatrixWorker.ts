@@ -1,11 +1,12 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { pools } from "../../business/db-client";
 import { commitmentWorker } from "./commitmentWorker";
+import { poolRegisteryWorker } from "./poolRegisteryWorker";
 import { poolTxWorker } from "./poolTxWorker";
 
-export const v2CtxPtxWorker = async (newBlockHash: string) => {
+export const bitmatrixWorker = async (newBlockHash: string) => {
   try {
-    console.log("pool tx , commitment tx worker started..");
+    console.log("bitmatrix worker started..");
 
     let newTxDetails: TxDetail[] = [];
 
@@ -14,22 +15,19 @@ export const v2CtxPtxWorker = async (newBlockHash: string) => {
     newTxDetails = newTxDetails.slice(1); // for coinbase transaction
 
     if (newTxDetails.length > 0) {
+      console.log("welcome to new tx ..");
+
+      // nft avcısı worker -> pool'u update edecek
+      // isCTXSpentWorker -> redisi update eder / silecek
+
       const ps = await pools();
 
       await commitmentWorker(ps, newTxDetails);
 
-      await poolTxWorker(newTxDetails);
+      await poolTxWorker(ps, newTxDetails);
+
+      await poolRegisteryWorker(newTxDetails);
     }
-
-    // await commitmentFinder(pool, newTxDetails);
-
-    // for (let i = 0; i < ps.length; i++) {
-    //   const p = ps[i];
-    //   if (p.active) {
-    //     const poolWorkerPromise = poolWorker(p, newBlock);
-    //     promises.push(poolWorkerPromise);
-    //   }
-    // }
   } catch (error) {
     console.error("worker.error", error);
   }
