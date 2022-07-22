@@ -1,13 +1,13 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { api, commitmentOutput } from "@bitmatrix/lib";
-import { Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
+import { CTXFinderResult, Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
 import { convertion } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import Decimal from "decimal.js";
 
 const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 
-export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => {
+export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult> => {
   // fetch tx details with rpc
   const rawTransactionHex: string = await api.getRawTransaction(transaction.txid);
   const decodedTransaction: TxDetailRPC = await api.decodeRawTransaction(rawTransactionHex);
@@ -15,35 +15,33 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => 
   //tx outputs
   const outputs: TxVOutRPC[] = decodedTransaction.vout;
 
-  if (outputs.length > 8 && outputs.length < 4) return Promise.reject();
+  if (outputs.length > 8 && outputs.length < 4) Promise.reject("Outputh length must be smaller than 8 and bigger than 4");
   const outputCount: WizData = WizData.fromNumber(outputs.length);
 
   //tx inputs
   const inputs: TxVInRPC[] = decodedTransaction.vin;
 
-  if (inputs.length > 12) return Promise.reject();
+  if (inputs.length > 12) Promise.reject("Input length must be smaller than 12");
   const inputCount: WizData = WizData.fromNumber(inputs.length);
 
   //cmt txin locktime’ı 4_bytes return
   const cmtTxLocktimeByteLength: string = convertion.numToLE32(WizData.fromNumber(decodedTransaction.locktime)).hex;
 
-  if (cmtTxLocktimeByteLength.length !== 8) return Promise.reject();
-
-  const cmtTxInOutpoints: Array<string> = inputs.map((inp) => {
+  const cmtTxInOutpoints = inputs.map((inp, index) => {
     const vout32Byte = convertion.numToLE32(WizData.fromNumber(inp.vout));
-    return hexLE(inp.txid) + vout32Byte.hex;
+    return { index, data: hexLE(inp.txid) + vout32Byte.hex };
   });
 
   const nSequences = inputs.map((inp) => inp.sequence);
 
   //Every nsequence must equal
-  if (nSequences.every((ns) => ns !== nSequences[0])) return Promise.reject();
+  if (nSequences.every((ns) => ns !== nSequences[0])) Promise.reject("Every nSequence must equal");
 
   const nsequenceValue: string = nSequences[0].toString(16);
 
   const opReturnOutput: Array<string> = outputs[0].scriptPubKey.asm.split(" ");
 
-  if (opReturnOutput[0] !== "OP_RETURN") return Promise.reject();
+  if (opReturnOutput[0] !== "OP_RETURN") Promise.reject("First output must be OP_RETURN output");
 
   const opReturnOutputScriptHex: string = opReturnOutput[1];
 
@@ -87,11 +85,14 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => 
   }
 
   // 6. Commitment out 1 (Calldatadan hemen sonraki output)’in taşıdığı L-BTC değeri 8 byte LE olarak.
-  if (cmtOutput1.asset !== lbtcAssest) return Promise.reject();
+  if (cmtOutput1.asset !== lbtcAssest) Promise.reject("Asset must be L-BTC");
 
   const cmtOutput1Value = "01" + convertion.numToLE64LE(WizData.fromNumber(new Decimal(cmtOutput1.value).mul(100000000).toNumber())).hex;
 
   //   7. Commitment out 2 (Cmt out 1 hemen sonraki output)’nin taşıdığı asset idsi pair1_asset türünden ise 0x03, pair2_asset türünden ise 0x01.
+  //const poolReq = await axios.get(`https://rocksdb.basebitmatrix.com/pools/${poolId}`);
+  //const poolDetail: Pool = poolReq.data;
+
   const pair1Asset = pool.quote.assetHash;
 
   const pair2Asset = pool.token.assetHash;
@@ -100,10 +101,11 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => 
 
   if (cmtOutput2.asset === pair2Asset) output2PairValue = "01";
   if (cmtOutput2.asset === pair1Asset) output2PairValue = "03";
+  if (methodCall === "04") output2PairValue = "02";
 
   //   8. Commitment out 2 ’in taşıdığı asset değeri 8 byte LE olarak.
 
-  if (cmtOutput2.value === undefined) return Promise.reject();
+  if (cmtOutput2.value === undefined) Promise.reject("Commitment Output Value musn't be confidential.");
   const cmtOutput2Value = "01" + convertion.numToLE64LE(WizData.fromNumber(new Decimal(cmtOutput2.value).mul(100000000).toNumber())).hex;
 
   //   9. Commitment out 3 ’ün taşıdığı asset id si pair1_asset türünden ise 0x03, pair2_asset türünden ise 0x01. (bu sadece case 3’ de var, eğer başka bir case ise empty 0x)
@@ -161,9 +163,14 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => 
 
   commitmentOutputResult = commitmentOutput.commitmentOutputTapscript(poolId, publicKey, isAddLiquidity);
   const tapTweakedResult = commitmentOutputResult.taprootResult.tweak.hex;
-  const tapTweakedResultPrefix: string = tapTweakedResult.substring(0, 2);
+  const tapTweakedResultPrefix = tapTweakedResult.substring(0, 2);
 
   return {
+    tapTweakedResultPrefix,
+    cmtTxLocktimeByteLength,
+    outputCount,
+    inputCount,
+    inputs,
     outputs,
     nsequenceValue,
     cmtTxInOutpoints,
@@ -176,13 +183,14 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]) => 
     cmtOutput3Asset,
     changeOutputFinal,
     seperatedChangeOutputs,
+    poolId,
     methodCall,
+    publicKey,
     slippageTolerance,
     orderingFee,
-    tapTweakedResultPrefix,
-    cmtOutput2DecimalValue: cmtOutput2.value,
-    poolId,
-    pool,
+    cmtOutput1,
+    cmtOutput2,
+    cmtOutput3,
     transaction,
   };
 };
