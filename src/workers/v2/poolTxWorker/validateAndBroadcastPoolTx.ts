@@ -3,7 +3,7 @@ import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool } from "@bitmatrix/models";
 
-export const validateAndBroadcastPoolTx = async (value: CTXFinderResult, pools: Pool[]) => {
+export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
   const cof = value;
   const poolData = cof.pool;
   const method = cof.methodCall;
