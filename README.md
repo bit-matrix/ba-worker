@@ -14,6 +14,7 @@ cd /root/github/bit-matrix/new-pool/ba-worker
 git pull
 docker build -t ba-worker-new-pool .
 docker run -d --network="host" ba-worker-new-pool
+docker run --name my-redis -p 6379:6379 -d redis
 
 ## live logs
 
