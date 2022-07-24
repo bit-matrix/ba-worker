@@ -7,7 +7,7 @@ import Decimal from "decimal.js";
 
 const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 
-export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult> => {
+export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult | undefined> => {
   // fetch tx details with rpc
   const rawTransactionHex: string = await api.getRawTransaction(transaction.txid);
   const decodedTransaction: TxDetailRPC = await api.decodeRawTransaction(rawTransactionHex);
@@ -15,13 +15,13 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
   //tx outputs
   const outputs: TxVOutRPC[] = decodedTransaction.vout;
 
-  if (outputs.length > 8 && outputs.length < 4) Promise.reject("Outputh length must be smaller than 8 and bigger than 4");
+  if (outputs.length > 8 && outputs.length < 4) return undefined;
   const outputCount: WizData = WizData.fromNumber(outputs.length);
 
   //tx inputs
   const inputs: TxVInRPC[] = decodedTransaction.vin;
 
-  if (inputs.length > 12) Promise.reject("Input length must be smaller than 12");
+  if (inputs.length > 12) return undefined;
   const inputCount: WizData = WizData.fromNumber(inputs.length);
 
   //cmt txin locktime’ı 4_bytes return
@@ -35,13 +35,13 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
   const nSequences = inputs.map((inp) => inp.sequence);
 
   //Every nsequence must equal
-  if (nSequences.every((ns) => ns !== nSequences[0])) Promise.reject("Every nSequence must equal");
+  if (nSequences.every((ns) => ns !== nSequences[0])) return undefined;
 
   const nsequenceValue: string = nSequences[0].toString(16);
 
   const opReturnOutput: Array<string> = outputs[0].scriptPubKey.asm.split(" ");
 
-  if (opReturnOutput[0] !== "OP_RETURN") Promise.reject("First output must be OP_RETURN output");
+  if (opReturnOutput[0] !== "OP_RETURN") return undefined;
 
   const opReturnOutputScriptHex: string = opReturnOutput[1];
 
@@ -52,7 +52,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     return p.id === poolId && p.active;
   });
 
-  if (!pool) return Promise.reject();
+  if (!pool) return undefined;
 
   //methodCall (2)
   const methodCall: string = opReturnOutputScriptHex.substring(64, 66);

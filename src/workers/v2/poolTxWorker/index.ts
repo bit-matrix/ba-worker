@@ -4,6 +4,7 @@ import { redisClient } from "../../../redisClient/redisInit";
 import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 
 export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
+  console.log("-------------------POOL TX WORKER-------------------------");
   //redisten ctx'leri cekme.
   //todo: valide etme
   const values: CTXFinderResult[] = await redisClient.getAllValues();
@@ -18,7 +19,7 @@ export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
       if (pools.length > 0) {
         for (let i = 0; i < waitingCommitmentList.length; i++) {
           const commitmentTx = waitingCommitmentList[i];
-          const poolTxId = await validateAndBroadcastPoolTx(commitmentTx, pools);
+          const poolTxId = await validateAndBroadcastPoolTx(commitmentTx);
 
           await redisClient.updateField(commitmentTx.transaction.txid, poolTxId.txId);
         }

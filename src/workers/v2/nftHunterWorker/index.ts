@@ -4,6 +4,7 @@ import { pools, poolUpdate } from "../../../business/db-client";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
   console.log("-------------------NFT HUNTER-------------------------");
+
   const bitmatrixPools = await pools();
 
   newTxDetails.forEach(async (tx) => {

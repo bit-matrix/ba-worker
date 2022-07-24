@@ -6,6 +6,7 @@ import { redisClient } from "../../../redisClient/redisInit";
 import { commitmentFinder } from "./commitmentFinder";
 
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {
+  console.log("-------------------COMMINTMENT WORKER-------------------------");
   let promiseArray = [];
 
   for (let i = 0; i < newTxDetails.length; i++) {
@@ -14,25 +15,27 @@ export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) 
   }
 
   return Promise.all(promiseArray)
-    .then(async (values: CTXFinderResult[]) => {
-      values.forEach(async (value) => {
-        const data: RedisData = { transaction: value.transaction, commitmentData: value };
+    .then(async (values: (CTXFinderResult | undefined)[]) => {
+      values.forEach(async (value: CTXFinderResult | undefined) => {
+        if (value) {
+          const data: RedisData = { transaction: value.transaction, commitmentData: value };
 
-        await redisClient.addKey(value.transaction.txid, 60000, data);
+          await redisClient.addKey(value.transaction.txid, 60000, data);
 
-        await sendTelegramMessage(
-          "Pool: " +
-            value.poolId +
-            "\n" +
-            "New Commitment Tx V2: <code>" +
-            value.transaction.txid +
-            "</code>\n" +
-            "Commitment Data: <b>Method</b>: <code>" +
-            value.methodCall +
-            "</code>, <b>Value</b>: <code>" +
-            value.cmtOutput2.value +
-            "</code>"
-        );
+          await sendTelegramMessage(
+            "Pool: " +
+              value.poolId +
+              "\n" +
+              "New Commitment Tx V2: <code>" +
+              value.transaction.txid +
+              "</code>\n" +
+              "Commitment Data: <b>Method</b>: <code>" +
+              value.methodCall +
+              "</code>, <b>Value</b>: <code>" +
+              value.cmtOutput2.value +
+              "</code>"
+          );
+        }
       });
     })
     .catch((err) => {
