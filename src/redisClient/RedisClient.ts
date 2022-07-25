@@ -37,6 +37,8 @@ export class RedisClient implements IRedisClient {
     return [];
   };
 
+  removeKey = async (key: string): Promise<number> => this.redisClient.del(key);
+
   removeKeys = async (keys: string[]): Promise<number> => this.redisClient.del(keys);
 
   updateField = async <T extends Custom>(key: string, value: string): Promise<string> => {

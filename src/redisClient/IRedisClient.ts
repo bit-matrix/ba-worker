@@ -3,6 +3,7 @@ interface IRedisClient {
   getAllKeys: () => Promise<string[]>;
   getDataByKey: <T>(key: string) => Promise<T>;
   getAllValues: <T>() => Promise<T[]>;
+  removeKey: (key: string) => Promise<number>;
   removeKeys: (keys: string[]) => Promise<number>;
   updateField: (keys: string, value: string) => Promise<string>;
 }
