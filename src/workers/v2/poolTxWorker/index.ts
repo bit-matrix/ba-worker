@@ -6,14 +6,15 @@ import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
   console.log("-------------------POOL TX WORKER-------------------------");
   //redisten ctx'leri cekme.
-  //todo: valide etme
-  const values: CTXFinderResult[] = await redisClient.getAllValues();
+
   //TODO:Pool transaction Id'leri update etme
 
+  const waitingTxs = await redisClient.getAllValues<CTXFinderResult>();
+
   //Pool validasyonlarından geçirme
-  if (values.length > 0) {
-    const waitingCommitmentList: CTXFinderResult[] = values.filter((value: CTXFinderResult) => !value.transaction.txid);
-    const waitingPoolTxList: CTXFinderResult[] = values.filter((value: CTXFinderResult) => value.transaction.txid);
+  if (waitingTxs.length > 0) {
+    const waitingCommitmentList: CTXFinderResult[] = waitingTxs.filter((value: CTXFinderResult) => !value.transaction.txid);
+    const waitingPoolTxList: CTXFinderResult[] = waitingTxs.filter((value: CTXFinderResult) => value.transaction.txid);
 
     if (waitingCommitmentList.length > 0) {
       if (pools.length > 0) {

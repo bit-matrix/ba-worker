@@ -4,9 +4,6 @@ import { isPoolRegistery } from "./isPoolRegistery";
 
 export const poolRegisteryWorker = async (txDetails: TxDetail[]) => {
   console.log("-------------------POOL REGISTERY WORKER-------------------------");
-  // console.log("newBlock.tx_count", newBlock.tx_count);
-
-  console.log("Find new pool register worker started");
 
   try {
     for (let i = 0; i < txDetails.length; i++) {
