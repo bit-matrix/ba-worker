@@ -175,6 +175,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
         lp: mainCovenant.controlBlock.slice(0, 2),
       },
     },
+    pair1_coefficient: pair1_coefficient,
   };
 
   try {
