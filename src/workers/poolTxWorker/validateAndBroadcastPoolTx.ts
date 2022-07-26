@@ -82,7 +82,7 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
 
   const pair_2_pool_supply = Number(poolData.token.value);
 
-  const pair_1_coefficient = 20;
+  const pair_1_coefficient = poolData.pair1_coefficient.number;
 
   const pair_2_coefficient = Math.floor(pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient;
 
@@ -139,7 +139,7 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
     // 16-user_received_pair_2_apx değerinden payout_additional_fees değerini çıkar ve sonuca user_received_pair_2 ismini ver.
     result.user_received_pair_2 = Math.floor(result.user_received_pair_2_apx - result.payout_additional_fees);
 
-    if (result.user_received_pair_2 < Math.floor(22 * pair_2_coefficient)) {
+    if (result.user_received_pair_2 < Math.floor(10 * pair_2_coefficient)) {
       errorMessages.push("Dust payout");
 
       output.assetId = pair_1_asset_id;
@@ -215,7 +215,7 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
     // 16- user_received_pair_1_apx değerinden payout_additional_fees değerini çıkar ve sonuca user_received_pair_1 ismini ver.
     result.user_received_pair_1 = Math.floor(result.user_received_pair_1_apx - result.payout_additional_fees);
 
-    if (result.user_received_pair_1 < Math.floor(22 * pair_1_coefficient)) {
+    if (result.user_received_pair_1 < Math.floor(10 * pair_1_coefficient)) {
       errorMessages.push("Dust payout");
 
       output.assetId = pair_2_asset_id;
