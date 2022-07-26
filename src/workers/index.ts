@@ -3,7 +3,7 @@ import { init, esploraClient } from "@bitmatrix/esplora-api-client";
 import { AppSync } from "@bitmatrix/models";
 import * as nodeCron from "node-cron";
 import { bitmatrixWorker } from "./bitmatrixWorker";
-import { redisInit } from "../redisClient/redisInit";
+import { redisInit } from "@bitmatrix/redis-client";
 
 const getFinalBlockDetail = async () => {
   const appLastState = await getLastAppSyncState();
