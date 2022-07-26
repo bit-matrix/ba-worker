@@ -1,6 +1,6 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { Pool } from "@bitmatrix/models";
-import { pools, poolUpdate } from "../../../business/db-client";
+import { pools, poolUpdate } from "../../business/db-client";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
   console.log("-------------------NFT HUNTER-------------------------");

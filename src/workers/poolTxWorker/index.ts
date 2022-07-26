@@ -1,6 +1,6 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult, Pool } from "@bitmatrix/models";
-import { redisClient } from "../../../redisClient/redisInit";
+import { redisClient } from "../../redisClient/redisInit";
 import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
 
 export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {

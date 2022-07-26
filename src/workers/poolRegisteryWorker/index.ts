@@ -1,5 +1,5 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { isPoolRegistery } from "./isPoolRegistery";
 
 export const poolRegisteryWorker = async (txDetails: TxDetail[]) => {

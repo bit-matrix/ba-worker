@@ -1,7 +1,7 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult, Pool } from "@bitmatrix/models";
-import { sendTelegramMessage } from "../../../helper/sendTelegramMessage";
-import { redisClient } from "../../../redisClient/redisInit";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { redisClient } from "../../redisClient/redisInit";
 import { commitmentFinder } from "./commitmentFinder";
 
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {

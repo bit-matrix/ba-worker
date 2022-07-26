@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
-import { CTXFinderResult, CTXPTXResult, Pool } from "@bitmatrix/models";
+import { CTXFinderResult, CTXPTXResult } from "@bitmatrix/models";
 
 export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
   const cof = value;
