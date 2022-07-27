@@ -1,13 +1,10 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult, Pool } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
-import { validatePoolTx } from "./validateAndBroadcastPoolTx";
+import { validatePoolTx } from "./validatePoolTx";
 
 export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
   console.log("-------------------POOL TX WORKER-------------------------");
-  //redisten ctx'leri cekme.
-
-  //TODO:Pool transaction Id'leri update etme
 
   const waitingTxs = await redisClient.getAllValues<CTXFinderResult>();
 
