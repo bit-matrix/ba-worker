@@ -1,9 +1,9 @@
 import Decimal from "decimal.js";
 import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
-import { CTXFinderResult, CTXPTXResult } from "@bitmatrix/models";
+import { CTXFinderResult, CTXPTXResult, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (value: CTXFinderResult) => {
+export const validatePoolTx = async (value: CTXFinderResult): Promise<PTXFinderResult> => {
   const cof = value;
   const poolData = cof.pool;
   const method = cof.methodCall;
@@ -63,12 +63,6 @@ export const validatePoolTx = async (value: CTXFinderResult) => {
     pair_1_min_redeem: 0,
     pair_2_min_redeem: 0,
   };
-
-  //const poolId = cof.poolId;
-
-  //get pool
-  //const poolReq = await axios.get(`https://rocksdb.basebitmatrix.com/pools/${poolId}`);
-  //const poolData = poolReq.data;
 
   // 1-Havuzun güncel pair_1 liquidity miktarına pool_pair_1_liquidity ismini ver.
   const pool_pair_1_liquidity = Number(poolData.quote.value);
@@ -417,7 +411,6 @@ export const validatePoolTx = async (value: CTXFinderResult) => {
   }
 
   return {
-    errorMessages,
     method,
     pool_pair_1_liquidity,
     pool_pair_2_liquidity,
@@ -431,11 +424,7 @@ export const validatePoolTx = async (value: CTXFinderResult) => {
     pool_pair_1_liquidity_downgraded,
     pool_pair_2_liquidity_downgraded,
     pool_constant,
-    lp_liquidty: poolData.lp.value,
-    new_lp_liquidty: poolData.lp.value,
     result,
-    txId: "",
-    ...cof,
     lp_asset_id,
     leafCount: poolData.maxLeaf,
     poolData,
