@@ -3,7 +3,7 @@ import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult } from "@bitmatrix/models";
 
-export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
+export const validatePoolTx = async (value: CTXFinderResult) => {
   const cof = value;
   const poolData = cof.pool;
   const method = cof.methodCall;
@@ -16,6 +16,11 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
   };
 
   let case3outputs = {
+    output1: { ...output },
+    output2: { ...output },
+  };
+
+  let case4outputs = {
     output1: { ...output },
     output2: { ...output },
   };
@@ -37,9 +42,11 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
     new_pair_2_pool_liquidity_apx_2: 0,
     user_received_pair_2_apx: 0,
     user_received_pair_2: 0,
+    new_pool_lp_supply: 0,
     pool_lp_supply: Number(poolData.lp.value),
     new_pool_lp_liquidity: Number(poolData.lp.value),
     lp_circulation: 0,
+    user_lp_supply_total: 0,
     user_lp_received: 0,
     user_lp_apx_1: 0,
     user_lp_apx_2: 0,
@@ -49,6 +56,12 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
     user_pair_2_supply_total_downgraded: 0,
     mul_1: 0,
     mul_2: 0,
+    div_1: 0,
+    div_2: 0,
+    pair_1_user_redeem: 0,
+    pair_2_user_redeem: 0,
+    pair_1_min_redeem: 0,
+    pair_2_min_redeem: 0,
   };
 
   //const poolId = cof.poolId;
@@ -332,6 +345,75 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
       result.new_pool_pair_2_liquidity = Math.floor(pool_pair_2_liquidity + result.user_pair_2_supply_total);
       result.new_pool_lp_liquidity = Math.floor(result.pool_lp_supply - result.user_lp_received);
     }
+  } else if (method === "04") {
+    // 2000000000 değerinden pool_lp_supply değerini çıkar ve sonuca lp_circulation ismini ver.
+    result.lp_circulation = Math.floor(2000000000 - result.pool_lp_supply);
+
+    // Commitment output 2 asset ID’sinin lp_asset_id olduğunu kontrol et.
+    if (commitmentOutput2AssetId !== lp_asset_id) errorMessages.push("Commitment Output 2 AssetId must be equal to Lp Asset Id");
+
+    // Commitment output 2 miktarına user_lp_supply_total ismini ver.
+    result.user_lp_supply_total = new Decimal(commitmentOutput2.value).mul(100000000).toNumber();
+
+    // user_lp_supply_total ile pool_pair_1_liquidity_downgraded değerini çarp ve bu değeri mul_1 ismini ver.
+    result.mul_1 = Math.floor(result.user_lp_supply_total * pool_pair_1_liquidity_downgraded);
+
+    // mul_1 değerini lp_circulation değerine böl ve sonuca div_1 ismini ver.
+    result.div_1 = Math.floor(result.mul_1 / result.lp_circulation);
+
+    // div_1 değeri ile pair_1_coefficient değerini çarp ve sonuca pair_1_user_redeem ismini ver.
+    result.pair_1_user_redeem = Math.floor(result.div_1 * pair_1_coefficient);
+
+    // user_lp_supply_total ile pool_pair_2_liquidity_downgraded değerini çarp ve bu değeri mul_2 ismini ver.
+    result.mul_2 = Math.floor(result.user_lp_supply_total * pool_pair_2_liquidity_downgraded);
+
+    // mul_2 değerini lp_circulation değerine böl ve sonuca div_2 ismini ver.
+    result.div_2 = Math.floor(result.mul_2 / result.lp_circulation);
+
+    // div_2 değeri ile pair_2_coefficient değerini çarp ve sonuca pair_2_user_redeem ismini ver.
+    result.pair_2_user_redeem = Math.floor(result.div_2 * pair_2_coefficient);
+
+    // 22 ile pair_1_coefficient değerini çarp ve bu değere pair_1_min_redeem ismini ver.
+
+    result.pair_1_min_redeem = Math.floor(pair_1_coefficient * 10);
+    // 22 ile pair_2_coefficient değerini çarp ve bu değere pair_2_min_redeem ismini ver.
+    result.pair_2_min_redeem = Math.floor(pair_2_coefficient * 10);
+
+    // a. pair_1_user_redeem değeri pair_1_min_redeem değerinden küçük ise veya pair_2_user_redeem değeri pair_2_min_redeem değerinden küçük ise “revert” logic’ini çalıştır. Bu erroru “Dust LP payout” olarak etiketle.
+    if (result.pair_1_user_redeem < result.pair_1_min_redeem || result.pair_2_user_redeem < result.pair_2_min_redeem) {
+      errorMessages.push("Dust LP payout");
+
+      // İlgili slot için 1 tane settlement output oluştur. Bu outputun asset ID ‘sini lp_asset id olarak ayarla ve miktarını da user_lp_supply_total olarak ayarla.
+      // new_pool_pair_1_liquidity = pool_pair_1_liquidity (değişmedi).
+      // new_pool_pair_2_liquidity = pool_pair_2_liquidity (değişmedi).
+      // new_pool_lp_supply = pool_lp_supply (değişmedi).
+
+      output.assetId = lp_asset_id;
+      output.value = result.user_lp_supply_total;
+      result.new_pool_pair_1_liquidity = pool_pair_1_liquidity;
+      result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
+      result.new_pool_lp_liquidity = result.pool_lp_supply;
+      // -------------------TODO-------------------
+      // burası mastera geçince new_pool_lp_supply olarak geğiştirilecek result.new_pool_lp_liquidity = result.pool_lp_supply;
+    }
+
+    if (errorMessages.length === 0) {
+      //       Success logic’inde;
+      // İlgili slot için 2 tane settlement output oluştur.
+      // Birinci outputun asset ID sini pair_1_asset_id olarak ayarla, miktarını da pair_1_user_redeem olarak ayarla.
+      // İkinci outputun asset ID sini pair_2_asset_id olarak ayarla, miktarını da pair_2_user_redeem olarak ayarla.
+      // pool_pair_1_liquidity değerinden pair_1_user_redeem değerini çıkar ve sonuca new_pool_pair_1_liquidity ismini ver. Bu değeri havuzun güncel pair 1 liquidity miktarı olarak ata.
+      // pool_pair_2_liquidity değerinden pair_2_user_redeem değerini çıkar ve sonuca new_pool_pair_2_liquidity ismini ver. Bu değeri havuzun güncel pair 2 liquidity miktarı olarak ata.
+      // pool_lp_supply değerine user_lp_supply_total değerini ekle ve sonuca new_pool_lp_supply ismini ver. Bu değeri havuzun güncel pair lp supply değeri olarak ata.
+      case4outputs.output1.assetId = pair_1_asset_id;
+      case4outputs.output1.value = result.pair_1_user_redeem;
+      case4outputs.output2.assetId = pair_2_asset_id;
+      case4outputs.output2.value = result.pair_2_user_redeem;
+
+      result.new_pool_pair_1_liquidity = Math.floor(pool_pair_1_liquidity - result.pair_1_user_redeem);
+      result.new_pool_pair_2_liquidity = Math.floor(pool_pair_2_liquidity - result.pair_2_user_redeem);
+      result.new_pool_lp_liquidity = Math.floor(result.pool_lp_supply + result.user_lp_supply_total);
+    }
   }
 
   return {
@@ -359,5 +441,6 @@ export const validateAndBroadcastPoolTx = async (value: CTXFinderResult) => {
     poolData,
     output,
     case3outputs,
+    case4outputs,
   };
 };

@@ -1,7 +1,7 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult, Pool } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
-import { validateAndBroadcastPoolTx } from "./validateAndBroadcastPoolTx";
+import { validatePoolTx } from "./validateAndBroadcastPoolTx";
 
 export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
   console.log("-------------------POOL TX WORKER-------------------------");
@@ -20,7 +20,7 @@ export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
       if (pools.length > 0) {
         for (let i = 0; i < waitingCommitmentList.length; i++) {
           const commitmentTx = waitingCommitmentList[i];
-          const poolTxId = await validateAndBroadcastPoolTx(commitmentTx);
+          const poolTxId = await validatePoolTx(commitmentTx);
 
           await redisClient.updateField(commitmentTx.transaction.txid, poolTxId.txId);
         }
