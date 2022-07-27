@@ -1,6 +1,6 @@
-import { CTXFinderResult, TxDetail } from "@bitmatrix/models";
+import { CTXFinderResult, CTXPTXResult } from "@bitmatrix/models";
 
-export type RedisData = {
-  transaction: TxDetail;
+export type BitmatrixStoreData = {
   commitmentData: CTXFinderResult;
+  poolValidationData: CTXPTXResult;
 };
