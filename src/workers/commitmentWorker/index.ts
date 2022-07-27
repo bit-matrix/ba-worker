@@ -3,6 +3,7 @@ import { CTXFinderResult, Pool } from "@bitmatrix/models";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { redisClient } from "@bitmatrix/redis-client";
 import { commitmentFinder } from "./commitmentFinder";
+import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {
   console.log("-------------------COMMINTMENT WORKER-------------------------");
@@ -17,7 +18,9 @@ export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) 
     .then(async (values: (CTXFinderResult | undefined)[]) => {
       values.forEach(async (value: CTXFinderResult | undefined) => {
         if (value) {
-          await redisClient.addKey(value.transaction.txid, 60000, value);
+          const newStoreData: BitmatrixStoreData = { commitmentData: value };
+
+          await redisClient.addKey(value.transaction.txid, 60000, newStoreData);
 
           await sendTelegramMessage(
             "Pool: " +
