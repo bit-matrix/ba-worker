@@ -16,7 +16,9 @@ export const isCtxSpentWorker = async () => {
       if (outspends[1].spent || outspends[2].spent) {
         await redisClient.removeKey(txId);
 
-        // add tx history
+        // @to-do add tx history
+
+        // @to-do telegram message swap completed for ctx = ""
       }
     }
   }

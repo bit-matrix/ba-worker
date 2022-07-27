@@ -27,6 +27,8 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
         }
 
         await poolUpdate(newPool);
+
+        //@to-do send telegram notifaction = (new pool last state detected)
       }
     }
   });
