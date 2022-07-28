@@ -35,7 +35,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
             "Pool: " +
             currentPool.id +
             "\n" +
-            "Commitment Data: <b>Quate Value</b>: <code>" +
+            "Commitment Data: <b>Quote Value</b>: <code>" +
             newPool.quote.value +
             "</code>, <b>Token Value</b>: <code>" +
             newPool.token.value +
