@@ -12,9 +12,9 @@
   "dependencies": {
     "@bitmatrix/esplora-api-client": "^0.0.8",
     "@bitmatrix/lib": "^0.0.53",
-    "@bitmatrix/models": "^1.0.0-24",
+    "@bitmatrix/models": "^1.0.0-29",
     "@bitmatrix/redis-client": "^1.0.1",
-    "@script-wiz/lib-core": "^0.0.46",
+    "@script-wiz/lib-core": "^0.0.47",
     "@script-wiz/wiz-data": "^1.0.0",
     "axios": "^0.24.0",
     "bcrypto": "^5.4.0",
