@@ -1,6 +1,7 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { Pool } from "@bitmatrix/models";
 import { pools, poolUpdate } from "../../business/db-client";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
   console.log("-------------------NFT HUNTER-------------------------");
@@ -29,6 +30,17 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
         await poolUpdate(newPool);
 
         //@to-do send telegram notifaction = (new pool last state detected)
+        await sendTelegramMessage(
+          "New Pool Last State Detected : " +
+            "Pool: " +
+            currentPool.id +
+            "\n" +
+            "Commitment Data: <b>Quote Value</b>: <code>" +
+            newPool.quote.value +
+            "</code>, <b>Token Value</b>: <code>" +
+            newPool.token.value +
+            "</code>"
+        );
       }
     }
   });
