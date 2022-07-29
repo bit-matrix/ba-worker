@@ -130,6 +130,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: quoteTicker.name,
     assetHash: pair1.asset || "",
     value: pair1.value?.toString() || "",
+    precision: 8,
   };
 
   const token: PAsset = {
@@ -137,6 +138,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: tokenTicker.name,
     assetHash: pair2.asset || "",
     value: pair2.value?.toString() || "",
+    precision: 8,
   };
 
   const lPAsset: PAsset = {
@@ -144,6 +146,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: lpTicker.name,
     assetHash: mayLP.asset || "",
     value: mayLP.value?.toString() || "",
+    precision: 8,
   };
 
   const initialTx: BmTxInfo = {
@@ -176,6 +179,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
       },
     },
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
+    tokenPrice: 0,
   };
 
   try {

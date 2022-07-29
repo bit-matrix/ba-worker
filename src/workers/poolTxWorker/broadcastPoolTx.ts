@@ -1,9 +1,9 @@
 import { Aggregator, CTXFinderResult, PTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
-import { commitmentOutput, pool } from "@bitmatrix/lib";
+import { api, commitmentOutput, pool } from "@bitmatrix/lib";
 
-export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValidationData: PTXFinderResult): Promise<Aggregator> => {
+export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValidationData: PTXFinderResult): Promise<string> => {
   // will be implemented in the future
 
   // ------------- INPUTS START -------------
@@ -339,7 +339,9 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     commitmentWitnessFinal +
     "00".repeat(outputTemplateCount * 2 + 1);
 
-  return { inputTemplate, outputTemplate, witnessTemplate, rawHex: inputTemplate + outputTemplate + witnessTemplate };
+  const rawHex = inputTemplate + outputTemplate + witnessTemplate;
 
-  // const poolTxId = await api.sendRawTransaction("raw hex");
+  const poolTxId = await api.sendRawTransaction(rawHex);
+
+  return poolTxId;
 };
