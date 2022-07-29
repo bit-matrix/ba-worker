@@ -1,6 +1,7 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
 import { CTXFinderResult } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
 export const isCtxSpentWorker = async () => {
@@ -19,6 +20,19 @@ export const isCtxSpentWorker = async () => {
         // @to-do add tx history
 
         // @to-do telegram message swap completed for ctx = ""
+        await sendTelegramMessage(
+          "Pool: " +
+            tx.poolTxId +
+            "\n" +
+            "Swap Complated for : <code>" +
+            txId +
+            "</code>\n" +
+            "Commitment Data: <b>Method</b>: <code>" +
+            tx.commitmentData.methodCall +
+            "</code>, <b>Value</b>: <code>" +
+            tx.commitmentData.cmtOutput2.value +
+            "</code>"
+        );
       }
     }
   }
