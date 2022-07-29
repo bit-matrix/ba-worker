@@ -24,21 +24,21 @@ export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
 
           const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData);
 
-          // const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
+          const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
 
           //telegram ms => tx id ile trans takip et
-          // await sendTelegramMessage(
-          //   "Tx Id: " +
-          //     poolTxId +
-          //     "\n" +
-          //     "Commitment Data: <b>Method</b>: <code>" +
-          //     commitmentData.methodCall +
-          //     "</code>, <b>Value</b>: <code>" +
-          //     commitmentData.cmtOutput2Value +
-          //     "</code>"
-          // );
+          await sendTelegramMessage(
+            "Pool Tx Id: " +
+              poolTxId +
+              "\n" +
+              "Method Call: <b>Method</b>: <code>" +
+              commitmentData.methodCall +
+              "</code>, <b>Value</b>: <code>" +
+              commitmentData.cmtOutput2Value +
+              "</code>"
+          );
 
-          // await redisClient.updateField(commitmentData.transaction.txid, poolTxId);
+          await redisClient.updateField(commitmentData.transaction.txid, poolTxId);
         }
       }
     }
