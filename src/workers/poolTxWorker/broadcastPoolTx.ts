@@ -85,25 +85,67 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   let outputTemplateCount = 7;
 
-  if (poolValidationData.case3outputs.output1.value !== 0) {
-    outputTemplateCount = 8;
-    settlementOutputs +=
-      "01" +
-      hexLE(poolValidationData.case3outputs.output1.assetId) +
-      "01" +
-      convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output1.value)).hex +
-      "001600" +
-      utils.compactSizeVarInt(scriptPubkey) +
-      scriptPubkey;
+  if (commitmentData.methodCall === "03") {
+    if (poolValidationData.case3outputs.output1.value !== 0) {
+      outputTemplateCount = 8;
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.case3outputs.output1.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output1.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
 
-    settlementOutputs +=
-      "01" +
-      hexLE(poolValidationData.case3outputs.output2.assetId) +
-      "01" +
-      convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output2.value)).hex +
-      "001600" +
-      utils.compactSizeVarInt(scriptPubkey) +
-      scriptPubkey;
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.case3outputs.output2.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output2.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
+    } else {
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.output.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.output.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
+    }
+  } else if (commitmentData.methodCall === "04") {
+    if (poolValidationData.case4outputs.output1.value !== 0) {
+      console.log(poolValidationData.case4outputs);
+      outputTemplateCount = 8;
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.case4outputs.output1.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case4outputs.output1.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
+
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.case4outputs.output2.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case4outputs.output2.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
+    } else {
+      settlementOutputs +=
+        "01" +
+        hexLE(poolValidationData.output.assetId) +
+        "01" +
+        convertion.numToLE64LE(WizData.fromNumber(poolValidationData.output.value)).hex +
+        "001600" +
+        utils.compactSizeVarInt(scriptPubkey) +
+        scriptPubkey;
+    }
   } else {
     settlementOutputs +=
       "01" +
