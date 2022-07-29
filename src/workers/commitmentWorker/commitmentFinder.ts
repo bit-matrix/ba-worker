@@ -45,6 +45,8 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
 
   const opReturnOutputScriptHex: string = opReturnOutput[1];
 
+  if (opReturnOutputScriptHex.length !== 156) return undefined;
+
   //poolIdLE (64)
   const poolId: string = hexLE(opReturnOutputScriptHex.substring(0, 64));
 
