@@ -29,15 +29,14 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
 
         await poolUpdate(newPool);
 
-        //@to-do send telegram notifaction = (new pool last state detected)
         await sendTelegramMessage(
           "New Pool Last State Detected : " +
             "Pool: " +
             currentPool.id +
             "\n" +
-            "Commitment Data: <b>Quote Value</b>: <code>" +
+            "Commitment Data: <b>Pair 1 Value</b>: <code>" +
             newPool.quote.value +
-            "</code>, <b>Token Value</b>: <code>" +
+            "</code>, <b>Pair2 Value</b>: <code>" +
             newPool.token.value +
             "</code>"
         );
