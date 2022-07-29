@@ -65,7 +65,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     "01" +
     hexLE(poolValidationData.lp_asset_id) +
     "01" +
-    convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_lp_supply)).hex +
+    convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_lp_liquidity)).hex +
     "00" +
     utils.compactSizeVarInt(lpHolderCovenantScriptPubkey) +
     lpHolderCovenantScriptPubkey;
