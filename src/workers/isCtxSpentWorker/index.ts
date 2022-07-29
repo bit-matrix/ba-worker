@@ -21,7 +21,10 @@ export const isCtxSpentWorker = async () => {
 
         // @to-do telegram message swap completed for ctx = ""
         await sendTelegramMessage(
-          "Pool Tx Id: " +
+          "Pool Id: " +
+            tx.commitmentData.poolId +
+            "\n" +
+            "Pool Tx Id: " +
             (tx.poolTxId || "unknown pool id") +
             "\n" +
             "Swap Completed for : <code>" +
