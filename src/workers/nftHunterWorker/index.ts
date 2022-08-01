@@ -3,7 +3,7 @@ import { Pool } from "@bitmatrix/models";
 import { pools, poolUpdate } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
-export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
+export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------NFT HUNTER-------------------------");
 
   const bitmatrixPools = await pools();
@@ -29,17 +29,19 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[]) => {
 
         await poolUpdate(newPool);
 
-        await sendTelegramMessage(
-          "New Pool Last State Detected : " +
-            "Pool: " +
-            currentPool.id +
-            "\n" +
-            "Commitment Data: <b>Pair 1 Value</b>: <code>" +
-            newPool.quote.value +
-            "</code>, <b>Pair2 Value</b>: <code>" +
-            newPool.token.value +
-            "</code>"
-        );
+        if (synced) {
+          await sendTelegramMessage(
+            "New Pool Last State Detected : " +
+              "Pool: " +
+              currentPool.id +
+              "\n" +
+              "Commitment Data: <b>Pair 1 Value</b>: <code>" +
+              newPool.quote.value +
+              "</code>, <b>Pair2 Value</b>: <code>" +
+              newPool.token.value +
+              "</code>"
+          );
+        }
       }
     }
   });

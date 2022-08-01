@@ -6,7 +6,7 @@ import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
 
-export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
+export const poolTxWorker = async (pools: Pool[]) => {
   console.log("-------------------POOL TX WORKER-------------------------");
 
   const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
@@ -26,7 +26,6 @@ export const poolTxWorker = async (pools: Pool[], txDetails: TxDetail[]) => {
 
           const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
 
-          //telegram ms => tx id ile trans takip et
           await sendTelegramMessage(
             "Pool Tx Id: " +
               poolTxId +

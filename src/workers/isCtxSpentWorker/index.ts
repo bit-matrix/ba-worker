@@ -4,7 +4,7 @@ import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
-export const isCtxSpentWorker = async () => {
+export const isCtxSpentWorker = async (synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
   const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
@@ -19,23 +19,24 @@ export const isCtxSpentWorker = async () => {
 
         // @to-do add tx history
 
-        // @to-do telegram message swap completed for ctx = ""
-        await sendTelegramMessage(
-          "Pool Id: " +
-            tx.commitmentData.poolId +
-            "\n" +
-            "Pool Tx Id: " +
-            (tx.poolTxId || "unknown pool id") +
-            "\n" +
-            "Swap Completed for : <code>" +
-            txId +
-            "</code>\n" +
-            "Commitment Data: <b>Method</b>: <code>" +
-            tx.commitmentData.methodCall +
-            "</code>, <b>Value</b>: <code>" +
-            tx.commitmentData.cmtOutput2.value +
-            "</code>"
-        );
+        if (synced) {
+          await sendTelegramMessage(
+            "Pool Id: " +
+              tx.commitmentData.poolId +
+              "\n" +
+              "Pool Tx Id: " +
+              (tx.poolTxId || "unknown pool id") +
+              "\n" +
+              "Swap Completed for : <code>" +
+              txId +
+              "</code>\n" +
+              "Commitment Data: <b>Method</b>: <code>" +
+              tx.commitmentData.methodCall +
+              "</code>, <b>Value</b>: <code>" +
+              tx.commitmentData.cmtOutput2.value +
+              "</code>"
+          );
+        }
       }
     }
   }

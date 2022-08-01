@@ -2,7 +2,7 @@ import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { isPoolRegistery } from "./isPoolRegistery";
 
-export const poolRegisteryWorker = async (txDetails: TxDetail[]) => {
+export const poolRegisteryWorker = async (txDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------POOL REGISTERY WORKER-------------------------");
 
   try {
@@ -10,7 +10,7 @@ export const poolRegisteryWorker = async (txDetails: TxDetail[]) => {
       const ntx = txDetails[i];
       const isNewPoolRegister = await isPoolRegistery(ntx);
 
-      if (isNewPoolRegister) {
+      if (isNewPoolRegister && synced) {
         sendTelegramMessage(
           "New pool registered " +
             "\n" +
