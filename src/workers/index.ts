@@ -18,19 +18,18 @@ const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
+      clearInterval(timer);
       await bitmatrixWorker(bestBlockHash, true);
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
 
       console.log("sync completed");
-
-      clearInterval(timer);
     }
     // synced app restarted
     else if (bestBlockHeight - appLastState.blockHeight > 1) {
-      appWorker();
       clearInterval(timer);
+      appWorker();
     }
   }
 };
