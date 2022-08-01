@@ -4,7 +4,7 @@ import { AppSync } from "@bitmatrix/models";
 import * as nodeCron from "node-cron";
 import { bitmatrixWorker } from "./bitmatrixWorker";
 import { redisInit } from "@bitmatrix/redis-client";
-import { REDIS_URL } from "../env";
+import { ELECTRS_URL, REDIS_URL } from "../env";
 
 const getFinalBlockDetail = async () => {
   const appLastState = await getLastAppSyncState();
@@ -72,7 +72,7 @@ nodeCron.schedule("*/15 * * * * *", async () => {
 
 export const startWorkers = async () => {
   console.log("startWorkers started...");
-  init("https://electrs.basebitmatrix.com/");
+  init(ELECTRS_URL);
   redisInit(REDIS_URL);
   appWorker();
 };
