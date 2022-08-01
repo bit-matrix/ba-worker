@@ -15,7 +15,7 @@ const isCtxSpend = async (ctx: BmCtxNew): Promise<BmPtx | undefined> => {
       block_hash: outSpend.status.block_hash,
       block_height: outSpend.status?.block_height,
     };
-    const bmPoolTx: BmPtx = { ...ctx, poolTx };
+    const bmPoolTx: BmPtx = { ...ctx, poolTx, isOutOfSlippage: false };
 
     return bmPoolTx;
   }

@@ -1,14 +1,31 @@
+# Install
+
+_-_ mkdir /root/github/new-pool/bit-matrix/new-pool
+cd /root/github/bit-matrix/new-pool
+git clone https://github.com/bit-matrix/ba-worker.git
+cd ba-worker
+git checkout -b new-pool
+git branch --set-upstream-to=origin/new-pool new-pool
+git pull
+
+# Update
+
+cd /root/github/bit-matrix/new-pool/ba-worker
+git pull
+docker build -t ba-worker-new-pool .
+docker run -d --network="host" ba-worker-new-pool
+
 ## live logs
 
 docker logs -f -n 20 8449e5fed439
 
 ## build
 
-docker build -t ba-worker .
+docker build -t ba-worker-new-pool .
 
 ## run
 
-docker run -d --network="host" ba-worker
+docker run -d --network="host" ba-worker-new-pool
 
 ## container list
 

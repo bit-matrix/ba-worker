@@ -38,7 +38,8 @@ export const poolWorker = async (pool: Pool, newBlock: Block, bestBlock: Block) 
     if (synced && pool.unspentTx && lastSentPtx === undefined) {
       let newCtxs: BmCtxNew[] = await ctxsNew(pool.id);
       newCtxs = await clearCtxSpents(pool, newCtxs);
-      lastSentPtx = await createPoolTxWorker(pool, newBlock, newCtxs);
+      const bmNewPtxResult = await createPoolTxWorker(pool, newBlock, newCtxs);
+      lastSentPtx = bmNewPtxResult?.poolTx;
     }
 
     /**

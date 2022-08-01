@@ -2,11 +2,12 @@ import { BN } from "bn.js";
 
 const MAX_INTEGER_64 = new BN("7fffffffffffffff", "hex");
 const MAX_INTEGER_32 = new BN("7fffffff", "hex");
+const BN_ZERO = new BN(0);
 const BN_ONE = new BN(1);
 
-export const positiveNumber64 = (leString: string, errMessage: string): string => {
+export const positiveNumber64 = (leString: string, errMessage: string, zeroOk: boolean = false): string => {
   const inputNumber = new BN(leString, "hex", "le");
-  if (inputNumber.gte(BN_ONE) && inputNumber.lte(MAX_INTEGER_64)) return inputNumber.toString();
+  if (inputNumber.gte(zeroOk ? BN_ZERO : BN_ONE) && inputNumber.lte(MAX_INTEGER_64)) return inputNumber.toString();
   throw new Error(errMessage);
 };
 

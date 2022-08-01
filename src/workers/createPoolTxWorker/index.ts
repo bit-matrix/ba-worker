@@ -1,34 +1,33 @@
 import { Block } from "@bitmatrix/esplora-api-client";
-import { BmConfig, BmCtxNew, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { BmConfig, BmCtxNew, BmNewPtxResult, Pool } from "@bitmatrix/models";
 import { config, ctxMempoolSave } from "../../business/db-client";
-import { method01 } from "./method01";
-import { method02 } from "./method02";
-import { method03 } from "./method03";
-import { method04 } from "./method04";
+import { topCtxs } from "./helper/common";
+import { createPoolTx } from "./createPoolTx";
 
-export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]): Promise<string | undefined> => {
-  console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
-
+export const createPoolTxWorker = async (pool: Pool, newBlock: Block, newCtxs: BmCtxNew[]): Promise<BmNewPtxResult | undefined> => {
   if (newCtxs.length === 0) return;
-
-  const sortedNewCtxs = newCtxs.sort((a, b) => b.callData.orderingFee - a.callData.orderingFee);
-  const ctxNew: BmCtxNew = sortedNewCtxs[0];
-  console.log("bestCtx for pool tx: ", ctxNew.commitmentTx.txid);
+  console.log("Create ptx worker for newCtxs started for pool: " + pool.id + ". newBlockheight: " + newBlock.height + ", newCtxs.count: " + newCtxs.length);
 
   const poolConfig: BmConfig = await config(pool.id);
 
-  let ptxid: string | undefined = undefined;
-  if (ctxNew.callData.method === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
-    ptxid = await method01(pool, poolConfig, ctxNew);
-  } else if (ctxNew.callData.method === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE) {
-    ptxid = await method02(pool, poolConfig, ctxNew);
-  } else if (ctxNew.callData.method === CALL_METHOD.ADD_LIQUIDITY) {
-    ptxid = await method03(pool, poolConfig, ctxNew);
-  } else if (ctxNew.callData.method === CALL_METHOD.REMOVE_LIQUIDITY) {
-    ptxid = await method04(pool, poolConfig, ctxNew);
+  const bestCtxs: BmCtxNew[] = topCtxs(newCtxs, poolConfig.maxLeaf);
+  console.log(bestCtxs.length + " bestCtxs for pool tx: ", bestCtxs.map((c) => c.commitmentTx.txid).join(","));
+
+  const bmNewPtxResult: BmNewPtxResult = await createPoolTx(pool, poolConfig, bestCtxs);
+
+  if (bmNewPtxResult.poolTx) {
+    for (let i = 0; i < bestCtxs.length; i++) {
+      const ctxNew = bestCtxs[i];
+
+      await ctxMempoolSave(pool.id, {
+        callData: ctxNew.callData,
+        output: ctxNew.output,
+        commitmentTx: ctxNew.commitmentTx,
+        poolTxid: bmNewPtxResult.poolTx,
+        isOutOfSlippage: bmNewPtxResult.ctxsResult[i].isOutOfSlippage,
+      });
+    }
   }
 
-  if (ptxid) await ctxMempoolSave(pool.id, { callData: ctxNew.callData, output: ctxNew.output, commitmentTx: ctxNew.commitmentTx, poolTxid: ptxid });
-
-  return ptxid;
+  return bmNewPtxResult;
 };
