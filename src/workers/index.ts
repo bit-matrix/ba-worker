@@ -1,42 +1,77 @@
-import { pools } from "../business/db-client";
-import { init, esploraClient, Block } from "@bitmatrix/esplora-api-client";
-import { poolWorker } from "./poolWorker";
-import { WORKER_DELAY } from "../env";
-import { getNewBlock } from "../helper/getNewBlock";
+import { getLastAppSyncState, updateAppSyncState } from "../business/db-client";
+import { init, esploraClient } from "@bitmatrix/esplora-api-client";
+import { AppSync } from "@bitmatrix/models";
+import * as nodeCron from "node-cron";
+import { bitmatrixWorker } from "./bitmatrixWorker";
+import { redisInit } from "@bitmatrix/redis-client";
 
-const worker = async () => {
-  try {
-    console.log("worker started..");
+const getFinalBlockDetail = async () => {
+  const appLastState = await getLastAppSyncState();
 
-    const bestBlock10 = await esploraClient.blocks();
+  // app synced state
+  if (appLastState.synced) {
+    const bestBlockHeight = await esploraClient.blockTipHeight();
+    const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
-    const ps = await pools();
-    const promises: Promise<void>[] = [];
+    if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
 
-    for (let i = 0; i < ps.length; i++) {
-      const p = ps[i];
-      if (p.active) {
-        const wantedNewBlockHeight = p.lastSyncedBlock.block_height + 1;
-        const blockData = await getNewBlock(bestBlock10, wantedNewBlockHeight);
+    // new block found
+    if (bestBlockHeight - appLastState.blockHeight === 1) {
+      await bitmatrixWorker(bestBlockHash, true);
 
-        if (blockData) {
-          const { newBlock, bestBlock } = blockData;
-          const poolWorkerPromise = poolWorker(p, newBlock, bestBlock);
-          promises.push(poolWorkerPromise);
-        }
-      }
+      const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
+      await updateAppSyncState(newDbState);
+
+      console.log("sync completed");
     }
-
-    await Promise.all(promises);
-  } catch (error) {
-    console.error("worker.error", error);
-  } finally {
-    setTimeout(worker, WORKER_DELAY * 1000);
+    // synced app restarted
+    else if (bestBlockHeight - appLastState.blockHeight > 1) {
+      appWorker();
+    }
   }
 };
+
+const appWorker = async () => {
+  console.log("app syncer started..");
+
+  try {
+    const appLastState = await getLastAppSyncState();
+
+    // app unsycned state
+    const bestBlockHeight = await esploraClient.blockTipHeight();
+
+    if (bestBlockHeight < appLastState.blockHeight) throw "block height is less than last block height , something went wrong";
+
+    if (bestBlockHeight > appLastState.blockHeight) {
+      const nextBlockHeight = appLastState.blockHeight + 1;
+
+      const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
+
+      await bitmatrixWorker(nextBlockHash, false);
+
+      const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
+
+      await updateAppSyncState(newDbState);
+
+      appWorker();
+    } else if (bestBlockHeight === appLastState.blockHeight) {
+      console.log("block çektim eşitledim update ediyorum statei");
+      const newDbState: AppSync = { ...appLastState, synced: true };
+
+      await updateAppSyncState(newDbState);
+    }
+  } catch (error) {
+    console.error("appWorker.error", error);
+  }
+};
+
+nodeCron.schedule("*/15 * * * * *", async () => {
+  await getFinalBlockDetail();
+});
 
 export const startWorkers = async () => {
   console.log("startWorkers started...");
   init("https://electrs.basebitmatrix.com/");
-  worker();
+  redisInit("redis://localhost:6379");
+  appWorker();
 };
