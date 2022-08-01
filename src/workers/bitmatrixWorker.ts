@@ -25,7 +25,7 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
 
       const ps = await pools();
 
-      await commitmentWorker(ps, newTxDetails);
+      await commitmentWorker(ps, newTxDetails, synced);
 
       if (synced) await poolTxWorker(ps);
 

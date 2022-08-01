@@ -5,7 +5,7 @@ import { redisClient } from "@bitmatrix/redis-client";
 import { commitmentFinder } from "./commitmentFinder";
 import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
-export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) => {
+export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------COMMINTMENT WORKER-------------------------");
   let promiseArray = [];
 
@@ -22,19 +22,21 @@ export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[]) 
 
           await redisClient.addKey(value.transaction.txid, 60000, newStoreData);
 
-          await sendTelegramMessage(
-            "Pool: " +
-              value.poolId +
-              "\n" +
-              "New Commitment Tx V2: <code>" +
-              value.transaction.txid +
-              "</code>\n" +
-              "Commitment Data: <b>Method</b>: <code>" +
-              value.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              value.cmtOutput2.value +
-              "</code>"
-          );
+          if (synced) {
+            await sendTelegramMessage(
+              "Pool: " +
+                value.poolId +
+                "\n" +
+                "New Commitment Tx V2: <code>" +
+                value.transaction.txid +
+                "</code>\n" +
+                "Commitment Data: <b>Method</b>: <code>" +
+                value.methodCall +
+                "</code>, <b>Value</b>: <code>" +
+                value.cmtOutput2.value +
+                "</code>"
+            );
+          }
         }
       });
     })
