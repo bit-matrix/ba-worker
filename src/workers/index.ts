@@ -8,10 +8,9 @@ import { ELECTRS_URL, REDIS_URL } from "../env";
 
 const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
   const appLastState = await getLastAppSyncState();
-  console.log("1");
+
   // app synced state
   if (appLastState.synced) {
-    console.log("2");
     const bestBlockHeight = await esploraClient.blockTipHeight();
     const bestBlockHash = await esploraClient.blockheight(bestBlockHeight);
 
@@ -19,7 +18,6 @@ const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
-      console.log("3");
       await bitmatrixWorker(bestBlockHash, true);
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
@@ -33,7 +31,6 @@ const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
     else if (bestBlockHeight - appLastState.blockHeight > 1) {
       appWorker();
       clearInterval(timer);
-      console.log("4");
     }
   }
 };
