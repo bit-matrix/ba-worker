@@ -65,8 +65,16 @@ const appWorker = async () => {
   }
 };
 
-nodeCron.schedule("*/15 * * * * *", async () => {
-  await getFinalBlockDetail();
+nodeCron.schedule("50 * * * * *", () => {
+  let i = 0;
+
+  const a = setInterval(async () => {
+    i++;
+
+    await getFinalBlockDetail();
+
+    if (i === 15) clearInterval(a);
+  }, 1000);
 });
 
 export const startWorkers = async () => {
