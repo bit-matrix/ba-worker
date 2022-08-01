@@ -6,7 +6,7 @@ import { bitmatrixWorker } from "./bitmatrixWorker";
 import { redisInit } from "@bitmatrix/redis-client";
 import { ELECTRS_URL, REDIS_URL } from "../env";
 
-const getFinalBlockDetail = async () => {
+const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
   const appLastState = await getLastAppSyncState();
 
   // app synced state
@@ -24,10 +24,13 @@ const getFinalBlockDetail = async () => {
       await updateAppSyncState(newDbState);
 
       console.log("sync completed");
+
+      clearInterval(timer);
     }
     // synced app restarted
     else if (bestBlockHeight - appLastState.blockHeight > 1) {
       appWorker();
+      clearInterval(timer);
     }
   }
 };
@@ -66,8 +69,10 @@ const appWorker = async () => {
   }
 };
 
-nodeCron.schedule("*/15 * * * * *", async () => {
-  await getFinalBlockDetail();
+nodeCron.schedule("50 * * * * *", () => {
+  const interval = setInterval(async () => {
+    await getFinalBlockDetail(interval);
+  }, 2000);
 });
 
 export const startWorkers = async () => {
