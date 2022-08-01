@@ -17,7 +17,7 @@ const getFinalBlockDetail = async () => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
-      await bitmatrixWorker(bestBlockHash);
+      await bitmatrixWorker(bestBlockHash, true);
 
       const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
@@ -47,7 +47,7 @@ const appWorker = async () => {
 
       const nextBlockHash = await esploraClient.blockheight(nextBlockHeight);
 
-      await bitmatrixWorker(nextBlockHash);
+      await bitmatrixWorker(nextBlockHash, false);
 
       const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 

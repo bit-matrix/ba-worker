@@ -6,7 +6,7 @@ import { nftHunterWorker } from "./nftHunterWorker";
 import { poolRegisteryWorker } from "./poolRegisteryWorker";
 import { poolTxWorker } from "./poolTxWorker";
 
-export const bitmatrixWorker = async (newBlockHash: string) => {
+export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => {
   try {
     console.log("bitmatrix worker started..");
 
@@ -27,7 +27,7 @@ export const bitmatrixWorker = async (newBlockHash: string) => {
 
       await commitmentWorker(ps, newTxDetails);
 
-      await poolTxWorker(ps, newTxDetails);
+      if (synced) await poolTxWorker(ps, newTxDetails);
 
       await poolRegisteryWorker(newTxDetails);
     }
