@@ -87,8 +87,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
   }
 
   // 6. Commitment out 1 (Calldatadan hemen sonraki output)’in taşıdığı L-BTC değeri 8 byte LE olarak.
-  if (cmtOutput1.asset !== lbtcAssest) Promise.reject("Asset must be L-BTC");
-
+  if (cmtOutput1.asset !== lbtcAssest) return undefined;
   const cmtOutput1Value = "01" + convertion.numToLE64LE(WizData.fromNumber(new Decimal(cmtOutput1.value).mul(100000000).toNumber())).hex;
 
   //   7. Commitment out 2 (Cmt out 1 hemen sonraki output)’nin taşıdığı asset idsi pair1_asset türünden ise 0x03, pair2_asset türünden ise 0x01.
@@ -107,7 +106,8 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
 
   //   8. Commitment out 2 ’in taşıdığı asset değeri 8 byte LE olarak.
 
-  if (cmtOutput2.value === undefined) Promise.reject("Commitment Output Value musn't be confidential.");
+  if (cmtOutput2.value === undefined) return undefined;
+
   const cmtOutput2Value = "01" + convertion.numToLE64LE(WizData.fromNumber(new Decimal(cmtOutput2.value).mul(100000000).toNumber())).hex;
 
   //   9. Commitment out 3 ’ün taşıdığı asset id si pair1_asset türünden ise 0x03, pair2_asset türünden ise 0x01. (bu sadece case 3’ de var, eğer başka bir case ise empty 0x)
