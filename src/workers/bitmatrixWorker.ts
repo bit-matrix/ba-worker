@@ -19,7 +19,6 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
     if (newTxDetails.length > 0) {
       console.log("welcome to new tx ..");
 
-      // nft avcısı worker -> pool'u update edecek
       await nftHunterWorker(newTxDetails, synced);
       await isCtxSpentWorker(synced);
 
@@ -27,10 +26,10 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
 
       await commitmentWorker(ps, newTxDetails, synced);
 
-      if (synced) await poolTxWorker(ps);
-
       await poolRegisteryWorker(newTxDetails, synced);
     }
+
+    if (synced) await poolTxWorker();
   } catch (error) {
     console.error("worker.error", error);
   }
