@@ -20,12 +20,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
         newPool.token.value = tx.vout[1].value?.toString();
         newPool.lp.value = tx.vout[2].value?.toString();
         newPool.quote.value = tx.vout[3].value?.toString();
-
-        if (newPool.unspentTx) {
-          newPool.unspentTx.txid = tx.txid;
-          newPool.unspentTx.block_hash = tx.status.block_hash;
-          newPool.unspentTx.block_height = tx.status.block_height;
-        }
+        newPool.lastStateTxId = tx.txid;
 
         await poolUpdate(newPool);
 

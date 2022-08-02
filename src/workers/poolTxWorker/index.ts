@@ -1,8 +1,7 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { Pool, PTXFinderResult } from "@bitmatrix/models";
+import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
-import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
 

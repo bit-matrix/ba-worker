@@ -1,8 +1,7 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
-import { CTXFinderResult } from "@bitmatrix/models";
+import { BitmatrixStoreData } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
-import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
 export const isCtxSpentWorker = async (synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");

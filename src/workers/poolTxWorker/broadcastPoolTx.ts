@@ -17,12 +17,10 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   let input3 = "";
   let input4 = "";
 
-  if (poolValidationData.poolData.unspentTx) {
-    input1 = hexLE(poolValidationData.poolData.unspentTx.txid) + convertion.convert32(WizData.fromNumber(0)).hex + "00" + "01000000";
-    input2 = hexLE(poolValidationData.poolData.unspentTx.txid) + convertion.convert32(WizData.fromNumber(1)).hex + "00" + "01000000";
-    input3 = hexLE(poolValidationData.poolData.unspentTx.txid) + convertion.convert32(WizData.fromNumber(2)).hex + "00" + "01000000";
-    input4 = hexLE(poolValidationData.poolData.unspentTx.txid) + convertion.convert32(WizData.fromNumber(3)).hex + "00" + "01000000";
-  }
+  input1 = hexLE(poolValidationData.poolData.lastStateTxId) + convertion.convert32(WizData.fromNumber(0)).hex + "00" + "01000000";
+  input2 = hexLE(poolValidationData.poolData.lastStateTxId) + convertion.convert32(WizData.fromNumber(1)).hex + "00" + "01000000";
+  input3 = hexLE(poolValidationData.poolData.lastStateTxId) + convertion.convert32(WizData.fromNumber(2)).hex + "00" + "01000000";
+  input4 = hexLE(poolValidationData.poolData.lastStateTxId) + convertion.convert32(WizData.fromNumber(3)).hex + "00" + "01000000";
 
   // @todo for loop for waiting ctx
   const input5 = hexLE(commitmentData.transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData.cmtOutput1.n)).hex + "00" + "01000000";

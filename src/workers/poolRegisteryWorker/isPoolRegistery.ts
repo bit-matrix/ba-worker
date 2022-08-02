@@ -161,25 +161,12 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     token,
     lp: lPAsset,
     initialTx,
-    unspentTx: initialTx,
-    lastSentPtx: newTxDetail.txid,
+    lastStateTxId: newTxDetail.txid,
     active: true,
-    mainCovenantScript: mainCovenant.mainCovenantScript.map((item) => item),
     maxLeaf: leafCount,
-    holderCovenant: {
-      scriptpubkey: {
-        main: pair1.scriptpubkey,
-        token: pair2.scriptpubkey,
-        lp: mayLP.scriptpubkey,
-      },
-      controlBlockPrefix: {
-        main: mainCovenant.controlBlock.slice(0, 2),
-        token: mainCovenant.controlBlock.slice(0, 2),
-        lp: mainCovenant.controlBlock.slice(0, 2),
-      },
-    },
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
     tokenPrice: 0,
+    version,
   };
 
   try {
