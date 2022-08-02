@@ -1,6 +1,6 @@
 import axios from "axios";
-import { DB_URL } from "../../env";
-import { BmConfig, Pool, AppSync, BmPtx } from "@bitmatrix/models";
+import { DB_URL, HISTORY_DB_URL } from "../../env";
+import { BmConfig, Pool, AppSync, BmPtx, BmChart } from "@bitmatrix/models";
 
 export const pools = (): Promise<Pool[]> => axios.get<Pool[]>(DB_URL + "pools").then((res) => res.data);
 export const pool = (asset: string): Promise<Pool> => axios.get<Pool>(DB_URL + "pools/" + asset).then((res) => res.data);
@@ -15,11 +15,11 @@ export const getLastAppSyncState = (): Promise<AppSync> => axios.get<AppSync>(DB
 export const updateAppSyncState = (newState: AppSync): Promise<void> => axios.post<void>(DB_URL + "appSync", newState).then((res) => res.data);
 
 // temp
-export const ptxSave = (asset: string, value: BmPtx): Promise<void> =>
+export const poolTxHistorySave = (asset: string, value: BmChart): Promise<void> =>
   axios
-    .post(DB_URL + "ptx/" + asset, value)
+    .put(HISTORY_DB_URL + "chart/" + asset, value)
     .then((res) => res.data)
     .catch((res) => {
-      console.error("ctxMempoolSave", res.message);
+      console.error("poolTxHistorySave", res.message);
       throw res.message;
     });
