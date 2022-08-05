@@ -21,7 +21,7 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
               tx.commitmentData.poolId +
               "\n" +
               "Pool Tx Id: " +
-              (tx.poolTxId || "unknown pool id") +
+              (tx.poolTxInfo?.txId || "unknown pool id") +
               "\n" +
               "Swap Completed for : <code>" +
               txId +

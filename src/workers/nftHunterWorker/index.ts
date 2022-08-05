@@ -23,7 +23,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         newPool.lastStateTxId = tx.txid;
         newPool.tokenPrice = Math.floor(Number(newPool.token.value) / Number(newPool.quote.value));
 
-        const poolTxDetails = waitingTxs.find((ptx) => ptx.poolTxId === tx.txid);
+        const poolTxDetails = waitingTxs.find((ptx) => ptx.poolTxInfo?.txId === tx.txid);
 
         if (poolTxDetails) {
           let volumeQuote = 0;

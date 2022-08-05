@@ -13,7 +13,7 @@ export const poolTxWorker = async () => {
   //Pool validasyonlarından geçirme
   if (waitingTxs.length > 0) {
     const waitingCommitmentList: BitmatrixStoreData[] = waitingTxs.filter(
-      (value: BitmatrixStoreData) => value.poolTxId === "" || value.poolTxId === null || value.poolTxId === undefined
+      (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
     );
 
     if (waitingCommitmentList.length > 0) {
