@@ -1,11 +1,10 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData } from "@bitmatrix/models";
+import { BitmatrixStoreData, BmPtx } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
-export const isCtxSpentWorker = async (synced: boolean) => {
+export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
-  const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
   if (waitingTxs.length > 0) {
     for (const tx of waitingTxs) {
@@ -16,15 +15,13 @@ export const isCtxSpentWorker = async (synced: boolean) => {
       if (outspends[1].spent || outspends[2].spent) {
         await redisClient.removeKey(txId);
 
-        // @to-do add tx history
-
         if (synced) {
           await sendTelegramMessage(
             "Pool Id: " +
               tx.commitmentData.poolId +
               "\n" +
               "Pool Tx Id: " +
-              (tx.poolTxId || "unknown pool id") +
+              (tx.poolTxInfo?.txId || "unknown pool id") +
               "\n" +
               "Swap Completed for : <code>" +
               txId +

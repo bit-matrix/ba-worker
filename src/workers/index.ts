@@ -58,7 +58,6 @@ const appWorker = async () => {
 
       appWorker();
     } else if (bestBlockHeight === appLastState.blockHeight) {
-      console.log("block çektim eşitledim update ediyorum statei");
       const newDbState: AppSync = { ...appLastState, synced: true };
 
       await updateAppSyncState(newDbState);
