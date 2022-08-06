@@ -87,13 +87,15 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   if (version === "01") {
     leafCount = 1;
   } else if (version === "02") {
+    leafCount = 2;
+  } else if (version === "03") {
     leafCount = 16;
   }
 
   const pair1_coefficient = outputHex.slice(20);
 
   if (bitmatrixHex !== "6269746d6174726978") return false;
-  if (version !== "01") return false;
+  // if (version !== "01") return false;
 
   if (pair1_coefficient === "14000000" && pair1.asset !== lbtcAsset) return false;
   if (pair1_coefficient === "40420f00" && pair1.asset !== usdtAsset) return false;
