@@ -1,4 +1,6 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
+import { BitmatrixStoreData } from "@bitmatrix/models";
+import { redisClient } from "@bitmatrix/redis-client";
 import { pools } from "../business/db-client";
 import { commitmentWorker } from "./commitmentWorker";
 import { isCtxSpentWorker } from "./isCtxSpentWorker";
@@ -19,8 +21,10 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
     if (newTxDetails.length > 0) {
       console.log("welcome to new tx ..");
 
-      await nftHunterWorker(newTxDetails, synced);
-      await isCtxSpentWorker(synced);
+      const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
+
+      await nftHunterWorker(newTxDetails, waitingTxs, synced);
+      await isCtxSpentWorker(waitingTxs, synced);
 
       const ps = await pools();
 
