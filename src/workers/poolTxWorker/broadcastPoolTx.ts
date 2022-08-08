@@ -1,4 +1,4 @@
-import { Aggregator, CTXFinderResult, PTXFinderResult } from "@bitmatrix/models";
+import { CTXFinderResult, PTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool } from "@bitmatrix/lib";
@@ -116,7 +116,6 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     }
   } else if (commitmentData.methodCall === "04") {
     if (poolValidationData.case4outputs.output1.value !== 0) {
-      console.log(poolValidationData.case4outputs);
       outputTemplateCount = 8;
       settlementOutputs +=
         "01" +
@@ -339,7 +338,14 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   const rawHex = inputTemplate + outputTemplate + witnessTemplate;
 
-  const poolTxId = await api.sendRawTransaction(rawHex);
+  console.log("rawHex:", rawHex);
+  let poolTxId = "";
+
+  try {
+    poolTxId = await api.sendRawTransaction(rawHex);
+  } catch (e) {
+    console.log("erol:", e);
+  }
 
   return poolTxId;
 };

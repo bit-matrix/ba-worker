@@ -26,9 +26,7 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
       await nftHunterWorker(newTxDetails, waitingTxs, synced);
       await isCtxSpentWorker(waitingTxs, synced);
 
-      const ps = await pools();
-
-      await commitmentWorker(ps, newTxDetails, synced);
+      await commitmentWorker(newTxDetails, synced);
 
       await poolRegisteryWorker(newTxDetails, synced);
     }

@@ -3,14 +3,17 @@ import { BitmatrixStoreData, CTXFinderResult, Pool } from "@bitmatrix/models";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { redisClient } from "@bitmatrix/redis-client";
 import { commitmentFinder } from "./commitmentFinder";
+import { pools } from "../../business/db-client";
 
-export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[], synced: boolean) => {
+export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------COMMINTMENT WORKER-------------------------");
   let promiseArray = [];
 
+  const bitmatrixPools = await pools();
+
   for (let i = 0; i < newTxDetails.length; i++) {
     const newTxDetail = newTxDetails[i];
-    promiseArray.push(commitmentFinder(newTxDetail, pools));
+    promiseArray.push(commitmentFinder(newTxDetail, bitmatrixPools));
   }
 
   return Promise.all(promiseArray)

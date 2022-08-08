@@ -25,3 +25,7 @@ export const tickerFinder = (asset: string): { ticker: string; name: string } =>
 
   return { ticker: asset.slice(0, 4), name: "unknown" };
 };
+
+export const deepCopy = <T>(original: T): T => {
+  return JSON.parse(JSON.stringify(original));
+};
