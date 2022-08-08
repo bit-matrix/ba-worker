@@ -2,6 +2,7 @@ import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
+import { pools } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
@@ -13,6 +14,8 @@ export const poolTxWorker = async () => {
 
   //Pool validasyonlarından geçirme
   if (waitingTxs.length > 0) {
+    const bitmatrixPools = await pools();
+
     const waitingCommitmentList: BitmatrixStoreData[] = waitingTxs.filter(
       (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
     );
@@ -21,7 +24,7 @@ export const poolTxWorker = async () => {
       for (let i = 0; i < waitingCommitmentList.length; i++) {
         const commitmentData = waitingCommitmentList[i].commitmentData;
 
-        const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData);
+        const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData, bitmatrixPools);
         const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
 
         const poolTxInfo: poolTxInfo = {
