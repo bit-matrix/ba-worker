@@ -1,6 +1,7 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, BmPtx } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
+import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
 export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
@@ -17,6 +18,23 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
         if (synced) {
           await sendTelegramMessage(
+            "Pool Id: " +
+              tx.commitmentData.poolId +
+              "\n" +
+              "Pool Tx Id: " +
+              (tx.poolTxInfo?.txId || "unknown pool id") +
+              "\n" +
+              "Swap Completed for : <code>" +
+              txId +
+              "</code>\n" +
+              "Commitment Data: <b>Method</b>: <code>" +
+              tx.commitmentData.methodCall +
+              "</code>, <b>Value</b>: <code>" +
+              tx.commitmentData.cmtOutput2.value +
+              "</code>"
+          );
+
+          sendSlackMessage(
             "Pool Id: " +
               tx.commitmentData.poolId +
               "\n" +

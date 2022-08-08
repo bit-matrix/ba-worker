@@ -1,6 +1,7 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
+import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: BitmatrixStoreData[], synced: boolean) => {
@@ -61,6 +62,18 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         if (synced) {
           await sendTelegramMessage(
             "New Pool Last State Detected : " +
+              "Pool: " +
+              currentPool.id +
+              "\n" +
+              "Commitment Data: <b>Pair 1 Value</b>: <code>" +
+              newPool.quote.value +
+              "</code>, <b>Pair2 Value</b>: <code>" +
+              newPool.token.value +
+              "</code>"
+          );
+
+          sendSlackMessage(
+            "1New Pool Last State Detected : " +
               "Pool: " +
               currentPool.id +
               "\n" +

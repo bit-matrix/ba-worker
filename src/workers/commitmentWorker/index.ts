@@ -1,7 +1,8 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, CTXFinderResult, Pool } from "@bitmatrix/models";
-import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { redisClient } from "@bitmatrix/redis-client";
+import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { commitmentFinder } from "./commitmentFinder";
 
 export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[], synced: boolean) => {
@@ -23,6 +24,20 @@ export const commitmentWorker = async (pools: Pool[], newTxDetails: TxDetail[], 
 
           if (synced) {
             await sendTelegramMessage(
+              "Pool: " +
+                value.poolId +
+                "\n" +
+                "New Commitment Tx V2: <code>" +
+                value.transaction.txid +
+                "</code>\n" +
+                "Commitment Data: <b>Method</b>: <code>" +
+                value.methodCall +
+                "</code>, <b>Value</b>: <code>" +
+                value.cmtOutput2.value +
+                "</code>"
+            );
+
+            sendSlackMessage(
               "Pool: " +
                 value.poolId +
                 "\n" +

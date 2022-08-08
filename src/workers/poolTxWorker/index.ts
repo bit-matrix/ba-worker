@@ -2,6 +2,7 @@ import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
+import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
@@ -41,8 +42,30 @@ export const poolTxWorker = async () => {
               commitmentData.cmtOutput2Value +
               "</code>"
           );
+
+          sendSlackMessage(
+            "Pool Tx Id: " +
+              poolTxId +
+              "\n" +
+              "Method Call: <b>Method</b>: <code>" +
+              commitmentData.methodCall +
+              "</code>, <b>Value</b>: <code>" +
+              commitmentData.cmtOutput2Value +
+              "</code>"
+          );
         } else {
           await sendTelegramMessage(
+            "Pool Tx Id: " +
+              poolTxId +
+              "\n" +
+              "Method Call: <b>Method</b>: <code>" +
+              commitmentData.methodCall +
+              "</code>, <b>Fail swap result : </b>: <code>" +
+              poolValidationData.errorMessages.join(", ") +
+              "</code>"
+          );
+
+          sendSlackMessage(
             "Pool Tx Id: " +
               poolTxId +
               "\n" +
