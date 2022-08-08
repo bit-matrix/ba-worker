@@ -167,7 +167,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     active: true,
     maxLeaf: leafCount,
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
-    tokenPrice: 0,
+    tokenPrice: Math.floor(Number(token.value) / Number(quote.value)),
     version,
   };
 
