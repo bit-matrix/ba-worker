@@ -33,28 +33,30 @@ export const poolTxWorker = async () => {
           failReason: poolValidationData.errorMessages.join(", "),
         };
 
-        if (poolTxInfo.isSuccess) {
-          await sendTelegramMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              commitmentData.cmtOutput2Value +
-              "</code>"
-          );
-        } else {
-          await sendTelegramMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Fail swap result : </b>: <code>" +
-              poolValidationData.errorMessages.join(", ") +
-              "</code>"
-          );
+        if (poolTxInfo.txId && poolTxInfo.txId !== "") {
+          if (poolTxInfo.isSuccess) {
+            await sendTelegramMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Value</b>: <code>" +
+                commitmentData.cmtOutput2Value +
+                "</code>"
+            );
+          } else {
+            await sendTelegramMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Fail swap result : </b>: <code>" +
+                poolValidationData.errorMessages.join(", ") +
+                "</code>"
+            );
+          }
         }
 
         await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
