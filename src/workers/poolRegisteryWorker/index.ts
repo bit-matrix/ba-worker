@@ -26,16 +26,16 @@ export const poolRegisteryWorker = async (txDetails: TxDetail[], synced: boolean
         );
 
         sendSlackMessage(
-          "New pool registered " +
+          "*New* *Pool* *Registered*" +
             "\n" +
-            "New Pool Id: <code>" +
+            "*New* *Pool* *Id:* " +
             ntx.vout[0].asset +
-            "</code>\n" +
-            "Block Height: <code>" +
+            "\n" +
+            "*Block* *Height:* " +
             ntx.status.block_height +
-            "</code>, <b>Pool Register tx</b>: <code>" +
-            ntx.txid +
-            "</code>"
+            "\n" +
+            "*Pool* *Register* *Tx*: " +
+            ntx.txid
         );
       }
     }

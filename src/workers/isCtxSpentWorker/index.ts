@@ -46,20 +46,19 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
           );
 
           sendSlackMessage(
-            "Pool Id: " +
+            "*Pool* *Id:* " +
               tx.commitmentData.poolId +
               "\n" +
-              "Pool Tx Id: " +
+              "*Pool* *Tx* *Id:* " +
               (tx.poolTxInfo?.txId || "unknown pool id") +
               "\n" +
-              "Swap Completed for : <code>" +
+              "*Swap* *Completed* *for:* " +
               txId +
-              "</code>\n" +
-              "Commitment Data: <b>Method</b>: <code>" +
+              "\n" +
+              "*Commitment* *Data:* _Method_ _-_ " +
               tx.commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              tx.commitmentData.cmtOutput2.value +
-              "</code>"
+              ", _Value_ _-_ " +
+              tx.commitmentData.cmtOutput2.value
           );
         }
       }

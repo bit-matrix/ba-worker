@@ -48,14 +48,7 @@ export const poolTxWorker = async () => {
             );
 
             sendSlackMessage(
-              "Pool Tx Id: " +
-                poolTxId +
-                "\n" +
-                "Method Call: <b>Method</b>: <code>" +
-                commitmentData.methodCall +
-                "</code>, <b>Value</b>: <code>" +
-                commitmentData.cmtOutput2Value +
-                "</code>"
+              "*Pool* *Tx* *Id:* " + poolTxId + "\n" + "*Method* *Call:* _Method_ _-_ " + commitmentData.methodCall + ", _Value_ _-_ " + commitmentData.cmtOutput2Value
             );
           } else {
             await sendTelegramMessage(
@@ -70,14 +63,13 @@ export const poolTxWorker = async () => {
             );
 
             sendSlackMessage(
-              "Pool Tx Id: " +
+              "*Pool* *Tx* *Id:* " +
                 poolTxId +
                 "\n" +
-                "Method Call: <b>Method</b>: <code>" +
+                "*Method* *Call:* _Method_ _-_ " +
                 commitmentData.methodCall +
-                "</code>, <b>Fail swap result : </b>: <code>" +
-                poolValidationData.errorMessages.join(", ") +
-                "</code>"
+                ", _Fail_ _Swap_ _Result_ _-_ " +
+                poolValidationData.errorMessages.join(", ")
             );
           }
         }

@@ -74,15 +74,15 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
           );
 
           sendSlackMessage(
-            "1New Pool Last State Detected : " +
-              "Pool: " +
+            "*New* *Pool* *Last* *State* *Detected* " +
+              "\n" +
+              "*Pool:* " +
               currentPool.id +
               "\n" +
-              "Commitment Data: <b>Pair 1 Value</b>: <code>" +
+              "*Commitment* *Data:* _Pair_ _1_ _Value_ _-_ " +
               newPool.quote.value +
-              "</code>, <b>Pair2 Value</b>: <code>" +
-              newPool.token.value +
-              "</code>"
+              ", _Pair2_ _Value_ _-_ " +
+              newPool.token.value
           );
         }
       }

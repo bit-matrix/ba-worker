@@ -41,17 +41,16 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
             );
 
             sendSlackMessage(
-              "Pool: " +
+              "*Pool:* " +
                 value.poolId +
                 "\n" +
-                "New Commitment Tx V2: <code>" +
+                "*New* *Commitment* *Tx* *V2:* " +
                 value.transaction.txid +
-                "</code>\n" +
-                "Commitment Data: <b>Method</b>: <code>" +
+                "\n" +
+                "*Commitment* *Data:* _Method_ _-_ " +
                 value.methodCall +
-                "</code>, <b>Value</b>: <code>" +
-                value.cmtOutput2.value +
-                "</code>"
+                ", _Value_ _-_ " +
+                value.cmtOutput2.value
             );
           }
         }
