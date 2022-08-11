@@ -194,6 +194,5 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     cmtOutput2,
     cmtOutput3,
     transaction,
-    pool,
   };
 };

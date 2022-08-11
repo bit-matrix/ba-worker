@@ -1,6 +1,6 @@
 import axios from "axios";
 import { DB_URL, HISTORY_DB_URL } from "../../env";
-import { BmConfig, Pool, AppSync, BmPtx, BmChart } from "@bitmatrix/models";
+import { BmConfig, Pool, AppSync, BmPtx, BmChart, CommitmentTxHistory } from "@bitmatrix/models";
 
 export const pools = (): Promise<Pool[]> => axios.get<Pool[]>(DB_URL + "pools").then((res) => res.data);
 export const pool = (asset: string): Promise<Pool> => axios.get<Pool>(DB_URL + "pools/" + asset).then((res) => res.data);
@@ -21,5 +21,14 @@ export const poolTxHistorySave = (asset: string, value: BmChart): Promise<void> 
     .then((res) => res.data)
     .catch((res) => {
       console.error("poolTxHistorySave", res.message);
+      throw res.message;
+    });
+
+export const ctxHistorySave = (txId: string, value: CommitmentTxHistory): Promise<CommitmentTxHistory> =>
+  axios
+    .post(HISTORY_DB_URL + "ctxHistory/" + txId, value)
+    .then((res) => res.data)
+    .catch((res) => {
+      console.error("ctxHistorySave", res.message);
       throw res.message;
     });

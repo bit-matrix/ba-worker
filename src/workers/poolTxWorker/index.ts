@@ -2,6 +2,7 @@ import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
+import { pools } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
@@ -14,6 +15,8 @@ export const poolTxWorker = async () => {
 
   //Pool validasyonlarından geçirme
   if (waitingTxs.length > 0) {
+    const bitmatrixPools = await pools();
+
     const waitingCommitmentList: BitmatrixStoreData[] = waitingTxs.filter(
       (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
     );
@@ -22,7 +25,7 @@ export const poolTxWorker = async () => {
       for (let i = 0; i < waitingCommitmentList.length; i++) {
         const commitmentData = waitingCommitmentList[i].commitmentData;
 
-        const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData);
+        const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData, bitmatrixPools);
         const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
 
         const poolTxInfo: poolTxInfo = {
@@ -31,50 +34,52 @@ export const poolTxWorker = async () => {
           failReason: poolValidationData.errorMessages.join(", "),
         };
 
-        if (poolTxInfo.isSuccess) {
-          await sendTelegramMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              commitmentData.cmtOutput2Value +
-              "</code>"
-          );
+        if (poolTxInfo.txId && poolTxInfo.txId !== "") {
+          if (poolTxInfo.isSuccess) {
+            await sendTelegramMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Value</b>: <code>" +
+                commitmentData.cmtOutput2Value +
+                "</code>"
+            );
 
-          sendSlackMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              commitmentData.cmtOutput2Value +
-              "</code>"
-          );
-        } else {
-          await sendTelegramMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Fail swap result : </b>: <code>" +
-              poolValidationData.errorMessages.join(", ") +
-              "</code>"
-          );
+            sendSlackMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Value</b>: <code>" +
+                commitmentData.cmtOutput2Value +
+                "</code>"
+            );
+          } else {
+            await sendTelegramMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Fail swap result : </b>: <code>" +
+                poolValidationData.errorMessages.join(", ") +
+                "</code>"
+            );
 
-          sendSlackMessage(
-            "Pool Tx Id: " +
-              poolTxId +
-              "\n" +
-              "Method Call: <b>Method</b>: <code>" +
-              commitmentData.methodCall +
-              "</code>, <b>Fail swap result : </b>: <code>" +
-              poolValidationData.errorMessages.join(", ") +
-              "</code>"
-          );
+            sendSlackMessage(
+              "Pool Tx Id: " +
+                poolTxId +
+                "\n" +
+                "Method Call: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>Fail swap result : </b>: <code>" +
+                poolValidationData.errorMessages.join(", ") +
+                "</code>"
+            );
+          }
         }
 
         await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);

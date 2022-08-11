@@ -3,6 +3,7 @@ import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/model
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: BitmatrixStoreData[], synced: boolean) => {
   console.log("-------------------NFT HUNTER-------------------------");
@@ -22,7 +23,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         newPool.lp.value = tx.vout[2].value?.toString();
         newPool.quote.value = tx.vout[3].value?.toString();
         newPool.lastStateTxId = tx.txid;
-        newPool.tokenPrice = Math.floor(Number(newPool.token.value) / Number(newPool.quote.value));
+        newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote);
 
         const poolTxDetails = waitingTxs.find((ptx) => ptx.poolTxInfo?.txId === tx.txid);
 

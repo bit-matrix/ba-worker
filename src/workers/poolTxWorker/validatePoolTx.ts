@@ -1,11 +1,12 @@
 import Decimal from "decimal.js";
 import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
-import { CTXFinderResult, CTXPTXResult, PTXFinderResult } from "@bitmatrix/models";
+import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (value: CTXFinderResult): Promise<PTXFinderResult> => {
+export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
   const cof = value;
-  const poolData = cof.pool;
+  const poolData = pools.find((p) => p.id === cof.poolId)!;
+
   const method = cof.methodCall;
 
   let errorMessages = [];

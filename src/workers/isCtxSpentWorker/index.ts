@@ -1,6 +1,7 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, BmPtx } from "@bitmatrix/models";
+import { BitmatrixStoreData, CALL_METHOD, CommitmentTxHistory } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
+import { ctxHistorySave } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
@@ -15,6 +16,16 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
       if (outspends[1].spent || outspends[2].spent) {
         await redisClient.removeKey(txId);
+
+        const commitmentTxHistory: CommitmentTxHistory = {
+          poolId: tx.commitmentData.poolId,
+          method: tx.commitmentData.methodCall as CALL_METHOD,
+          txId,
+          isSuccess: tx.poolTxInfo?.isSuccess || false,
+          failReasons: tx.poolTxInfo?.failReason || "",
+        };
+
+        await ctxHistorySave(txId, commitmentTxHistory);
 
         if (synced) {
           await sendTelegramMessage(

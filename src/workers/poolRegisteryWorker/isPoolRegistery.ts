@@ -6,6 +6,7 @@ import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
 import { BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
 import { poolUpdate } from "../../business/db-client";
+import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
@@ -167,7 +168,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     active: true,
     maxLeaf: leafCount,
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
-    tokenPrice: 0,
+    tokenPrice: tokenPriceCalculation(token, quote),
     version,
   };
 
