@@ -28,13 +28,13 @@ export const poolTxWorker = async () => {
         const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData, bitmatrixPools);
         const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
 
-        const poolTxInfo: poolTxInfo = {
-          txId: poolTxId,
-          isSuccess: poolValidationData.errorMessages.length === 0,
-          failReason: poolValidationData.errorMessages.join(", "),
-        };
+        if (poolTxId && poolTxId !== "") {
+          const poolTxInfo: poolTxInfo = {
+            txId: poolTxId,
+            isSuccess: poolValidationData.errorMessages.length === 0,
+            failReason: poolValidationData.errorMessages.join(", "),
+          };
 
-        if (poolTxInfo.txId && poolTxInfo.txId !== "") {
           if (poolTxInfo.isSuccess) {
             await sendTelegramMessage(
               "Pool Tx Id: " +
@@ -72,9 +72,9 @@ export const poolTxWorker = async () => {
                 poolValidationData.errorMessages.join(", ")
             );
           }
-        }
 
-        await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
+          await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
+        }
       }
     }
   }
