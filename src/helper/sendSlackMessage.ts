@@ -1,6 +1,6 @@
 import { LogLevel, WebClient } from "@slack/web-api";
 
-const BOT_USER_OAUTH_TOKEN = "xoxb-3891760304886-3901195336611-5EMFToIRWzoPIcK0QqrQa6DC";
+const BOT_USER_OAUTH_TOKEN = "xoxb-1891434848919-3894455745527-0HxAKFCNKsqEr5eJmbujXskC";
 const channelId = "C03T3JHGMMX";
 
 export const sendSlackMessage = (message: string) => {
