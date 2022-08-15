@@ -15,8 +15,6 @@ export const sendSlackMessage = (message: string) => {
       channel: channelId,
       text: message,
     });
-
-    console.log(result);
   } catch (error) {
     console.error("sendSlackMessage.error", error);
   }
