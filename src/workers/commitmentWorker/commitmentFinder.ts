@@ -160,10 +160,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     };
   });
 
-  let isAddLiquidity: boolean = false;
-  let commitmentOutputResult: any = undefined;
-
-  commitmentOutputResult = commitmentOutput.commitmentOutputTapscript(poolId, publicKey, isAddLiquidity);
+  const commitmentOutputResult = commitmentOutput.commitmentOutputTapscript(poolId, publicKey, methodCall === "03");
   const tapTweakedResult = commitmentOutputResult.taprootResult.tweak.hex;
   const tapTweakedResultPrefix = tapTweakedResult.substring(0, 2);
 
