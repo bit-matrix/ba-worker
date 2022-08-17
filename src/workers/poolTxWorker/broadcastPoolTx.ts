@@ -63,8 +63,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     "01" +
     hexLE(poolValidationData.lp_asset_id) +
     "01" +
-    convertion.numToLE64LE(WizData.fromNumber(commitmentData.methodCall === "03" ? poolValidationData.result.new_pool_lp_supply : poolValidationData.result.new_pool_lp_liquidity))
-      .hex +
+    convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_lp_liquidity)).hex +
     "00" +
     utils.compactSizeVarInt(lpHolderCovenantScriptPubkey) +
     lpHolderCovenantScriptPubkey;
@@ -338,13 +337,12 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   const rawHex = inputTemplate + outputTemplate + witnessTemplate;
 
-  console.log("rawHex:", rawHex);
   let poolTxId = "";
 
   try {
     poolTxId = await api.sendRawTransaction(rawHex);
   } catch (e) {
-    console.log("erol:", e);
+    console.log("error:", e);
   }
 
   return poolTxId;
