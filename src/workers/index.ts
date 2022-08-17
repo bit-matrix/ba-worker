@@ -21,7 +21,7 @@ const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
       clearInterval(timer);
       await bitmatrixWorker(bestBlockHash, true);
 
-      const newDbState: AppSync = { blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
+      const newDbState: AppSync = { bestBlockHeight, blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
 
       console.log("sync completed");
@@ -52,7 +52,7 @@ const appWorker = async () => {
 
       await bitmatrixWorker(nextBlockHash, false);
 
-      const newDbState: AppSync = { blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
+      const newDbState: AppSync = { bestBlockHeight, blockHash: nextBlockHash, blockHeight: nextBlockHeight, synced: false };
 
       await updateAppSyncState(newDbState);
 

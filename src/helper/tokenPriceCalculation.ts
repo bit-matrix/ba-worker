@@ -1,9 +1,10 @@
 import { PAsset } from "@bitmatrix/models";
+import { lbtcAsset, usdtAsset } from "./util";
 
 export const tokenPriceCalculation = (token: PAsset, quote: PAsset): number => {
-  if (quote.ticker === "tL-BTC") {
+  if (quote.assetHash === lbtcAsset) {
     return Number(token.value) / Number(quote.value);
-  } else if (quote.ticker === "tL-USDt") {
+  } else if (quote.assetHash === usdtAsset) {
     return Number(quote.value) / Number(token.value);
   }
 
