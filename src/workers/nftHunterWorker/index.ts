@@ -61,29 +61,44 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         await poolUpdate(newPool);
 
         if (synced) {
+          //console.log("currentPool", currentPool);
+          //console.log("newPool", newPool);
+
           await sendTelegramMessage(
-            "New Pool Last State Detected : " +
-              "Pool: " +
-              currentPool.id +
+            "<b>New Pool Last State Detected</b>" +
               "\n" +
-              "Commitment Data: <b>Pair 1 Value</b>: <code>" +
+              "Pool: " +
+              newPool.id +
+              "\n" +
+              "Version: " +
+              newPool.version +
+              "\n" +
+              "Commitment Data" +
+              "\n" +
+              "<b>Pair 1 Value</b>: <code>" +
               newPool.quote.value +
-              "</code>, <b>Pair2 Value</b>: <code>" +
+              " " +
+              newPool.quote.ticker +
+              "</code>, " +
+              " ---> " +
+              "<b>Pair 2 Value</b>: <code>" +
               newPool.token.value +
+              " " +
+              newPool.token.ticker +
               "</code>"
           );
 
-          sendSlackMessage(
-            "*New* *Pool* *Last* *State* *Detected* " +
-              "\n" +
-              "*Pool:* " +
-              currentPool.id +
-              "\n" +
-              "*Commitment* *Data:* _Pair_ _1_ _Value_ _-_ " +
-              newPool.quote.value +
-              ", _Pair2_ _Value_ _-_ " +
-              newPool.token.value
-          );
+          // sendSlackMessage(
+          //   "*New* *Pool* *Last* *State* *Detected* " +
+          //     "\n" +
+          //     "*Pool:* " +
+          //     currentPool.id +
+          //     "\n" +
+          //     "*Commitment* *Data:* _Pair_ _1_ _Value_ _-_ " +
+          //     newPool.quote.value +
+          //     ", _Pair2_ _Value_ _-_ " +
+          //     newPool.token.value
+          // );
         }
       }
     }
