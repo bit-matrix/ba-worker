@@ -12,6 +12,8 @@ export const poolRegisteryWorker = async (txDetails: TxDetail[], synced: boolean
       const isNewPoolRegister = await isPoolRegistery(ntx);
 
       if (isNewPoolRegister && synced) {
+        console.log("poolRegisteryWorker", ntx);
+
         await sendTelegramMessage(
           "New pool registered " +
             "\n" +
@@ -25,18 +27,18 @@ export const poolRegisteryWorker = async (txDetails: TxDetail[], synced: boolean
             "</code>"
         );
 
-        sendSlackMessage(
-          "*New* *Pool* *Registered*" +
-            "\n" +
-            "*New* *Pool* *Id:* " +
-            ntx.vout[0].asset +
-            "\n" +
-            "*Block* *Height:* " +
-            ntx.status.block_height +
-            "\n" +
-            "*Pool* *Register* *Tx*: " +
-            ntx.txid
-        );
+        // sendSlackMessage(
+        //   "*New* *Pool* *Registered*" +
+        //     "\n" +
+        //     "*New* *Pool* *Id:* " +
+        //     ntx.vout[0].asset +
+        //     "\n" +
+        //     "*Block* *Height:* " +
+        //     ntx.status.block_height +
+        //     "\n" +
+        //     "*Pool* *Register* *Tx*: " +
+        //     ntx.txid
+        // );
       }
     }
     // console.log(res);

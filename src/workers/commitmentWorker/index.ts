@@ -26,6 +26,8 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
           await redisClient.addKey(value.transaction.txid, 60000, newStoreData);
 
           if (synced) {
+            console.log("commitmentWorker", value);
+
             await sendTelegramMessage(
               "Pool: " +
                 value.poolId +
@@ -40,18 +42,18 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
                 "</code>"
             );
 
-            sendSlackMessage(
-              "*Pool:* " +
-                value.poolId +
-                "\n" +
-                "*New* *Commitment* *Tx* *V2:* " +
-                value.transaction.txid +
-                "\n" +
-                "*Commitment* *Data:* _Method_ _-_ " +
-                value.methodCall +
-                ", _Value_ _-_ " +
-                value.cmtOutput2.value
-            );
+            // sendSlackMessage(
+            //   "*Pool:* " +
+            //     value.poolId +
+            //     "\n" +
+            //     "*New* *Commitment* *Tx* *V2:* " +
+            //     value.transaction.txid +
+            //     "\n" +
+            //     "*Commitment* *Data:* _Method_ _-_ " +
+            //     value.methodCall +
+            //     ", _Value_ _-_ " +
+            //     value.cmtOutput2.value
+            // );
           }
         }
       });

@@ -28,6 +28,8 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
         await ctxHistorySave(txId, commitmentTxHistory);
 
         if (synced) {
+          console.log("isCtxSpentWorker", tx);
+
           await sendTelegramMessage(
             "Pool Id: " +
               tx.commitmentData.poolId +
@@ -38,28 +40,28 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
               "Swap Completed for : <code>" +
               txId +
               "</code>\n" +
-              "Commitment Data: <b>Method</b>: <code>" +
+              "Commitment Data: <b>Version: </b>: <code>" +
               tx.commitmentData.methodCall +
               "</code>, <b>Value</b>: <code>" +
               tx.commitmentData.cmtOutput2.value +
               "</code>"
           );
 
-          sendSlackMessage(
-            "*Pool* *Id:* " +
-              tx.commitmentData.poolId +
-              "\n" +
-              "*Pool* *Tx* *Id:* " +
-              (tx.poolTxInfo?.txId || "unknown pool id") +
-              "\n" +
-              "*Swap* *Completed* *for:* " +
-              txId +
-              "\n" +
-              "*Commitment* *Data:* _Method_ _-_ " +
-              tx.commitmentData.methodCall +
-              ", _Value_ _-_ " +
-              tx.commitmentData.cmtOutput2.value
-          );
+          // sendSlackMessage(
+          //   "*Pool* *Id:* " +
+          //     tx.commitmentData.poolId +
+          //     "\n" +
+          //     "*Pool* *Tx* *Id:* " +
+          //     (tx.poolTxInfo?.txId || "unknown pool id") +
+          //     "\n" +
+          //     "*Swap* *Completed* *for:* " +
+          //     txId +
+          //     "\n" +
+          //     "*Commitment* *Data:* _Method_ _-_ " +
+          //     tx.commitmentData.methodCall +
+          //     ", _Value_ _-_ " +
+          //     tx.commitmentData.cmtOutput2.value
+          // );
         }
       }
     }

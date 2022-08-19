@@ -36,6 +36,9 @@ export const poolTxWorker = async () => {
           };
 
           if (poolTxInfo.isSuccess) {
+            console.log("if- poolTxWorker - poolTxId", poolTxId);
+            console.log("if- poolTxWorker - commitmentData", commitmentData);
+
             await sendTelegramMessage(
               "Pool Tx Id: " +
                 poolTxId +
@@ -47,10 +50,14 @@ export const poolTxWorker = async () => {
                 "</code>"
             );
 
-            sendSlackMessage(
-              "*Pool* *Tx* *Id:* " + poolTxId + "\n" + "*Method* *Call:* _Method_ _-_ " + commitmentData.methodCall + ", _Value_ _-_ " + commitmentData.cmtOutput2Value
-            );
+            // sendSlackMessage(
+            //   "*Pool* *Tx* *Id:* " + poolTxId + "\n" + "*Method* *Call:* _Method_ _-_ " + commitmentData.methodCall + ", _Value_ _-_ " + commitmentData.cmtOutput2Value
+            // );
           } else {
+            console.log("else- poolTxWorker - poolTxId", poolTxId);
+            console.log("else- poolTxWorker - commitmentData", commitmentData);
+            console.log("else- poolTxWorker - poolValidationData", poolValidationData);
+
             await sendTelegramMessage(
               "Pool Tx Id: " +
                 poolTxId +
@@ -62,15 +69,15 @@ export const poolTxWorker = async () => {
                 "</code>"
             );
 
-            sendSlackMessage(
-              "*Pool* *Tx* *Id:* " +
-                poolTxId +
-                "\n" +
-                "*Method* *Call:* _Method_ _-_ " +
-                commitmentData.methodCall +
-                ", _Fail_ _Swap_ _Result_ _-_ " +
-                poolValidationData.errorMessages.join(", ")
-            );
+            // sendSlackMessage(
+            //   "*Pool* *Tx* *Id:* " +
+            //     poolTxId +
+            //     "\n" +
+            //     "*Method* *Call:* _Method_ _-_ " +
+            //     commitmentData.methodCall +
+            //     ", _Fail_ _Swap_ _Result_ _-_ " +
+            //     poolValidationData.errorMessages.join(", ")
+            // );
           }
 
           await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
