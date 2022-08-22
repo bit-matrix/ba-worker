@@ -1,9 +1,9 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, CTXFinderResult, Pool } from "@bitmatrix/models";
+import { BitmatrixStoreData } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
-import { commitmentFinder } from "./commitmentFinder";
+import { commitmentFinder, CTXFinderResult } from "./commitmentFinder";
 import { pools } from "../../business/db-client";
 
 export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
@@ -25,22 +25,79 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
 
           await redisClient.addKey(value.transaction.txid, 60000, newStoreData);
 
-          if (synced) {
-            console.log("commitmentWorker", value);
+          let telegramMessageText = "";
 
-            await sendTelegramMessage(
-              "Pool: " +
+          if (synced) {
+            if (value.methodCall === "03") {
+              telegramMessageText =
+                "Pool Id: " +
                 value.poolId +
-                "\n" +
-                "New Commitment Tx V2: <code>" +
+                "\nNew Commitment Tx V2: <code>" +
                 value.transaction.txid +
-                "</code>\n" +
-                "Commitment Data: <b>Method</b>: <code>" +
+                "</code> \nCommitment Data\n<b>CASE</b>: <code>" +
                 value.methodCall +
-                "</code>, <b>Value</b>: <code>" +
+                "\n<b>Pair 1 Value</b>: <code>" +
+                value.cmtOutput1.value +
+                " " +
+                value.pair1Ticker +
+                "</code> + <b>Pair 2 Value</b>: <code> " +
                 value.cmtOutput2.value +
-                "</code>"
-            );
+                " " +
+                value.pair2Ticker +
+                "</code> ---> <b>LP Value</b>: <code>" +
+                value.cmtOutput3?.value +
+                " " +
+                value.lpTicker +
+                "</code>";
+            } else if (value.methodCall === "04") {
+              telegramMessageText =
+                "Pool: " +
+                value.poolId +
+                "\nNew Commitment Tx V2: <code>" +
+                value.transaction.txid +
+                "</code> \nCommitment Data \n <b>CASE</b>: <code>" +
+                value.methodCall +
+                "\n<b>LP Value</b>: <code>" +
+                value.cmtOutput3?.value +
+                " " +
+                value.lpTicker +
+                "</code>  ---> <b>Pair 1 Value</b>: <code>" +
+                value.cmtOutput1.value +
+                " " +
+                value.pair1Ticker +
+                "<b>Pair 2 Value</b>: <code>" +
+                value.cmtOutput2.value +
+                " " +
+                value.pair2Ticker +
+                "</code>";
+            } else {
+              telegramMessageText =
+                "Pool: " +
+                value.poolId +
+                "\nNew Commitment Tx V2: <code>" +
+                value.transaction.txid +
+                "</code> \nCommitment Data \n<b>Method</b>: <code>" +
+                value.methodCall +
+                "\n<b>Pair 1 Value</b>: <code>" +
+                value.cmtOutput1.value +
+                " " +
+                value.pair1Ticker +
+                "</code> ---> <b> Pair 2 Value</b>: <code>" +
+                value.cmtOutput2.value +
+                " " +
+                value.pair2Ticker +
+                "</code>" +
+                "ℹ️ User gave <code/>" +
+                value.cmtOutput1.value +
+                " " +
+                value.pair1Ticker +
+                "</code>, wanted to get <code>" +
+                value.cmtOutput2.value +
+                " " +
+                value.pair2Ticker +
+                "</code>";
+            }
+            await sendTelegramMessage(telegramMessageText);
 
             // sendSlackMessage(
             //   "*Pool:* " +

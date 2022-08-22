@@ -5,7 +5,7 @@ import { ctxHistorySave } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 
-export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
+export const isCtxSpentWorker = async (waitingTxs: any[], synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
 
   if (waitingTxs.length > 0) {
@@ -28,24 +28,76 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
         await ctxHistorySave(txId, commitmentTxHistory);
 
         if (synced) {
-          console.log("isCtxSpentWorker", tx);
-
-          await sendTelegramMessage(
-            "Pool Id: " +
+          let telegramMessageText = "";
+          if (tx.commitmentData.methodCall === "03") {
+            telegramMessageText =
+              "Pool Id: " +
               tx.commitmentData.poolId +
-              "\n" +
-              "Pool Tx Id: " +
-              (tx.poolTxInfo?.txId || "unknown pool id") +
-              "\n" +
-              "Swap Completed for : <code>" +
+              "\nSwap Completed for : <code>" +
               txId +
-              "</code>\n" +
-              "Commitment Data: <b>Version: </b>: <code>" +
+              "\nPool Tx Id:" +
+              (tx.poolTxInfo?.txId || "unknown pool tx id") +
+              "</code>\nCommitment Data: <b>CASE: </b>: <code>" +
               tx.commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
+              "</code>\n<b>Pair 1 Value</b>: <code>" +
+              tx.commitmentData.cmtOutput1.value +
+              " " +
+              tx.commitmentData.pair1Ticker +
+              "</code> + <b>Pair 2 Value</b>: <code>" +
               tx.commitmentData.cmtOutput2.value +
-              "</code>"
-          );
+              " " +
+              tx.commitmentData.pair2Ticker +
+              "</code>" +
+              "<code> \n <b>LP Value</b>:" +
+              tx.commitmentData.cmtOutput3.value +
+              " " +
+              tx.commitmentData.lpTicker +
+              "</code>";
+          } else if (tx.commitmentData.methodCall === "04") {
+            telegramMessageText =
+              "Pool Id: " +
+              tx.commitmentData.poolId +
+              "\nSwap Completed for : <code>" +
+              txId +
+              "\nPool Tx Id:" +
+              (tx.poolTxInfo?.txId || "unknown pool tx id") +
+              "</code>\nCommitment Data: <b>CASE: </b>: <code>" +
+              tx.commitmentData.methodCall +
+              "</code>\n<b>LP Value</b>:" +
+              tx.commitmentData.cmtOutput3.value +
+              " " +
+              tx.commitmentData.lpTicker +
+              "</code> ---> <b>Pair 1 Value</b>: <code>" +
+              tx.commitmentData.cmtOutput1.value +
+              " " +
+              tx.commitmentData.pair1Ticker +
+              "</code> + <b>Pair 2 Value</b>: <code>" +
+              tx.commitmentData.cmtOutput2.value +
+              " " +
+              tx.commitmentData.pair2Ticker +
+              "</code>";
+          } else {
+            telegramMessageText =
+              "Pool Id: " +
+              tx.commitmentData.poolId +
+              "\nSwap Completed for : <code>" +
+              txId +
+              "\nPool Tx Id:" +
+              (tx.poolTxInfo?.txId || "unknown pool tx id") +
+              "</code>\nCommitment Data: <b>CASE: </b>: <code>" +
+              tx.commitmentData.methodCall +
+              "</code>\n<b>Pair 1 Value</b>: <code>" +
+              tx.commitmentData.cmtOutput1.value +
+              " " +
+              tx.commitmentData.pair1Ticker +
+              "</code> ---> <b>Pair 2 Value</b>: <code>" +
+              tx.commitmentData.cmtOutput2.value +
+              " " +
+              tx.commitmentData.pair2Ticker +
+              "</code>";
+          }
+
+          await sendTelegramMessage(telegramMessageText);
 
           // sendSlackMessage(
           //   "*Pool* *Id:* " +

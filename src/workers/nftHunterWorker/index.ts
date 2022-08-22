@@ -1,3 +1,4 @@
+import Numeral from "numeral";
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
@@ -61,30 +62,24 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         await poolUpdate(newPool);
 
         if (synced) {
-          //console.log("currentPool", currentPool);
-          //console.log("newPool", newPool);
-
           await sendTelegramMessage(
             "<b>New Pool Last State Detected</b>" +
-              "\n" +
-              "Pool: " +
+              "\nPool Id: " +
               newPool.id +
-              "\n" +
-              "Version: " +
+              "\nPool Version: " +
               newPool.version +
-              "\n" +
-              "Commitment Data" +
-              "\n" +
-              "<b>Pair 1 Value</b>: <code>" +
-              newPool.quote.value +
+              "\nCommitment Data \n<b>Pair 1 Value</b>: <code>" +
+              Numeral(newPool.quote.value) +
               " " +
               newPool.quote.ticker +
-              "</code>, " +
-              " ---> " +
-              "<b>Pair 2 Value</b>: <code>" +
+              "</code>, <b>Pair 2 Value</b>: <code>" +
               newPool.token.value +
               " " +
-              newPool.token.ticker +
+              Numeral(newPool.token.ticker) +
+              "</code>, <b>Lp Token Value</b>: <code>" +
+              Numeral(newPool.lp.value) +
+              " " +
+              newPool.lp.ticker +
               "</code>"
           );
 

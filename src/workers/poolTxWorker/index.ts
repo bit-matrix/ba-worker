@@ -17,7 +17,7 @@ export const poolTxWorker = async () => {
   if (waitingTxs.length > 0) {
     const bitmatrixPools = await pools();
 
-    const waitingCommitmentList: BitmatrixStoreData[] = waitingTxs.filter(
+    const waitingCommitmentList: any[] = waitingTxs.filter(
       (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
     );
 
@@ -35,20 +35,66 @@ export const poolTxWorker = async () => {
             failReason: poolValidationData.errorMessages.join(", "),
           };
 
+          let telegramMessageText = "";
+
           if (poolTxInfo.isSuccess) {
             console.log("if- poolTxWorker - poolTxId", poolTxId);
             console.log("if- poolTxWorker - commitmentData", commitmentData);
-
-            await sendTelegramMessage(
-              "Pool Tx Id: " +
+            if (commitmentData.methodCall === "03") {
+              telegramMessageText =
+                "Pool Transaction Completed successfully.\nPool Tx Id: " +
                 poolTxId +
-                "\n" +
-                "Method Call: <b>Method</b>: <code>" +
+                "\nCommitment Data: <b>Method</b>: <code>" +
                 commitmentData.methodCall +
-                "</code>, <b>Value</b>: <code>" +
-                commitmentData.cmtOutput2Value +
-                "</code>"
-            );
+                "</code>, <b>Pair 1 Value</b>: <code>" +
+                commitmentData.cmtOutput1.value +
+                "" +
+                commitmentData.pair1Ticker +
+                "</code> + <b>Pair 2 Value</b>: <code>" +
+                commitmentData.cmtOutput2.value +
+                "" +
+                commitmentData.pair2Ticker +
+                "</code> ---> <b>LP Value</b>: <code>" +
+                commitmentData.cmtOutput3.value +
+                "" +
+                commitmentData.lpTicker +
+                (await sendTelegramMessage(telegramMessageText));
+            } else if (commitmentData.methodCall === "04") {
+              telegramMessageText =
+                "Pool Transaction Completed successfully.\nPool Tx Id: " +
+                poolTxId +
+                "\nCommitment Data: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>, <b>LP Value</b>: <code>" +
+                commitmentData.cmtOutput3.value +
+                "" +
+                commitmentData.lpTicker +
+                "</code> ---> <b>Pair 1 Value</b>: <code>" +
+                commitmentData.cmtOutput1.value +
+                "" +
+                commitmentData.pair1Ticker +
+                "</code> + <b>Pair 2 Value</b>: <code>" +
+                commitmentData.cmtOutput2.value +
+                "" +
+                commitmentData.pair2Ticker +
+                (await sendTelegramMessage(telegramMessageText));
+            } else {
+              telegramMessageText =
+                "Pool Transaction Completed successfully.\nPool Tx Id: " +
+                poolTxId +
+                "\nCommitment Data: <b>Method</b>: <code>" +
+                commitmentData.methodCall +
+                "</code>" +
+                "<b>Pair 1 Value</b>: <code>" +
+                commitmentData.cmtOutput1.value +
+                "" +
+                commitmentData.pair1Ticker +
+                "</code> ---> <b>Pair 2 Value</b>: <code>" +
+                commitmentData.cmtOutput2.value +
+                "" +
+                commitmentData.pair2Ticker +
+                (await sendTelegramMessage(telegramMessageText));
+            }
 
             // sendSlackMessage(
             //   "*Pool* *Tx* *Id:* " + poolTxId + "\n" + "*Method* *Call:* _Method_ _-_ " + commitmentData.methodCall + ", _Value_ _-_ " + commitmentData.cmtOutput2Value
@@ -62,9 +108,9 @@ export const poolTxWorker = async () => {
               "Pool Tx Id: " +
                 poolTxId +
                 "\n" +
-                "Method Call: <b>Method</b>: <code>" +
+                "Commitment Data: <b>Method</b>: <code>" +
                 commitmentData.methodCall +
-                "</code>, <b>Fail swap result : </b>: <code>" +
+                "</code>, <b>Fail swap result : </b> <code>" +
                 poolValidationData.errorMessages.join(", ") +
                 "</code>"
             );
