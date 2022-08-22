@@ -42,9 +42,8 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   const script = [WizData.fromHex("20" + hexLE(commitmentData.poolId) + "00c86987")];
   const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
 
-  // @todo index in pool
   // leaf count and current index temp
-  const poolMainCovenant = pool.createCovenants(0, 0, commitmentData.poolId, poolValidationData.pair_1_coefficient, 2);
+  const poolMainCovenant = pool.createCovenants(0, 0, commitmentData.poolId, poolValidationData.pair_1_coefficient, poolValidationData.poolData.pair1_coefficient.number);
 
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
