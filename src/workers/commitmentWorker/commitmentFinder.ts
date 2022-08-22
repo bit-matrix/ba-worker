@@ -1,11 +1,46 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { api, commitmentOutput } from "@bitmatrix/lib";
-import { CTXFinderResult, Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
+import { ChangeOutputFinal, Pool, SeperatedChangeOutputs, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
 import { convertion } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import Decimal from "decimal.js";
 
 const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
+
+export type CTXFinderResult = {
+  tapTweakedResultPrefix: string;
+  cmtTxLocktimeByteLength: string;
+  outputCount: WizData;
+  inputCount: WizData;
+  inputs: TxVInRPC[];
+  outputs: TxVOutRPC[];
+  nsequenceValue: string;
+  cmtTxInOutpoints: {
+    index: number;
+    data: string;
+  }[];
+  cmtOutput1Value: string;
+  output2PairValue: string;
+  cmtOutput2Value: string;
+  cmtOutput3Value?: string;
+  cmtOutputFeeHexValue: string;
+  cmtOutput3PairValue: string;
+  cmtOutput3Asset?: string;
+  changeOutputFinal: ChangeOutputFinal[];
+  seperatedChangeOutputs: SeperatedChangeOutputs[];
+  poolId: string;
+  methodCall: string;
+  publicKey: string;
+  slippageTolerance: string;
+  cmtOutput1: TxVOutRPC;
+  cmtOutput2: TxVOutRPC;
+  cmtOutput3?: TxVOutRPC;
+  orderingFee: string;
+  transaction: TxDetail;
+  pair1Ticker: string;
+  pair2Ticker: string;
+  lpTicker: string;
+};
 
 export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult | undefined> => {
   // fetch tx details with rpc
@@ -95,8 +130,12 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
   //const poolDetail: Pool = poolReq.data;
 
   const pair1Asset = pool.quote.assetHash;
+  const pair1Ticker = pool.quote.ticker;
 
   const pair2Asset = pool.token.assetHash;
+  const pair2Ticker = pool.token.ticker;
+
+  const lpTicker = pool.lp.ticker;
 
   let output2PairValue = "00";
 
@@ -191,5 +230,8 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     cmtOutput2,
     cmtOutput3,
     transaction,
+    pair1Ticker,
+    pair2Ticker,
+    lpTicker,
   };
 };
