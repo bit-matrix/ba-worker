@@ -96,7 +96,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     leafCount = 16;
   }
 
-  const pair1_coefficient = outputHex.slice(20);
+  const pair1_coefficient = outputHex.slice(20, 28);
 
   if (bitmatrixHex !== "6269746d6174726978") return false;
   // if (version !== "01") return false;
