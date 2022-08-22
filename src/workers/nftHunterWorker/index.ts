@@ -1,10 +1,11 @@
 import Numeral from "numeral";
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
+import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
 export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: BitmatrixStoreData[], synced: boolean) => {
   console.log("-------------------NFT HUNTER-------------------------");
@@ -69,15 +70,15 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
               "\nPool Version: " +
               newPool.version +
               "\nCommitment Data \n<b>Pair 1 Value</b>: <code>" +
-              Numeral(newPool.quote.value) +
+              Numeral(newPool.quote.value).format("(0.00a)") +
               " " +
               newPool.quote.ticker +
               "</code>, <b>Pair 2 Value</b>: <code>" +
-              newPool.token.value +
+              Numeral(newPool.token.value).format("(0.00a)") +
               " " +
-              Numeral(newPool.token.ticker) +
+              newPool.token.ticker +
               "</code>, <b>Lp Token Value</b>: <code>" +
-              Numeral(newPool.lp.value) +
+              Numeral(newPool.lp.value).format("(0.00a)") +
               " " +
               newPool.lp.ticker +
               "</code>"

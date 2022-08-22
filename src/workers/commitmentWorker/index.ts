@@ -1,10 +1,11 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
-import { commitmentFinder, CTXFinderResult } from "./commitmentFinder";
+import { commitmentFinder } from "./commitmentFinder";
 import { pools } from "../../business/db-client";
+import { CTXFinderResult } from "../../models/CTXFinderResult";
+import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
 export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------COMMINTMENT WORKER-------------------------");
@@ -34,9 +35,9 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
                 value.poolId +
                 "\nNew Commitment Tx V2: <code>" +
                 value.transaction.txid +
-                "</code> \nCommitment Data\n<b>CASE</b>: <code>" +
+                "</code>\nCommitment Data\n<b>CASE</b>: <code>" +
                 value.methodCall +
-                "\n<b>Pair 1 Value</b>: <code>" +
+                "</code>\n<b>Pair 1 Value</b>: <code>" +
                 value.cmtOutput1.value +
                 " " +
                 value.pair1Ticker +
@@ -57,7 +58,7 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
                 value.transaction.txid +
                 "</code> \nCommitment Data \n <b>CASE</b>: <code>" +
                 value.methodCall +
-                "\n<b>LP Value</b>: <code>" +
+                "</code>\n<b>LP Value</b>: <code>" +
                 value.cmtOutput3?.value +
                 " " +
                 value.lpTicker +
@@ -78,7 +79,7 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
                 value.transaction.txid +
                 "</code> \nCommitment Data \n<b>Method</b>: <code>" +
                 value.methodCall +
-                "\n<b>Pair 1 Value</b>: <code>" +
+                "</code>\n<b>Pair 1 Value</b>: <code>" +
                 value.cmtOutput1.value +
                 " " +
                 value.pair1Ticker +
@@ -86,17 +87,9 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
                 value.cmtOutput2.value +
                 " " +
                 value.pair2Ticker +
-                "</code>" +
-                "ℹ️ User gave <code/>" +
-                value.cmtOutput1.value +
-                " " +
-                value.pair1Ticker +
-                "</code>, wanted to get <code>" +
-                value.cmtOutput2.value +
-                " " +
-                value.pair2Ticker +
                 "</code>";
             }
+
             await sendTelegramMessage(telegramMessageText);
 
             // sendSlackMessage(

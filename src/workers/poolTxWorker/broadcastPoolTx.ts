@@ -1,7 +1,8 @@
-import { CTXFinderResult, PTXFinderResult, Pool } from "@bitmatrix/models";
+import { PTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool } from "@bitmatrix/lib";
+import { CTXFinderResult } from "../../models/CTXFinderResult";
 
 export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValidationData: PTXFinderResult): Promise<string> => {
   // will be implemented in the future

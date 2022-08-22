@@ -1,11 +1,12 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, CALL_METHOD, CommitmentTxHistory } from "@bitmatrix/models";
+import { CALL_METHOD, CommitmentTxHistory } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
 import { ctxHistorySave } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 
-export const isCtxSpentWorker = async (waitingTxs: any[], synced: boolean) => {
+export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
 
   if (waitingTxs.length > 0) {
@@ -49,7 +50,7 @@ export const isCtxSpentWorker = async (waitingTxs: any[], synced: boolean) => {
               tx.commitmentData.pair2Ticker +
               "</code>" +
               "<code> \n <b>LP Value</b>:" +
-              tx.commitmentData.cmtOutput3.value +
+              tx.commitmentData.cmtOutput3?.value +
               " " +
               tx.commitmentData.lpTicker +
               "</code>";
@@ -64,7 +65,7 @@ export const isCtxSpentWorker = async (waitingTxs: any[], synced: boolean) => {
               "</code>\nCommitment Data: <b>CASE: </b>: <code>" +
               tx.commitmentData.methodCall +
               "</code>\n<b>LP Value</b>:" +
-              tx.commitmentData.cmtOutput3.value +
+              tx.commitmentData.cmtOutput3?.value +
               " " +
               tx.commitmentData.lpTicker +
               "</code> ---> <b>Pair 1 Value</b>: <code>" +

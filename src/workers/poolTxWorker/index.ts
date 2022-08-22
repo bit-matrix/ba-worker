@@ -1,10 +1,10 @@
-import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
+import { PTXFinderResult } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
 import { pools } from "../../business/db-client";
 import { sendSlackMessage } from "../../helper/sendSlackMessage";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { BitmatrixStoreData } from "../../models/BitmatrixStoreData";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
 
@@ -57,8 +57,9 @@ export const poolTxWorker = async () => {
                 "</code> ---> <b>LP Value</b>: <code>" +
                 commitmentData.cmtOutput3.value +
                 "" +
-                commitmentData.lpTicker +
-                (await sendTelegramMessage(telegramMessageText));
+                commitmentData.lpTicker;
+
+              await sendTelegramMessage(telegramMessageText);
             } else if (commitmentData.methodCall === "04") {
               telegramMessageText =
                 "Pool Transaction Completed successfully.\nPool Tx Id: " +
@@ -76,8 +77,8 @@ export const poolTxWorker = async () => {
                 "</code> + <b>Pair 2 Value</b>: <code>" +
                 commitmentData.cmtOutput2.value +
                 "" +
-                commitmentData.pair2Ticker +
-                (await sendTelegramMessage(telegramMessageText));
+                commitmentData.pair2Ticker;
+              await sendTelegramMessage(telegramMessageText);
             } else {
               telegramMessageText =
                 "Pool Transaction Completed successfully.\nPool Tx Id: " +
@@ -92,8 +93,8 @@ export const poolTxWorker = async () => {
                 "</code> ---> <b>Pair 2 Value</b>: <code>" +
                 commitmentData.cmtOutput2.value +
                 "" +
-                commitmentData.pair2Ticker +
-                (await sendTelegramMessage(telegramMessageText));
+                commitmentData.pair2Ticker;
+              await sendTelegramMessage(telegramMessageText);
             }
 
             // sendSlackMessage(
