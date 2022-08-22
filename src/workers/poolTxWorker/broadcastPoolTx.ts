@@ -1,4 +1,4 @@
-import { CTXFinderResult, PTXFinderResult } from "@bitmatrix/models";
+import { CTXFinderResult, PTXFinderResult, Pool } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool } from "@bitmatrix/lib";
@@ -43,7 +43,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
 
   // leaf count and current index temp
-  const poolMainCovenant = pool.createCovenants(0, 0, commitmentData.poolId, poolValidationData.pair_1_coefficient);
+  const poolMainCovenant = pool.createCovenants(0, 0, commitmentData.poolId, poolValidationData.pair_1_coefficient, poolValidationData.poolData.pair1_coefficient.number);
 
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
@@ -293,7 +293,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     const mainCovenantControlBlockDetails = utils.compactSizeVarInt(poolMainCovenant.controlBlock) + poolMainCovenant.controlBlock;
 
     const isAddLiquidity = commitmentData.methodCall === "03";
-    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData.poolId, commitmentData.publicKey, isAddLiquidity);
+    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData.poolId, commitmentData.publicKey);
 
     const commitmentOutputWitness =
       "00000003" +
