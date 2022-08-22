@@ -160,7 +160,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     };
   });
 
-  const commitmentOutputResult = commitmentOutput.commitmentOutputTapscript(poolId, publicKey, methodCall === "03");
+  const commitmentOutputResult = commitmentOutput.commitmentOutputTapscript(poolId, publicKey);
   const tapTweakedResult = commitmentOutputResult.taprootResult.tweak.hex;
   const tapTweakedResultPrefix = tapTweakedResult.substring(0, 2);
 
