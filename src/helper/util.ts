@@ -29,3 +29,13 @@ export const tickerFinder = (asset: string): { ticker: string; name: string } =>
 export const deepCopy = <T>(original: T): T => {
   return JSON.parse(JSON.stringify(original));
 };
+
+export const replaceChar = (text: string, index: number, replacement: string) => {
+  if (index >= text.length) {
+    return text.valueOf();
+  }
+
+  var chars = text.split("");
+  chars[index] = replacement;
+  return chars.join("");
+};
