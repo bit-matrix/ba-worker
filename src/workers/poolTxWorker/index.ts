@@ -1,4 +1,3 @@
-import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
@@ -42,7 +41,7 @@ export const poolTxWorker = async () => {
                 "Method Call: <b>Method</b>: <code>" +
                 commitmentData.methodCall +
                 "</code>, <b>Value</b>: <code>" +
-                commitmentData.cmtOutput2Value +
+                commitmentData.cmtOutput2.value +
                 "</code>"
             );
           } else {
