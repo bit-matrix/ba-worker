@@ -3,8 +3,8 @@ import { convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
-  const cof = value;
+export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
+  const cof = commitmentData;
   const poolData = pools.find((p) => p.id === cof.poolId)!;
 
   const method = cof.methodCall;
@@ -71,11 +71,8 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
   // 2-Havuzun güncel pair_2 liquidity miktarına pool_pair_2_liquidity ismini ver.
   const pool_pair_2_liquidity = Number(poolData.token.value);
 
-  // transaction outputs
-  const commitmentOutputs = cof.outputs;
-
   //commitment output 2
-  const commitmentOutput2 = commitmentOutputs[2];
+  const commitmentOutput2 = cof.cmtOutput2;
 
   // commitment Output2 Asset Id
   const commitmentOutput2AssetId = commitmentOutput2.asset;
@@ -254,9 +251,9 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
       // pool_pair_1_liquidity değerinden user_received_pair_1 değerini çıkar ve sonuca new_pool_pair_1_liquidity ismini ver. Bu değeri havuzun güncel pair 1 liquidity miktarı olarak ata.
       result.new_pool_pair_1_liquidity = Math.floor(pool_pair_1_liquidity - result.user_received_pair_1);
     }
-  } else if (method === "03") {
+  } else if (method === "03" && cof.cmtOutput3) {
     //commitment output 3
-    const commitmentOutput3 = commitmentOutputs[3];
+    const commitmentOutput3 = cof.cmtOutput3;
 
     // commitment Output2 Asset Id
     const commitmentOutput3AssetId = commitmentOutput3.asset;
