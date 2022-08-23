@@ -74,7 +74,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
 
   // sha256 initializeye sok
   // 40 byte - 103 byte arası limit validasyon
-  const sha256InitializeResult: string = sha256Streaming.sha256initialize(contextInput);
+  const sha256InitializeResult: string = sha256Streaming.sha256Initializer(contextInput);
   const sha256InitializeResultLength = sha256InitializeResult.length;
 
   if (sha256InitializeResultLength <= 80 && sha256InitializeResultLength >= 206) return "sha256InitializeResult length must be 40 byte - 103 byte";
