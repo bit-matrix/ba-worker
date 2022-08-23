@@ -15,7 +15,7 @@
     "@bitmatrix/models": "^0.1.33",
     "@bitmatrix/redis-client": "^1.0.3",
     "@bitmatrix/sha256streaming": "^1.0.36",
-    "@script-wiz/lib-core": "^0.0.47",
+    "@script-wiz/lib-core": "^0.0.59",
     "@script-wiz/wiz-data": "^1.0.0",
     "axios": "^0.24.0",
     "bcrypto": "^5.4.0",
