@@ -1,6 +1,6 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { api, commitmentOutput } from "@bitmatrix/lib";
-import { Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
+import { CTXFinderResult, Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
 import { convertion } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { replaceChar } from "../../helper/util";
@@ -8,7 +8,7 @@ import sha256Streaming from "@bitmatrix/sha256streaming";
 
 const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 
-export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<any> => {
+export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult | undefined> => {
   // fetch tx details with rpc
   const rawTransactionHex: string = await api.getRawTransaction(transaction.txid);
   const decodedTransaction: TxDetailRPC = await api.decodeRawTransaction(rawTransactionHex);
@@ -24,11 +24,6 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
   if (decodedTransaction.locktime !== 0) return undefined;
 
   const locktimeHex: string = convertion.numToLE32(WizData.fromNumber(decodedTransaction.locktime)).hex;
-
-  const cmtTxInOutpoints = inputs.map((inp, index) => {
-    const vout32Byte = convertion.numToLE32(WizData.fromNumber(inp.vout));
-    return { index, data: hexLE(inp.txid) + vout32Byte.hex };
-  });
 
   const callData: string = opReturnOutput[1];
 
@@ -74,10 +69,10 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
 
   // sha256 initializeye sok
   // 40 byte - 103 byte arası limit validasyon
-  const sha256InitializeResult: string = sha256Streaming.sha256Initializer(contextInput);
+  const sha256InitializeResult: string = (sha256Streaming.sha256Initializer(contextInput) as string).toLowerCase();
   const sha256InitializeResultLength = sha256InitializeResult.length;
 
-  if (sha256InitializeResultLength <= 80 && sha256InitializeResultLength >= 206) return "sha256InitializeResult length must be 40 byte - 103 byte";
+  if (sha256InitializeResultLength <= 80 && sha256InitializeResultLength >= 206) return undefined;
 
   // PART - 1
   const part1 = sha256InitializeResult.substring(0, 80);
@@ -101,7 +96,6 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     outputCount,
     inputs,
     outputs,
-    cmtTxInOutpoints,
     poolId,
     methodCall,
     publicKey,
