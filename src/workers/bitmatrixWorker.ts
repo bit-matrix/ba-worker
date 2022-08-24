@@ -1,7 +1,6 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
 import { BitmatrixStoreData } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
-import { pools } from "../business/db-client";
 import { commitmentWorker } from "./commitmentWorker";
 import { isCtxSpentWorker } from "./isCtxSpentWorker";
 import { nftHunterWorker } from "./nftHunterWorker";
