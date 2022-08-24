@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { convertion } from "@script-wiz/lib-core";
+import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
@@ -153,7 +153,9 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
 
-    if (result.user_received_pair_2 < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+    const bn_user_received_pair_2 = convertion.numToLE64(WizData.fromNumber(result.user_received_pair_2));
+
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_received_pair_2).number === 1) {
       errorMessages.push("Out of slippage");
 
       output.assetId = pair_1_asset_id;
@@ -228,7 +230,10 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
       result.new_pool_pair_1_liquidity = pool_pair_1_liquidity;
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
-    if (result.user_received_pair_1 < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+
+    const bn_user_received_pair_1 = convertion.LE64ToNum(WizData.fromNumber(result.user_received_pair_1));
+
+    if (arithmetics64.greaterThan64(convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance)), bn_user_received_pair_1)) {
       errorMessages.push("Out of slippage");
 
       output.assetId = pair_2_asset_id;
@@ -308,7 +313,9 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
 
-    if (result.user_lp_received < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+    const bn_user_lp_received = convertion.LE64ToNum(WizData.fromNumber(result.user_lp_received));
+
+    if (arithmetics64.greaterThan64(convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance)), bn_user_lp_received)) {
       errorMessages.push("Out of slippage");
       // İlgili slot için 2 tane settlement output oluştur. Birinci outputun asset ID ‘sini pair_1_asset id olarak, ikinci outputun asset ID’sini ise ise pair_1_asset ID olarak ayarla.
       // Birinci outpunun miktarını user_pair_1_supply_total olarak ayarla.
