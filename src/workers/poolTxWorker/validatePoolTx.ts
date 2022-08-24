@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
-import { convertion } from "@script-wiz/lib-core";
+import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
-  const cof = value;
+export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
+  const cof = commitmentData;
   const poolData = pools.find((p) => p.id === cof.poolId)!;
 
   const method = cof.methodCall;
@@ -71,11 +71,8 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
   // 2-Havuzun güncel pair_2 liquidity miktarına pool_pair_2_liquidity ismini ver.
   const pool_pair_2_liquidity = Number(poolData.token.value);
 
-  // transaction outputs
-  const commitmentOutputs = cof.outputs;
-
   //commitment output 2
-  const commitmentOutput2 = commitmentOutputs[2];
+  const commitmentOutput2 = cof.cmtOutput2;
 
   // commitment Output2 Asset Id
   const commitmentOutput2AssetId = commitmentOutput2.asset;
@@ -156,7 +153,9 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
 
-    if (result.user_received_pair_2 < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+    const bn_user_received_pair_2 = convertion.numToLE64(WizData.fromNumber(result.user_received_pair_2));
+
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_received_pair_2).number === 1) {
       errorMessages.push("Out of slippage");
 
       output.assetId = pair_1_asset_id;
@@ -231,7 +230,10 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
       result.new_pool_pair_1_liquidity = pool_pair_1_liquidity;
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
-    if (result.user_received_pair_1 < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+
+    const bn_user_received_pair_1 = convertion.numToLE64(WizData.fromNumber(result.user_received_pair_1));
+
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_received_pair_1)) {
       errorMessages.push("Out of slippage");
 
       output.assetId = pair_2_asset_id;
@@ -254,9 +256,9 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
       // pool_pair_1_liquidity değerinden user_received_pair_1 değerini çıkar ve sonuca new_pool_pair_1_liquidity ismini ver. Bu değeri havuzun güncel pair 1 liquidity miktarı olarak ata.
       result.new_pool_pair_1_liquidity = Math.floor(pool_pair_1_liquidity - result.user_received_pair_1);
     }
-  } else if (method === "03") {
+  } else if (method === "03" && cof.cmtOutput3) {
     //commitment output 3
-    const commitmentOutput3 = commitmentOutputs[3];
+    const commitmentOutput3 = cof.cmtOutput3;
 
     // commitment Output2 Asset Id
     const commitmentOutput3AssetId = commitmentOutput3.asset;
@@ -311,7 +313,9 @@ export const validatePoolTx = async (value: CTXFinderResult, pools: Pool[]): Pro
       result.new_pool_pair_2_liquidity = pool_pair_2_liquidity;
     }
 
-    if (result.user_lp_received < (convertion.LE64ToNum(WizData.fromHex(cof.slippageTolerance))?.number || 0)) {
+    const bn_user_lp_received = convertion.numToLE64(WizData.fromNumber(result.user_lp_received));
+
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_lp_received)) {
       errorMessages.push("Out of slippage");
       // İlgili slot için 2 tane settlement output oluştur. Birinci outputun asset ID ‘sini pair_1_asset id olarak, ikinci outputun asset ID’sini ise ise pair_1_asset ID olarak ayarla.
       // Birinci outpunun miktarını user_pair_1_supply_total olarak ayarla.

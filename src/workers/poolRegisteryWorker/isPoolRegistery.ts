@@ -78,11 +78,14 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
 
   const outputHex = opreturnOutput.scriptpubkey.slice(4);
 
-  if (outputHex.length !== 28) return false;
+  if (outputHex.length !== 30) return false;
 
   const bitmatrixHex = outputHex.slice(0, 18);
 
   const version = outputHex.slice(18, 20);
+
+  const lpTierIndex = outputHex.slice(28, 30);
+
   let leafCount = 0;
 
   if (version === "01") {
@@ -93,7 +96,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     leafCount = 16;
   }
 
-  const pair1_coefficient = outputHex.slice(20);
+  const pair1_coefficient = outputHex.slice(20, 28);
 
   if (bitmatrixHex !== "6269746d6174726978") return false;
   // if (version !== "01") return false;
@@ -115,7 +118,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
   const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
-  const mainCovenant = pool.createCovenants(leafCount - 1, 0, mayPoolAssetId, pair1_coefficientNumber);
+  const mainCovenant = pool.createCovenants(leafCount - 1, 0, mayPoolAssetId, pair1_coefficientNumber, WizData.fromHex(lpTierIndex).number || 0);
 
   if (flagOutput.scriptpubkey !== flagCovenantScriptPubkey) return false;
   if (pair2.scriptpubkey !== tokenCovenantScriptPubkey) return false;
@@ -172,6 +175,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
     tokenPrice,
     version,
+    lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };
 
   try {

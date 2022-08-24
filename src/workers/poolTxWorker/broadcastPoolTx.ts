@@ -1,11 +1,9 @@
-import { CTXFinderResult, PTXFinderResult } from "@bitmatrix/models";
+import { CTXFinderResult, PTXFinderResult, Pool } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool } from "@bitmatrix/lib";
 
 export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValidationData: PTXFinderResult): Promise<string> => {
-  // will be implemented in the future
-
   // ------------- INPUTS START -------------
   const inputCountForInput = commitmentData.methodCall === "03" ? WizData.fromNumber(7) : WizData.fromNumber(6);
 
@@ -42,39 +40,44 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   const script = [WizData.fromHex("20" + hexLE(commitmentData.poolId) + "00c86987")];
   const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
 
-  // leaf count and current index temp
-  const poolMainCovenant = pool.createCovenants(0, 0, commitmentData.poolId, poolValidationData.pair_1_coefficient);
+  // @todo leaf count and current index temp
+  const poolMainCovenant = pool.createCovenants(
+    poolValidationData.poolData.maxLeaf - 1,
+    0,
+    commitmentData.poolId,
+    poolValidationData.pair_1_coefficient,
+    poolValidationData.poolData.lpFeeTierIndex.number
+  );
 
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;
   const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
   const poolMainCovenantScriptPubkey = poolMainCovenant.taprootResult.scriptPubkey.hex;
 
-  const output1 = "01" + hexLE(commitmentData.poolId) + "01" + "0000000000000001" + "00" + utils.compactSizeVarInt(flagCovenantScriptPubkey) + flagCovenantScriptPubkey;
+  const output1 = "01" + hexLE(commitmentData.poolId) + "01" + "0000000000000001" + "00" + utils.compactSizeVarIntData(flagCovenantScriptPubkey);
   const output2 =
     "01" +
     hexLE(poolValidationData.pair_2_asset_id) +
     "01" +
     convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_pair_2_liquidity)).hex +
     "00" +
-    utils.compactSizeVarInt(tokenCovenantScriptPubkey) +
-    tokenCovenantScriptPubkey;
+    utils.compactSizeVarIntData(tokenCovenantScriptPubkey);
+
   const output3 =
     "01" +
     hexLE(poolValidationData.lp_asset_id) +
     "01" +
     convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_lp_liquidity)).hex +
     "00" +
-    utils.compactSizeVarInt(lpHolderCovenantScriptPubkey) +
-    lpHolderCovenantScriptPubkey;
+    utils.compactSizeVarIntData(lpHolderCovenantScriptPubkey);
+
   const output4 =
     "01" +
     hexLE(poolValidationData.pair_1_asset_id) +
     "01" +
     convertion.numToLE64LE(WizData.fromNumber(poolValidationData.result.new_pool_pair_1_liquidity)).hex +
     "00" +
-    utils.compactSizeVarInt(poolMainCovenantScriptPubkey) +
-    poolMainCovenantScriptPubkey;
+    utils.compactSizeVarIntData(poolMainCovenantScriptPubkey);
 
   // @todo for loop for waiting ctx
   let settlementOutputs = "";
@@ -92,8 +95,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output1.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
 
       settlementOutputs +=
         "01" +
@@ -101,8 +103,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case3outputs.output2.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
     } else {
       settlementOutputs +=
         "01" +
@@ -110,8 +111,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.output.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
     }
   } else if (commitmentData.methodCall === "04") {
     if (poolValidationData.case4outputs.output1.value !== 0) {
@@ -122,8 +122,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case4outputs.output1.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
 
       settlementOutputs +=
         "01" +
@@ -131,8 +130,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.case4outputs.output2.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
     } else {
       settlementOutputs +=
         "01" +
@@ -140,8 +138,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "01" +
         convertion.numToLE64LE(WizData.fromNumber(poolValidationData.output.value)).hex +
         "001600" +
-        utils.compactSizeVarInt(scriptPubkey) +
-        scriptPubkey;
+        utils.compactSizeVarIntData(scriptPubkey);
     }
   } else {
     settlementOutputs +=
@@ -150,8 +147,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
       "01" +
       convertion.numToLE64LE(WizData.fromNumber(poolValidationData.output.value)).hex +
       "001600" +
-      utils.compactSizeVarInt(scriptPubkey) +
-      scriptPubkey;
+      utils.compactSizeVarIntData(scriptPubkey);
   }
 
   const orderingFeeNumber = parseInt(hexLE(commitmentData.orderingFee), 16);
@@ -201,107 +197,28 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   // @todo Number of total main covenant  witness elements (2 + 33*s)
 
-  const numberOfWitnessElements = WizData.fromNumber(2 + 33 * poolValidationData.leafCount).hex;
+  const numberOfWitnessElements = WizData.fromNumber(2 + 4 * poolValidationData.leafCount).hex;
 
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
   let commitmentoutputtopoolData = "";
 
   for (let i = 0; i < poolValidationData.leafCount; i++) {
-    const tweakKeyPrefixLength = "01";
-    const locktimeLength = "04";
-    const txFeesLength = "09";
-    // @todo calculate fees
-    const txFees = commitmentData.cmtOutputFeeHexValue;
-    // const changeOutputSorted = changeOutputFinal.sort((a, b) => b.index - a.index);
-
-    let changeOutputs = "";
-    let commitmentOutputs = "";
-
-    for (let t = 2; t >= 0; t--) {
-      if (commitmentData.changeOutputFinal[t]) {
-        const currentChangeOutput = commitmentData.changeOutputFinal[t];
-        changeOutputs +=
-          utils.compactSizeVarInt(currentChangeOutput.noncScpkey) +
-          currentChangeOutput.noncScpkey +
-          utils.compactSizeVarInt(currentChangeOutput.assetValue) +
-          currentChangeOutput.assetValue;
-      } else {
-        changeOutputs += "0000";
-      }
-    }
-
-    if (commitmentData.cmtOutput3) {
-      const cmtData =
-        "09" +
-        commitmentData.cmtOutput3Value +
-        "01" +
-        commitmentData.cmtOutput3PairValue +
-        "09" +
-        commitmentData.cmtOutput2Value +
-        "01" +
-        commitmentData.output2PairValue +
-        "09" +
-        commitmentData.cmtOutput1Value;
-      commitmentOutputs += cmtData;
-    } else {
-      const cmtData = "00" + "00" + "09" + commitmentData.cmtOutput2Value + "01" + commitmentData.output2PairValue + "09" + commitmentData.cmtOutput1Value;
-      commitmentOutputs += cmtData;
-    }
-
-    const orderingFeeDetails = utils.compactSizeVarInt(commitmentData.orderingFee) + commitmentData.orderingFee;
-    const slippageToleranceDetails = utils.compactSizeVarInt(commitmentData.slippageTolerance) + commitmentData.slippageTolerance;
-    const receipentPubkeyDetails = utils.compactSizeVarInt(commitmentData.publicKey) + commitmentData.publicKey;
-    const methodCallDetails = utils.compactSizeVarInt(commitmentData.methodCall) + commitmentData.methodCall;
-    const outputCountDetails = utils.compactSizeVarInt(commitmentData.outputCount.hex) + commitmentData.outputCount.hex;
-
-    let outpoints = "";
-
-    for (let z = 11; z >= 0; z--) {
-      if (commitmentData.cmtTxInOutpoints[z]) {
-        outpoints += utils.compactSizeVarInt(commitmentData.cmtTxInOutpoints[z].data) + commitmentData.cmtTxInOutpoints[z].data;
-      } else {
-        outpoints += "00";
-      }
-    }
-
-    const inputSequence = "ffffffff";
-    const inputSequenceDetails = utils.compactSizeVarInt(inputSequence) + inputSequence;
-    const inputCountDetails = utils.compactSizeVarInt(commitmentData.inputCount.hex) + commitmentData.inputCount.hex;
-
     commitmentoutputtopoolData +=
-      tweakKeyPrefixLength +
-      commitmentData.tapTweakedResultPrefix +
-      locktimeLength +
-      locktime +
-      txFeesLength +
-      txFees +
-      changeOutputs +
-      commitmentOutputs +
-      orderingFeeDetails +
-      slippageToleranceDetails +
-      receipentPubkeyDetails +
-      methodCallDetails +
-      outputCountDetails +
-      outpoints +
-      inputSequenceDetails +
-      inputCountDetails;
+      utils.compactSizeVarIntData(commitmentData.tweakKeyPrefix) +
+      utils.compactSizeVarIntData(commitmentData.part1) +
+      utils.compactSizeVarIntData(commitmentData.part2) +
+      utils.compactSizeVarIntData(commitmentData.part3);
   }
 
   let commitmentWitnessFinal = "";
   for (let i = 0; i < poolValidationData.leafCount; i++) {
-    const mainCovenantScriptDetails = utils.compactSizeVarInt(poolMainCovenant.mainCovenantScript[0]) + poolMainCovenant.mainCovenantScript[0];
-    const mainCovenantControlBlockDetails = utils.compactSizeVarInt(poolMainCovenant.controlBlock) + poolMainCovenant.controlBlock;
+    const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[0]);
+    const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
 
     const isAddLiquidity = commitmentData.methodCall === "03";
-    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData.poolId, commitmentData.publicKey, isAddLiquidity);
+    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData.poolId, commitmentData.publicKey);
 
-    const commitmentOutputWitness =
-      "00000003" +
-      "0101" +
-      utils.compactSizeVarInt(poolCommitment.commitmentOutput) +
-      poolCommitment.commitmentOutput +
-      utils.compactSizeVarInt(poolCommitment.controlBlock) +
-      poolCommitment.controlBlock;
+    const commitmentOutputWitness = "00000002" + utils.compactSizeVarIntData(poolCommitment.commitmentOutput) + utils.compactSizeVarIntData(poolCommitment.controlBlock);
 
     let commitmentWitness = "";
     if (isAddLiquidity) {
@@ -336,6 +253,11 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     "00".repeat(outputTemplateCount * 2 + 1);
 
   const rawHex = inputTemplate + outputTemplate + witnessTemplate;
+
+  console.log("inputTemplate", inputTemplate);
+  console.log("outputTemplate", outputTemplate);
+  console.log("witnessTemplate", witnessTemplate);
+  console.log("rawhEX", rawHex);
 
   let poolTxId = "";
 
