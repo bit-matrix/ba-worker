@@ -233,7 +233,7 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
 
     const bn_user_received_pair_1 = convertion.numToLE64(WizData.fromNumber(result.user_received_pair_1));
 
-    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_received_pair_1)) {
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_received_pair_1).number === 1) {
       errorMessages.push("Out of slippage");
 
       output.assetId = pair_2_asset_id;
@@ -315,7 +315,7 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
 
     const bn_user_lp_received = convertion.numToLE64(WizData.fromNumber(result.user_lp_received));
 
-    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_lp_received)) {
+    if (arithmetics64.greaterThan64(WizData.fromHex(cof.slippageTolerance), bn_user_lp_received).number === 1) {
       errorMessages.push("Out of slippage");
       // İlgili slot için 2 tane settlement output oluştur. Birinci outputun asset ID ‘sini pair_1_asset id olarak, ikinci outputun asset ID’sini ise ise pair_1_asset ID olarak ayarla.
       // Birinci outpunun miktarını user_pair_1_supply_total olarak ayarla.
