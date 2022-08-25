@@ -5,21 +5,45 @@ import { pools } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
 import { validatePoolTx } from "./validatePoolTx";
+import { convertion } from "@script-wiz/lib-core";
+import WizData, { hexLE } from "@script-wiz/wiz-data";
+import { hexToNum, lexicographical } from "../../helper/util";
 
 export const poolTxWorker = async () => {
   console.log("-------------------POOL TX WORKER-------------------------");
 
-  const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
+  const allWaitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
+
+  const waitingCommitmentList: BitmatrixStoreData[] = allWaitingTxs.filter(
+    (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
+  );
 
   //Pool validasyonlarından geçirme
-  if (waitingTxs.length > 0) {
+  if (waitingCommitmentList.length > 0) {
     const bitmatrixPools = await pools();
 
-    const waitingCommitmentList: BitmatrixStoreData[] = waitingTxs.filter(
-      (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
-    );
+    const poolWaitingList = bitmatrixPools.map((pool: Pool) => {
+      const currentPoolNextList = waitingCommitmentList.filter((nl) => nl.commitmentData.poolId === pool.id);
+      if (currentPoolNextList.length === 0) return;
 
-    if (waitingCommitmentList.length > 0) {
+      const todoList = currentPoolNextList
+        .sort(
+          (b, a) =>
+            hexToNum(b.commitmentData.orderingFee) - hexToNum(a.commitmentData.orderingFee) || lexicographical(a.commitmentData.transaction.txid, b.commitmentData.transaction.txid)
+        )
+        .slice(0, pool.leafCount);
+
+      return { pool, todoList };
+    });
+
+    // if (poolWaitingList.length > 0) {
+    //   poolWaitingList.forEach((pwl) => {
+    //     pwl?.todoList.forEach(async (tdl) => {
+    //       // const poolValidationData: PTXFinderResult = await validatePoolTx(tdl.commitmentData, pwl.pool);
+    //       const poolTxId: string = await broadcastPoolTx(tdl, poolValidationData);
+    //     });
+    //   });
+
       for (let i = 0; i < waitingCommitmentList.length; i++) {
         const commitmentData = waitingCommitmentList[i].commitmentData;
 

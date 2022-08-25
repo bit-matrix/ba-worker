@@ -51,3 +51,7 @@ export const lexicographical = (aTxid: string, bTxid: string): number => {
 
   return arithmetics64.greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
 };
+
+export const hexToNum = (hex: string) => {
+  return parseInt(hexLE(hex), 16);
+};

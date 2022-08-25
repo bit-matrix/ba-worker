@@ -3,9 +3,9 @@ import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool } from "@bitmatrix/lib";
 
-export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValidationData: PTXFinderResult): Promise<string> => {
+export const broadcastPoolTx = async (commitmentData: CTXFinderResult[], poolValidationData: PTXFinderResult): Promise<string> => {
   // ------------- INPUTS START -------------
-  const inputCountForInput = commitmentData.methodCall === "03" ? WizData.fromNumber(7) : WizData.fromNumber(6);
+  const inputCountForInput = commitmentData[0].methodCall === "03" ? WizData.fromNumber(7) : WizData.fromNumber(6);
 
   const version = "02000000";
   const const1 = "01";
@@ -21,13 +21,13 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   input4 = hexLE(poolValidationData.poolData.lastStateTxId) + convertion.convert32(WizData.fromNumber(3)).hex + "00" + "01000000";
 
   // @todo for loop for waiting ctx
-  const input5 = hexLE(commitmentData.transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData.cmtOutput1.n)).hex + "00" + "01000000";
-  const input6 = hexLE(commitmentData.transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData.cmtOutput2.n)).hex + "00" + "01000000";
+  const input5 = hexLE(commitmentData[0].transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData[0].cmtOutput1.n)).hex + "00" + "01000000";
+  const input6 = hexLE(commitmentData[0].transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData[0].cmtOutput2.n)).hex + "00" + "01000000";
 
   let inputs = input1 + input2 + input3 + input4 + input5 + input6;
 
-  if (commitmentData.cmtOutput3) {
-    const input7 = hexLE(commitmentData.transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData.cmtOutput3.n)).hex + "00" + "01000000";
+  if (commitmentData[0].cmtOutput3) {
+    const input7 = hexLE(commitmentData[0].transaction.txid) + convertion.convert32(WizData.fromNumber(commitmentData[0].cmtOutput3.n)).hex + "00" + "01000000";
     inputs = inputs + input7;
   }
 
@@ -37,14 +37,14 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   // ------------- OUTPUTS START -------------
 
-  const script = [WizData.fromHex("20" + hexLE(commitmentData.poolId) + "00c86987")];
+  const script = [WizData.fromHex("20" + hexLE(commitmentData[0].poolId) + "00c86987")];
   const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
 
   // @todo leaf count and current index temp
   const poolMainCovenant = pool.createCovenants(
     poolValidationData.poolData.leafCount - 1,
     0,
-    commitmentData.poolId,
+    commitmentData[0].poolId,
     poolValidationData.pair_1_coefficient,
     poolValidationData.poolData.lpFeeTierIndex.number
   );
@@ -54,7 +54,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   const lpHolderCovenantScriptPubkey = tokenCovenantScriptPubkey;
   const poolMainCovenantScriptPubkey = poolMainCovenant.taprootResult.scriptPubkey.hex;
 
-  const output1 = "01" + hexLE(commitmentData.poolId) + "01" + "0000000000000001" + "00" + utils.compactSizeVarIntData(flagCovenantScriptPubkey);
+  const output1 = "01" + hexLE(commitmentData[0].poolId) + "01" + "0000000000000001" + "00" + utils.compactSizeVarIntData(flagCovenantScriptPubkey);
   const output2 =
     "01" +
     hexLE(poolValidationData.pair_2_asset_id) +
@@ -82,11 +82,11 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
   // @todo for loop for waiting ctx
   let settlementOutputs = "";
 
-  const scriptPubkey = utils.publicKeyToScriptPubkey(commitmentData.publicKey);
+  const scriptPubkey = utils.publicKeyToScriptPubkey(commitmentData[0].publicKey);
 
   let outputTemplateCount = 7;
 
-  if (commitmentData.methodCall === "03") {
+  if (commitmentData[0].methodCall === "03") {
     if (poolValidationData.case3outputs.output1.value !== 0) {
       outputTemplateCount = 8;
       settlementOutputs +=
@@ -113,7 +113,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
         "001600" +
         utils.compactSizeVarIntData(scriptPubkey);
     }
-  } else if (commitmentData.methodCall === "04") {
+  } else if (commitmentData[0].methodCall === "04") {
     if (poolValidationData.case4outputs.output1.value !== 0) {
       outputTemplateCount = 8;
       settlementOutputs +=
@@ -150,10 +150,10 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
       utils.compactSizeVarIntData(scriptPubkey);
   }
 
-  const orderingFeeNumber = parseInt(hexLE(commitmentData.orderingFee), 16);
+  const orderingFeeNumber = parseInt(hexLE(commitmentData[0].orderingFee), 16);
 
   const bandwith = pool.bandwithArray[poolValidationData.leafCount - 1] + orderingFeeNumber;
-  const totalFee = commitmentData.cmtOutput1.value * 100000000;
+  const totalFee = commitmentData[0].cmtOutput1.value * 100000000;
 
   const serviceFee = totalFee - bandwith;
 
@@ -204,10 +204,10 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   for (let i = 0; i < poolValidationData.leafCount; i++) {
     commitmentoutputtopoolData +=
-      utils.compactSizeVarIntData(commitmentData.tweakKeyPrefix) +
-      utils.compactSizeVarIntData(commitmentData.part1) +
-      utils.compactSizeVarIntData(commitmentData.part2) +
-      utils.compactSizeVarIntData(commitmentData.part3);
+      utils.compactSizeVarIntData(commitmentData[0].tweakKeyPrefix) +
+      utils.compactSizeVarIntData(commitmentData[0].part1) +
+      utils.compactSizeVarIntData(commitmentData[0].part2) +
+      utils.compactSizeVarIntData(commitmentData[0].part3);
   }
 
   let commitmentWitnessFinal = "";
@@ -215,8 +215,8 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
     const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[0]);
     const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
 
-    const isAddLiquidity = commitmentData.methodCall === "03";
-    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData.poolId, commitmentData.publicKey);
+    const isAddLiquidity = commitmentData[0].methodCall === "03";
+    const poolCommitment = commitmentOutput.commitmentOutputTapscript(commitmentData[0].poolId, commitmentData[0].publicKey);
 
     const commitmentOutputWitness = "00000002" + utils.compactSizeVarIntData(poolCommitment.commitmentOutput) + utils.compactSizeVarIntData(poolCommitment.controlBlock);
 
