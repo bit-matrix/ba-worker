@@ -4,8 +4,8 @@ import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../he
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
-import { BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
-import { poolUpdate } from "../../business/db-client";
+import { BmChart, BmTxInfo, CALL_METHOD, PAsset, Pool } from "@bitmatrix/models";
+import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
@@ -178,8 +178,28 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };
 
+  const volumeToken = Number(newPool.token.value);
+
+  const result: BmChart = {
+    time: newTxDetail.status.block_time,
+    ptxid: newPool.lastStateTxId,
+    method: CALL_METHOD.ADD_LIQUIDITY,
+    value: {
+      quote: Number(newPool.quote.value),
+      token: volumeToken,
+      lp: Number(newPool.lp.value),
+    },
+    price: newPool.tokenPrice,
+    volume: {
+      token: volumeToken,
+      quote: Math.floor(volumeToken / newPool.tokenPrice),
+    },
+  };
+
   try {
     await poolUpdate(newPool);
+
+    await poolTxHistorySave(newPool.id, result);
   } catch {
     return false;
   }
