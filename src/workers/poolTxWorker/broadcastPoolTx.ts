@@ -1,4 +1,4 @@
-import { CTXFinderResult, PTXFinderResult, Pool, BitmatrixStoreData } from "@bitmatrix/models";
+import { Pool, BitmatrixStoreData } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
@@ -51,14 +51,14 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
 
   let settlementOutputs = "";
 
-  let outputTemplateCount = 4;
+  let outputTemplateCount = 6;
 
   let activePool: Pool = { ...pool };
   let orderingFeeNumber = 0;
   let totalFee = 0;
 
-  bitmatrixStoreData.forEach(async (bsd) => {
-    const poolValidationData = await validatePoolTx(bsd.commitmentData, activePool);
+  bitmatrixStoreData.forEach((bsd) => {
+    const poolValidationData = validatePoolTx(bsd.commitmentData, activePool);
 
     const scriptPubkey = utils.publicKeyToScriptPubkey(bsd.commitmentData.publicKey);
 
@@ -169,7 +169,7 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
     "00" +
     utils.compactSizeVarIntData(poolMainCovenantScriptPubkey);
 
-  const bandwith = poolFunc.bandwithArray[pool.leafCount - 1] + orderingFeeNumber;
+  const bandwith = poolFunc.bandwithArray[bitmatrixStoreData.length - 1] + orderingFeeNumber;
 
   const serviceFee = totalFee - bandwith;
 
@@ -196,39 +196,43 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
 
   const tokenCovenantWitness = "00000002";
 
-  const tokenCovenantScript = "20" + hexLE(pool.id) + "00c86987";
-  const tokenCovenantScriptLength = utils.compactSizeVarInt(tokenCovenantScript);
-
+  const tokenCovenantScript = utils.compactSizeVarIntData("20" + hexLE(pool.id) + "00c86987");
   // @todo index temp
-  const tokenCovenantControlBlock = taproot.controlBlockCalculation(script, "c4", pubkey.hex, bitmatrixStoreData.length - 1);
-  const tokenCovenantControlBlockLength = utils.compactSizeVarInt(tokenCovenantControlBlock);
+  const tokenCovenantControlBlock = utils.compactSizeVarIntData(taproot.controlBlockCalculation(script, "c4", pubkey.hex, bitmatrixStoreData.length - 1));
+
+  console.log("tokenCovenantControlBlock", tokenCovenantControlBlock);
 
   const lpCovenantWitness = "00000002";
   const lpCovenantScript = tokenCovenantScript;
-  const lpCovenantScriptLength = tokenCovenantScriptLength;
-  const lpCovenantControlBlockLength = tokenCovenantControlBlockLength;
   const lpCovenantControlBlock = tokenCovenantControlBlock;
 
   const mainCovenantWitness = "000000";
 
   // @todo Number of total main covenant  witness elements (2 + 33*s)
 
-  const numberOfWitnessElements = WizData.fromNumber(2 + 4 * bitmatrixStoreData.length - 1).hex;
+  const numberOfWitnessElements = WizData.fromNumber(2 + 4 * bitmatrixStoreData.length).hex;
+
+  console.log("numberOfWitnessElements", numberOfWitnessElements);
 
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
   let commitmentoutputtopoolData = "";
-  let commitmentWitnessFinal = "";
 
-  bitmatrixStoreData.forEach(async (bsd) => {
+  bitmatrixStoreData.reverse().forEach((bsd) => {
     commitmentoutputtopoolData +=
       utils.compactSizeVarIntData(bsd.commitmentData.tweakKeyPrefix) +
       utils.compactSizeVarIntData(bsd.commitmentData.part1) +
       utils.compactSizeVarIntData(bsd.commitmentData.part2) +
       utils.compactSizeVarIntData(bsd.commitmentData.part3);
+  });
 
-    const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[0]);
-    const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
+  console.log("commitmentoutputtopoolData", commitmentoutputtopoolData);
 
+  const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[bitmatrixStoreData.length - 1]);
+  const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
+
+  let commitmentWitnessFinal = "";
+
+  bitmatrixStoreData.forEach((bsd) => {
     const isAddLiquidity = bsd.commitmentData.methodCall === "03";
     const poolCommitment = commitmentOutput.commitmentOutputTapscript(pool.id, bsd.commitmentData.publicKey);
 
@@ -241,9 +245,10 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
       commitmentWitness = commitmentOutputWitness.repeat(2);
     }
 
-    commitmentWitnessFinal += mainCovenantScriptDetails + mainCovenantControlBlockDetails + commitmentWitness + "00".repeat(outputTemplateCount * 2 + 1);
+    commitmentWitnessFinal += commitmentWitness;
   });
 
+  console.log("commitmentWitnessFinal", commitmentWitnessFinal);
   const witnessTemplate =
     flagCovenantWitness +
     flagCovenantScriptLength +
@@ -251,19 +256,18 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
     flagCovenantControlBlockLength +
     flagCovenantControlBlock +
     tokenCovenantWitness +
-    tokenCovenantScriptLength +
     tokenCovenantScript +
-    tokenCovenantControlBlockLength +
     tokenCovenantControlBlock +
     lpCovenantWitness +
-    lpCovenantScriptLength +
     lpCovenantScript +
-    lpCovenantControlBlockLength +
     lpCovenantControlBlock +
     mainCovenantWitness +
     numberOfWitnessElements +
     commitmentoutputtopoolData +
-    commitmentWitnessFinal;
+    mainCovenantScriptDetails +
+    mainCovenantControlBlockDetails +
+    commitmentWitnessFinal +
+    "00".repeat(outputTemplateCount * 2 + 1);
 
   const rawHex = inputTemplate + outputTemplate + witnessTemplate;
 
