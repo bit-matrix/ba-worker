@@ -1,3 +1,6 @@
+import { arithmetics64 } from "@script-wiz/lib-core";
+import WizData, { hexLE } from "@script-wiz/wiz-data";
+
 const onlyUnique = (value: Array<any>, index: number, self: any) => {
   return self.indexOf(value) === index;
 };
@@ -38,4 +41,14 @@ export const replaceChar = (text: string, index: number, replacement: string) =>
   var chars = text.split("");
   chars[index] = replacement;
   return chars.join("");
+};
+
+export const lexicographical = (aTxid: string, bTxid: string): number => {
+  if (aTxid.length !== 64 || bTxid.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTxid + "," + bTxid);
+  const a = hexLE(aTxid.substring(48));
+  const b = hexLE(bTxid.substring(48));
+
+  if (a === b) return 0;
+
+  return arithmetics64.greaterThan64(WizData.fromHex(b), WizData.fromHex(a)).number === 1 ? 1 : -1;
 };
