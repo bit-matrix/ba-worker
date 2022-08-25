@@ -36,54 +36,50 @@ export const poolTxWorker = async () => {
       return { pool, todoList };
     });
 
-    // if (poolWaitingList.length > 0) {
-    //   poolWaitingList.forEach((pwl) => {
-    //     pwl?.todoList.forEach(async (tdl) => {
-    //       // const poolValidationData: PTXFinderResult = await validatePoolTx(tdl.commitmentData, pwl.pool);
-    //       const poolTxId: string = await broadcastPoolTx(tdl, poolValidationData);
-    //     });
-    //   });
-
-      for (let i = 0; i < waitingCommitmentList.length; i++) {
-        const commitmentData = waitingCommitmentList[i].commitmentData;
-
-        const poolValidationData: PTXFinderResult = await validatePoolTx(commitmentData, bitmatrixPools);
-        const poolTxId: string = await broadcastPoolTx(commitmentData, poolValidationData);
-
-        if (poolTxId && poolTxId !== "") {
-          const poolTxInfo: poolTxInfo = {
-            txId: poolTxId,
-            isSuccess: poolValidationData.errorMessages.length === 0,
-            failReason: poolValidationData.errorMessages.join(", "),
-          };
-
-          if (poolTxInfo.isSuccess) {
-            await sendTelegramMessage(
-              "Pool Tx Id: " +
-                poolTxId +
-                "\n" +
-                "Method Call: <b>Method</b>: <code>" +
-                commitmentData.methodCall +
-                "</code>, <b>Value</b>: <code>" +
-                commitmentData.cmtOutput2.value +
-                "</code>"
-            );
-          } else {
-            await sendTelegramMessage(
-              "Pool Tx Id: " +
-                poolTxId +
-                "\n" +
-                "Method Call: <b>Method</b>: <code>" +
-                commitmentData.methodCall +
-                "</code>, <b>Fail swap result : </b>: <code>" +
-                poolValidationData.errorMessages.join(", ") +
-                "</code>"
-            );
-          }
-
-          await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
+    if (poolWaitingList.length > 0) {
+      poolWaitingList.forEach(async (pwl) => {
+        if (pwl) {
+          const poolTxId: string = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
+          console.log(poolTxId);
         }
-      }
+      });
     }
+    //   for (let i = 0; i < waitingCommitmentList.length; i++) {
+    //     const commitmentData = waitingCommitmentList[i].commitmentData;
+
+    //     if (poolTxId && poolTxId !== "") {
+    //       const poolTxInfo: poolTxInfo = {
+    //         txId: poolTxId,
+    //         isSuccess: poolValidationData.errorMessages.length === 0,
+    //         failReason: poolValidationData.errorMessages.join(", "),
+    //       };
+
+    //       if (poolTxInfo.isSuccess) {
+    //         await sendTelegramMessage(
+    //           "Pool Tx Id: " +
+    //             poolTxId +
+    //             "\n" +
+    //             "Method Call: <b>Method</b>: <code>" +
+    //             commitmentData.methodCall +
+    //             "</code>, <b>Value</b>: <code>" +
+    //             commitmentData.cmtOutput2.value +
+    //             "</code>"
+    //         );
+    //       } else {
+    //         await sendTelegramMessage(
+    //           "Pool Tx Id: " +
+    //             poolTxId +
+    //             "\n" +
+    //             "Method Call: <b>Method</b>: <code>" +
+    //             commitmentData.methodCall +
+    //             "</code>, <b>Fail swap result : </b>: <code>" +
+    //             poolValidationData.errorMessages.join(", ") +
+    //             "</code>"
+    //         );
+    //       }
+
+    //       await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
+    //     }
+    //   }
   }
 };
