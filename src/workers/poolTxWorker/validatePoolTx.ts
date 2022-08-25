@@ -431,7 +431,7 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
     pool_constant,
     result,
     lp_asset_id,
-    leafCount: poolData.maxLeaf,
+    leafCount: poolData.leafCount,
     poolData,
     output,
     case3outputs,

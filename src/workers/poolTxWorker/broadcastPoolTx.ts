@@ -42,7 +42,7 @@ export const broadcastPoolTx = async (commitmentData: CTXFinderResult, poolValid
 
   // @todo leaf count and current index temp
   const poolMainCovenant = pool.createCovenants(
-    poolValidationData.poolData.maxLeaf - 1,
+    poolValidationData.poolData.leafCount - 1,
     0,
     commitmentData.poolId,
     poolValidationData.pair_1_coefficient,
