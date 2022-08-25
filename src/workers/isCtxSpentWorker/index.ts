@@ -13,7 +13,7 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
       const outspends = await esploraClient.txOutspends(txId);
 
-      if (outspends[1].spent || outspends[2].spent) {
+      if (outspends[0].spent) {
         await redisClient.removeKey(txId);
 
         const commitmentTxHistory: CommitmentTxHistory = {
