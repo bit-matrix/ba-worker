@@ -13,6 +13,7 @@ export const div = (input1: number, input2: number) => Math.floor(input1 / input
 export const lbtcAsset = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 export const usdtAsset = "f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11ff0e820958";
 export const cadAsset = "ac3e0ff248c5051ffd61e00155b7122e5ebc04fd397a0ecbdd4f4e4a56232926";
+export const fusdAsset = "0d86b2f6a8c3b02a8c7c8836b83a081e68b7e2b4bcdfc58981fc5486f59f7518";
 
 export const tickerFinder = (asset: string): { ticker: string; name: string } => {
   if (asset === lbtcAsset) {
@@ -21,6 +22,8 @@ export const tickerFinder = (asset: string): { ticker: string; name: string } =>
     return { ticker: "tL-USDt", name: "Liquid Tether" };
   } else if (asset === cadAsset) {
     return { ticker: "LCAD", name: "Liquid Canadian Dollar" };
+  } else if (asset === fusdAsset) {
+    return { ticker: "FUSD", name: "Fuji USD" };
   }
 
   return { ticker: asset.slice(0, 4), name: "unknown" };
