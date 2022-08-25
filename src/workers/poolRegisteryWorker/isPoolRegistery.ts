@@ -127,9 +127,9 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
 
   // --------------------------- POOL INSERT ---------------------------------
 
-  const quoteTicker = tickerFinder(pair1.asset || "");
-  const tokenTicker = tickerFinder(pair2.asset || "");
-  const lpTicker = tickerFinder(mayLP.asset || "");
+  const quoteTicker = await tickerFinder(pair1.asset || "");
+  const tokenTicker = await tickerFinder(pair2.asset || "");
+  const lpTicker = await tickerFinder(mayLP.asset || "");
 
   const quote: PAsset = {
     ticker: quoteTicker.ticker,
