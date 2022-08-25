@@ -3,7 +3,7 @@ import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (commitmentData: CTXFinderResult, poolData: Pool): Promise<PTXFinderResult> => {
+export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool): PTXFinderResult => {
   const cof = commitmentData;
 
   const method = cof.methodCall;
