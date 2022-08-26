@@ -1,10 +1,13 @@
-import { Pool, BitmatrixStoreData } from "@bitmatrix/models";
+import { Pool, BitmatrixStoreData, PTXFinderResult, CTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
 import { validatePoolTx } from "./validatePoolTx";
 
-export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], pool: Pool): Promise<string> => {
+export const broadcastPoolTx = async (
+  bitmatrixStoreData: BitmatrixStoreData[],
+  pool: Pool
+): Promise<{ poolTxId: string; commitmentDataState: { commitmentData: CTXFinderResult; poolValidationData: PTXFinderResult }[] }> => {
   // ------------- INPUTS START -------------
 
   // constants
@@ -56,9 +59,12 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
   let activePool: Pool = { ...pool };
   let orderingFeeNumber = 0;
   let totalFee = 0;
+  let commitmentDataState: { commitmentData: CTXFinderResult; poolValidationData: PTXFinderResult }[] = [];
 
   bitmatrixStoreData.forEach((bsd) => {
     const poolValidationData = validatePoolTx(bsd.commitmentData, activePool);
+
+    commitmentDataState.push({ commitmentData: bsd.commitmentData, poolValidationData });
 
     const scriptPubkey = utils.publicKeyToScriptPubkey(bsd.commitmentData.publicKey);
 
@@ -270,11 +276,6 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
 
   const rawHex = inputTemplate + outputTemplate + witnessTemplate;
 
-  console.log("inputTemplate", inputTemplate);
-  console.log("outputTemplate", outputTemplate);
-  console.log("witnessTemplate", witnessTemplate);
-  console.log("rawhEX", rawHex);
-
   let poolTxId = "";
 
   try {
@@ -283,5 +284,5 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
     console.log("error:", e);
   }
 
-  return poolTxId;
+  return { poolTxId, commitmentDataState };
 };

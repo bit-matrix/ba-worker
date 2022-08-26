@@ -1,12 +1,9 @@
-import { BitmatrixStoreData, Pool, PTXFinderResult } from "@bitmatrix/models";
+import { BitmatrixStoreData, Pool } from "@bitmatrix/models";
 import { poolTxInfo } from "@bitmatrix/models/PoolTxInfo";
 import { redisClient } from "@bitmatrix/redis-client";
 import { pools } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
-import { validatePoolTx } from "./validatePoolTx";
-import { convertion } from "@script-wiz/lib-core";
-import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { hexToNum, lexicographical } from "../../helper/util";
 
 export const poolTxWorker = async () => {
@@ -39,47 +36,48 @@ export const poolTxWorker = async () => {
     if (poolWaitingList.length > 0) {
       poolWaitingList.forEach(async (pwl) => {
         if (pwl) {
-          const poolTxId: string = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
-          console.log(poolTxId);
+          const { poolTxId, commitmentDataState } = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
+          console.log("poolTxId", poolTxId);
+          console.log("commitmentDataState", commitmentDataState);
+          for (let i = 0; i < commitmentDataState.length; i++) {
+            const resultData = commitmentDataState[i];
+
+            if (poolTxId && poolTxId !== "") {
+              const poolTxInfo: poolTxInfo = {
+                txId: poolTxId,
+                isSuccess: resultData.poolValidationData.errorMessages.length === 0,
+                failReason: resultData.poolValidationData.errorMessages.join(", "),
+              };
+
+              if (poolTxInfo.isSuccess) {
+                await sendTelegramMessage(
+                  "Pool Tx Id: " +
+                    poolTxId +
+                    "\n" +
+                    "Method Call: <b>Method</b>: <code>" +
+                    resultData.commitmentData.methodCall +
+                    "</code>, <b>Value</b>: <code>" +
+                    resultData.commitmentData.cmtOutput2.value +
+                    "</code>"
+                );
+              } else {
+                await sendTelegramMessage(
+                  "Pool Tx Id: " +
+                    poolTxId +
+                    "\n" +
+                    "Method Call: <b>Method</b>: <code>" +
+                    resultData.commitmentData.methodCall +
+                    "</code>, <b>Fail swap result : </b>: <code>" +
+                    resultData.poolValidationData.errorMessages.join(", ") +
+                    "</code>"
+                );
+              }
+
+              await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+            }
+          }
         }
       });
     }
-    //   for (let i = 0; i < waitingCommitmentList.length; i++) {
-    //     const commitmentData = waitingCommitmentList[i].commitmentData;
-
-    //     if (poolTxId && poolTxId !== "") {
-    //       const poolTxInfo: poolTxInfo = {
-    //         txId: poolTxId,
-    //         isSuccess: poolValidationData.errorMessages.length === 0,
-    //         failReason: poolValidationData.errorMessages.join(", "),
-    //       };
-
-    //       if (poolTxInfo.isSuccess) {
-    //         await sendTelegramMessage(
-    //           "Pool Tx Id: " +
-    //             poolTxId +
-    //             "\n" +
-    //             "Method Call: <b>Method</b>: <code>" +
-    //             commitmentData.methodCall +
-    //             "</code>, <b>Value</b>: <code>" +
-    //             commitmentData.cmtOutput2.value +
-    //             "</code>"
-    //         );
-    //       } else {
-    //         await sendTelegramMessage(
-    //           "Pool Tx Id: " +
-    //             poolTxId +
-    //             "\n" +
-    //             "Method Call: <b>Method</b>: <code>" +
-    //             commitmentData.methodCall +
-    //             "</code>, <b>Fail swap result : </b>: <code>" +
-    //             poolValidationData.errorMessages.join(", ") +
-    //             "</code>"
-    //         );
-    //       }
-
-    //       await redisClient.updateField(commitmentData.transaction.txid, poolTxInfo);
-    //     }
-    //   }
   }
 };
