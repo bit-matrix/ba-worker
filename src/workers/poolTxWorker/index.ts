@@ -28,7 +28,7 @@ export const poolTxWorker = async () => {
 
       const todoList = currentPoolNextList
         .sort(
-          (b, a) =>
+          (a, b) =>
             hexToNum(b.commitmentData.orderingFee) - hexToNum(a.commitmentData.orderingFee) || lexicographical(a.commitmentData.transaction.txid, b.commitmentData.transaction.txid)
         )
         .slice(0, pool.leafCount);

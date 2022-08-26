@@ -215,17 +215,16 @@ export const broadcastPoolTx = async (bitmatrixStoreData: BitmatrixStoreData[], 
   console.log("numberOfWitnessElements", numberOfWitnessElements);
 
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
+
   let commitmentoutputtopoolData = "";
 
-  bitmatrixStoreData.reverse().forEach((bsd) => {
+  [...bitmatrixStoreData].reverse().forEach((bsd) => {
     commitmentoutputtopoolData +=
       utils.compactSizeVarIntData(bsd.commitmentData.tweakKeyPrefix) +
       utils.compactSizeVarIntData(bsd.commitmentData.part1) +
       utils.compactSizeVarIntData(bsd.commitmentData.part2) +
       utils.compactSizeVarIntData(bsd.commitmentData.part3);
   });
-
-  console.log("commitmentoutputtopoolData", commitmentoutputtopoolData);
 
   const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[bitmatrixStoreData.length - 1]);
   const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
