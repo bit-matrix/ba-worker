@@ -61,7 +61,7 @@ export const broadcastPoolTx = async (
   let totalFee = 0;
   let commitmentDataState: { commitmentData: CTXFinderResult; poolValidationData: PTXFinderResult }[] = [];
 
-  bitmatrixStoreData.forEach((bsd) => {
+  bitmatrixStoreData.forEach((bsd, index) => {
     const poolValidationData = validatePoolTx(bsd.commitmentData, activePool);
 
     commitmentDataState.push({ commitmentData: bsd.commitmentData, poolValidationData });
@@ -140,13 +140,12 @@ export const broadcastPoolTx = async (
     orderingFeeNumber += parseInt(hexLE(bsd.commitmentData.orderingFee), 16);
     totalFee += bsd.commitmentData.cmtOutput1.value * 100000000;
 
-    const finalPool = { ...activePool };
-
-    finalPool.quote.value = poolValidationData.result.new_pool_pair_1_liquidity.toString();
-    finalPool.token.value = poolValidationData.result.new_pool_pair_2_liquidity.toString();
-    finalPool.lp.value = poolValidationData.result.new_pool_lp_liquidity.toString();
-
-    activePool = finalPool;
+    activePool = {
+      ...activePool,
+      quote: { ...activePool.quote, value: poolValidationData.result.new_pool_pair_1_liquidity.toString() },
+      token: { ...activePool.token, value: poolValidationData.result.new_pool_pair_2_liquidity.toString() },
+      lp: { ...activePool.lp, value: poolValidationData.result.new_pool_lp_liquidity.toString() },
+    };
   });
 
   const output1 = "01" + hexLE(pool.id) + "01" + "0000000000000001" + "00" + utils.compactSizeVarIntData(flagCovenantScriptPubkey);
@@ -206,8 +205,6 @@ export const broadcastPoolTx = async (
   // @todo index temp
   const tokenCovenantControlBlock = utils.compactSizeVarIntData(taproot.controlBlockCalculation(script, "c4", pubkey.hex, bitmatrixStoreData.length - 1));
 
-  console.log("tokenCovenantControlBlock", tokenCovenantControlBlock);
-
   const lpCovenantWitness = "00000002";
   const lpCovenantScript = tokenCovenantScript;
   const lpCovenantControlBlock = tokenCovenantControlBlock;
@@ -218,21 +215,21 @@ export const broadcastPoolTx = async (
 
   const numberOfWitnessElements = WizData.fromNumber(2 + 4 * bitmatrixStoreData.length).hex;
 
-  console.log("numberOfWitnessElements", numberOfWitnessElements);
-
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
 
   let commitmentoutputtopoolData = "";
 
   [...bitmatrixStoreData].reverse().forEach((bsd) => {
-    commitmentoutputtopoolData +=
-      utils.compactSizeVarIntData(bsd.commitmentData.tweakKeyPrefix) +
-      utils.compactSizeVarIntData(bsd.commitmentData.part1) +
-      utils.compactSizeVarIntData(bsd.commitmentData.part2) +
-      utils.compactSizeVarIntData(bsd.commitmentData.part3);
+    commitmentoutputtopoolData += [
+      utils.compactSizeVarIntData(bsd.commitmentData.tweakKeyPrefix),
+      utils.compactSizeVarIntData(bsd.commitmentData.part1),
+      utils.compactSizeVarIntData(bsd.commitmentData.part2),
+      utils.compactSizeVarIntData(bsd.commitmentData.part3),
+    ].join("");
   });
 
   const mainCovenantScriptDetails = utils.compactSizeVarIntData(poolMainCovenant.mainCovenantScript[bitmatrixStoreData.length - 1]);
+
   const mainCovenantControlBlockDetails = utils.compactSizeVarIntData(poolMainCovenant.controlBlock);
 
   let commitmentWitnessFinal = "";
@@ -253,28 +250,28 @@ export const broadcastPoolTx = async (
     commitmentWitnessFinal += commitmentWitness;
   });
 
-  console.log("commitmentWitnessFinal", commitmentWitnessFinal);
-  const witnessTemplate =
-    flagCovenantWitness +
-    flagCovenantScriptLength +
-    flagCovenantScript +
-    flagCovenantControlBlockLength +
-    flagCovenantControlBlock +
-    tokenCovenantWitness +
-    tokenCovenantScript +
-    tokenCovenantControlBlock +
-    lpCovenantWitness +
-    lpCovenantScript +
-    lpCovenantControlBlock +
-    mainCovenantWitness +
-    numberOfWitnessElements +
-    commitmentoutputtopoolData +
-    mainCovenantScriptDetails +
-    mainCovenantControlBlockDetails +
-    commitmentWitnessFinal +
-    "00".repeat(outputTemplateCount * 2 + 1);
+  const witnessTemplate = [
+    flagCovenantWitness,
+    flagCovenantScriptLength,
+    flagCovenantScript,
+    flagCovenantControlBlockLength,
+    flagCovenantControlBlock,
+    tokenCovenantWitness,
+    tokenCovenantScript,
+    tokenCovenantControlBlock,
+    lpCovenantWitness,
+    lpCovenantScript,
+    lpCovenantControlBlock,
+    mainCovenantWitness,
+    numberOfWitnessElements,
+    commitmentoutputtopoolData,
+    mainCovenantScriptDetails,
+    mainCovenantControlBlockDetails,
+    commitmentWitnessFinal,
+    "00".repeat(outputTemplateCount * 2 + 1),
+  ].join("");
 
-  const rawHex = inputTemplate + outputTemplate + witnessTemplate;
+  const rawHex = [inputTemplate, outputTemplate, witnessTemplate].join("");
 
   let poolTxId = "";
 

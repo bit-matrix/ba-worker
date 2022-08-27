@@ -37,8 +37,7 @@ export const poolTxWorker = async () => {
       poolWaitingList.forEach(async (pwl) => {
         if (pwl) {
           const { poolTxId, commitmentDataState } = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
-          console.log("poolTxId", poolTxId);
-          console.log("commitmentDataState", commitmentDataState);
+
           for (let i = 0; i < commitmentDataState.length; i++) {
             const resultData = commitmentDataState[i];
 
