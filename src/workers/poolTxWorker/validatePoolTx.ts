@@ -3,9 +3,8 @@ import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
 
-export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Pool[]): Promise<PTXFinderResult> => {
+export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool): PTXFinderResult => {
   const cof = commitmentData;
-  const poolData = pools.find((p) => p.id === cof.poolId)!;
 
   const method = cof.methodCall;
 
@@ -89,7 +88,7 @@ export const validatePoolTx = async (commitmentData: CTXFinderResult, pools: Poo
 
   const pair_1_coefficient = poolData.pair1_coefficient.number;
 
-  const pair_2_coefficient = Math.floor((pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient);
+  const pair_2_coefficient = Math.floor(pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient;
 
   //   9-pool_pair_1_liquidity değerini pair_1_coefficient’a böl ve sonuca pool_pair_1_liquidity_downgraded ismini ver
   const pool_pair_1_liquidity_downgraded = Math.floor(pool_pair_1_liquidity / pair_1_coefficient);
