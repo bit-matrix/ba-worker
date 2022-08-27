@@ -4,8 +4,8 @@ import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../he
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
-import { BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
-import { poolUpdate } from "../../business/db-client";
+import { BmChart, BmTxInfo, CALL_METHOD, PAsset, Pool } from "@bitmatrix/models";
+import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
@@ -127,9 +127,9 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
 
   // --------------------------- POOL INSERT ---------------------------------
 
-  const quoteTicker = tickerFinder(pair1.asset || "");
-  const tokenTicker = tickerFinder(pair2.asset || "");
-  const lpTicker = tickerFinder(mayLP.asset || "");
+  const quoteTicker = await tickerFinder(pair1.asset || "");
+  const tokenTicker = await tickerFinder(pair2.asset || "");
+  const lpTicker = await tickerFinder(mayLP.asset || "");
 
   const quote: PAsset = {
     ticker: quoteTicker.ticker,
@@ -171,15 +171,35 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     initialTx,
     lastStateTxId: newTxDetail.txid,
     active: true,
-    maxLeaf: leafCount,
+    leafCount,
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
     tokenPrice,
     version,
     lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };
 
+  const volumeToken = Number(newPool.token.value);
+
+  const result: BmChart = {
+    time: newTxDetail.status.block_time,
+    ptxid: newPool.lastStateTxId,
+    method: CALL_METHOD.ADD_LIQUIDITY,
+    value: {
+      quote: Number(newPool.quote.value),
+      token: volumeToken,
+      lp: Number(newPool.lp.value),
+    },
+    price: newPool.tokenPrice,
+    volume: {
+      token: volumeToken,
+      quote: Math.floor(volumeToken / newPool.tokenPrice),
+    },
+  };
+
   try {
     await poolUpdate(newPool);
+
+    await poolTxHistorySave(newPool.id, result);
   } catch {
     return false;
   }
