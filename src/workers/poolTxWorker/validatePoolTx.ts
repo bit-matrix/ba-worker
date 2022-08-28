@@ -93,7 +93,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
   if (pair_2_pool_supply >= pair_1_pool_supply) {
     pair_2_coefficient = Math.floor(pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient;
   } else {
-    pair_2_coefficient = Math.floor(pair_1_pool_supply / pair_2_pool_supply) * pair_1_coefficient;
+    pair_2_coefficient = Math.floor(pair_1_coefficient / Math.floor(pair_1_pool_supply / pair_2_pool_supply));
   }
 
   if (pair_2_coefficient < 1) {
