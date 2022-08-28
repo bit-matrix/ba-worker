@@ -88,7 +88,17 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
 
   const pair_1_coefficient = poolData.pair1_coefficient.number;
 
-  const pair_2_coefficient = Math.floor(pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient;
+  let pair_2_coefficient;
+
+  if (pair_2_pool_supply >= pair_1_pool_supply) {
+    pair_2_coefficient = Math.floor(pair_2_pool_supply / pair_1_pool_supply) * pair_1_coefficient;
+  } else {
+    pair_2_coefficient = Math.floor(pair_1_pool_supply / pair_2_pool_supply) * pair_1_coefficient;
+  }
+
+  if (pair_2_coefficient < 1) {
+    pair_2_coefficient = 1;
+  }
 
   //   9-pool_pair_1_liquidity değerini pair_1_coefficient’a böl ve sonuca pool_pair_1_liquidity_downgraded ismini ver
   const pool_pair_1_liquidity_downgraded = Math.floor(pool_pair_1_liquidity / pair_1_coefficient);
