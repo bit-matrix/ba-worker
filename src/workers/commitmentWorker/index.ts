@@ -4,6 +4,7 @@ import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { redisClient } from "@bitmatrix/redis-client";
 import { commitmentFinder } from "./commitmentFinder";
 import { pools } from "../../business/db-client";
+import { REDIS_EXPIRE_TIME } from "../../env";
 
 export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------COMMINTMENT WORKER-------------------------");
@@ -22,7 +23,7 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
         if (value) {
           const newStoreData: BitmatrixStoreData = { commitmentData: value };
 
-          await redisClient.addKey(value.transaction.txid, 60000, newStoreData);
+          await redisClient.addKey(value.transaction.txid, REDIS_EXPIRE_TIME, newStoreData);
 
           if (synced) {
             await sendTelegramMessage(

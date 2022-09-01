@@ -3,6 +3,7 @@ import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
 import { api, commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
 import { validatePoolTx } from "./validatePoolTx";
+import { INNER_PUBLIC_KEY, TEAM_ADDRESS } from "../../env";
 
 export const broadcastPoolTx = async (
   bitmatrixStoreData: BitmatrixStoreData[],
@@ -43,7 +44,7 @@ export const broadcastPoolTx = async (
   // ------------- OUTPUTS START -------------
 
   const script = [WizData.fromHex("20" + hexLE(pool.id) + "00c86987")];
-  const pubkey = WizData.fromHex("1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624");
+  const pubkey = WizData.fromHex(INNER_PUBLIC_KEY);
 
   const poolMainCovenant = poolFunc.createCovenants(pool.leafCount - 1, bitmatrixStoreData.length - 1, pool.id, pool.pair1_coefficient.number, pool.lpFeeTierIndex.number);
 
@@ -61,7 +62,7 @@ export const broadcastPoolTx = async (
   let totalFee = 0;
   let commitmentDataState: { commitmentData: CTXFinderResult; poolValidationData: PTXFinderResult }[] = [];
 
-  bitmatrixStoreData.forEach((bsd, index) => {
+  bitmatrixStoreData.forEach((bsd) => {
     const poolValidationData = validatePoolTx(bsd.commitmentData, activePool);
 
     commitmentDataState.push({ commitmentData: bsd.commitmentData, poolValidationData });
@@ -178,10 +179,7 @@ export const broadcastPoolTx = async (
 
   const serviceFee = totalFee - bandwith;
 
-  const serviceFeeOutput =
-    "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" +
-    convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex +
-    "00160014156e0dc932770529a4946433c500611b9ba77871";
+  const serviceFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + TEAM_ADDRESS;
 
   const txFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 

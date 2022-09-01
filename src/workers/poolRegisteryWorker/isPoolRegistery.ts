@@ -1,12 +1,13 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { getAsset } from "../../helper/getAsset";
-import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../helper/util";
+import { div, isUniqueArray, tickerFinder } from "../../helper/util";
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
 import { BmChart, BmTxInfo, CALL_METHOD, PAsset, Pool } from "@bitmatrix/models";
 import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
+import { INNER_PUBLIC_KEY, LBTC_ASSET, USDT_ASSET } from "../../env";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
@@ -16,8 +17,6 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   // 4 input - 7 output
   if (newTxDetail.vout.length !== 7) return false;
   if (newTxDetail.vin.length !== 4) return false;
-
-  const innerPublicKey = "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
 
   // first 4 outputs asset ids must be different
   const firtOutputAssets = newTxDetail.vout.slice(0, 4).map((out) => out.asset);
@@ -64,8 +63,8 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
    *
    */
 
-  if (pair2.asset === lbtcAsset || pair2.asset === usdtAsset) {
-    if (pair1.asset !== lbtcAsset && pair2.asset !== usdtAsset) return false;
+  if (pair2.asset === LBTC_ASSET || pair2.asset === USDT_ASSET) {
+    if (pair1.asset !== LBTC_ASSET && pair2.asset !== USDT_ASSET) return false;
   }
 
   /*
@@ -101,8 +100,8 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   if (bitmatrixHex !== "6269746d6174726978") return false;
   // if (version !== "01") return false;
 
-  if (pair1_coefficient === "14000000" && pair1.asset !== lbtcAsset) return false;
-  if (pair1_coefficient === "40420f00" && pair1.asset !== usdtAsset) return false;
+  if (pair1_coefficient === "14000000" && pair1.asset !== LBTC_ASSET) return false;
+  if (pair1_coefficient === "40420f00" && pair1.asset !== USDT_ASSET) return false;
 
   if (!mayLP.value) return false;
   const lpCirculation = 2000000000 - mayLP.value; // 10000
@@ -113,7 +112,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   if (pair1Div != lpCirculation || lpCirculation < 50) return false;
 
   const script = [WizData.fromHex("20" + hexLE(mayPoolAssetId || "") + "00c86987")];
-  const pubkey = WizData.fromHex(innerPublicKey);
+  const pubkey = WizData.fromHex(INNER_PUBLIC_KEY);
 
   const flagCovenantScriptPubkey = "512070d3017ab2a8ae4cccdb0537a45fb4a3192bff79c49cf54bd9edd508dcc93f55";
   const tokenCovenantScriptPubkey = taproot.tapRoot(pubkey, script, TAPROOT_VERSION.LIQUID).scriptPubkey.hex;

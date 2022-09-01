@@ -5,8 +5,7 @@ import { convertion } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { replaceChar } from "../../helper/util";
 import sha256Streaming from "@bitmatrix/sha256streaming";
-
-const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
+import { LBTC_ASSET } from "../../env";
 
 export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult | undefined> => {
   // fetch tx details with rpc
@@ -59,7 +58,7 @@ export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Pr
     cmtOutput3 = outputs[2];
   }
 
-  if (cmtOutput1.asset !== lbtcAssest) return undefined;
+  if (cmtOutput1.asset !== LBTC_ASSET) return undefined;
 
   const baseTransaction = rawTransactionHex.split(callData)[0] + callData + locktimeHex;
 
