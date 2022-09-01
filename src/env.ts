@@ -1,7 +1,8 @@
 const base_host = process.env.BASE_HOST || "host.docker.internal";
 
+const electrs_port = process.env.ELECTRS_PORT || "30001";
 const electrs_host = process.env.ELECTRS_HOST || base_host;
-const electrs_url = process.env.ELECTRS_URL || `http://${electrs_host}`;
+const electrs_url = process.env.ELECTRS_URL || `http://${electrs_host}:${electrs_port}`;
 
 const redis_port = process.env.REDIS_PORT || "6379";
 const redis_host = process.env.REDIS_HOST || base_host;
