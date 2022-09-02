@@ -1,6 +1,8 @@
 const base_host = process.env.BASE_HOST || "host.docker.internal";
 
-const electrs_url = process.env.ELECTRS_URL || "https://electrs.basebitmatrix.com";
+const electrs_port = process.env.ELECTRS_PORT || "30001";
+const electrs_host = process.env.ELECTRS_HOST || base_host;
+const electrs_url = process.env.ELECTRS_URL || `http://${electrs_host}:${electrs_port}`;
 
 const redis_port = process.env.REDIS_PORT || "6379";
 const redis_host = process.env.REDIS_HOST || base_host;
@@ -16,8 +18,6 @@ const db_url = process.env.DB_URL || `http://${db_host}:${db_port}`;
 
 const telegram_token = "AAGLP1BTJQ9i7Y2Old7MsV3daCWg0RVLqzs";
 const telegram_chat_id = "-707696434";
-
-console.log(db_url, "DB URL------");
 
 export const ELECTRS_URL = electrs_url + "/";
 export const DB_URL = db_url + "/";
