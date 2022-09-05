@@ -89,20 +89,13 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   let leafCount = 0;
 
   if (version === "01") {
-    leafCount = 1;
-  } else if (version === "02") {
-    leafCount = 2;
-  } else if (version === "03") {
-    leafCount = 16;
+    leafCount = 64;
   }
 
   const pair1_coefficient = outputHex.slice(20, 28);
 
   if (bitmatrixHex !== "6269746d6174726978") return false;
-  // if (version !== "01") return false;
-
-  if (pair1_coefficient === "14000000" && pair1.asset !== lbtcAsset) return false;
-  if (pair1_coefficient === "40420f00" && pair1.asset !== usdtAsset) return false;
+  if (parseInt(hexLE(pair1_coefficient), 16) <= 0) return false;
 
   if (!mayLP.value) return false;
   const lpCirculation = 2000000000 - mayLP.value; // 10000
@@ -136,7 +129,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: quoteTicker.name,
     assetHash: pair1.asset || "",
     value: pair1.value?.toString() || "",
-    precision: 8,
+    precision: quoteTicker.precision,
   };
 
   const token: PAsset = {
@@ -144,7 +137,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: tokenTicker.name,
     assetHash: pair2.asset || "",
     value: pair2.value?.toString() || "",
-    precision: 8,
+    precision: quoteTicker.precision,
   };
 
   const lPAsset: PAsset = {
@@ -152,7 +145,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: lpTicker.name,
     assetHash: mayLP.asset || "",
     value: mayLP.value?.toString() || "",
-    precision: 8,
+    precision: quoteTicker.precision,
   };
 
   const initialTx: BmTxInfo = {

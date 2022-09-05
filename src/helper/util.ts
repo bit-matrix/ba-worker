@@ -19,12 +19,12 @@ export const usdtAsset = "f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11
 export const cadAsset = "ac3e0ff248c5051ffd61e00155b7122e5ebc04fd397a0ecbdd4f4e4a56232926";
 export const fusdAsset = "0d86b2f6a8c3b02a8c7c8836b83a081e68b7e2b4bcdfc58981fc5486f59f7518";
 
-export const tickerFinder = async (asset: string): Promise<{ ticker: string; name: string }> => {
+export const tickerFinder = async (asset: string): Promise<{ ticker: string; name: string; precision: number }> => {
   if (asset === lbtcAsset) {
-    return { ticker: "tL-BTC", name: "Liquid Bitcoin" };
+    return { ticker: "tL-BTC", name: "Liquid Bitcoin", precision: 8 };
   } else {
     const bsAsset = await getAssetWithBlockstream(asset);
-    return bsAsset.ticker ? { ticker: bsAsset.ticker, name: bsAsset.name } : { ticker: asset.slice(0, 4), name: "unknown" };
+    return bsAsset.ticker ? { ticker: bsAsset.ticker, name: bsAsset.name, precision: bsAsset.precision || 8 } : { ticker: asset.slice(0, 4), name: "unknown", precision: 8 };
   }
 };
 
