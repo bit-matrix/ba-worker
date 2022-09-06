@@ -176,7 +176,6 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   const result: BmChart = {
     time: newTxDetail.status.block_time,
     ptxid: newPool.lastStateTxId,
-    method: CALL_METHOD.ADD_LIQUIDITY,
     value: {
       quote: Number(newPool.quote.value),
       token: volumeToken,

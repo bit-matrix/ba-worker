@@ -72,7 +72,11 @@ export const poolTxWorker = async () => {
                 );
               }
 
-              await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+              try {
+                await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+              } catch (error) {
+                console.log("broadcast error", error);
+              }
             }
           }
         }
