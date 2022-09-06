@@ -24,38 +24,25 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         newPool.lastStateTxId = tx.txid;
         newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote);
 
-        const poolTxDetails = waitingTxs.find((ptx) => ptx.poolTxInfo?.txId === tx.txid);
+        const volumeQuote = Number(newPool.quote.value);
+        const volumeToken = volumeQuote * newPool.tokenPrice;
 
-        if (poolTxDetails) {
-          let volumeQuote = 0;
-          let volumeToken = 0;
+        const result: BmChart = {
+          time: tx.status.block_time,
+          ptxid: tx.txid,
+          value: {
+            quote: Number(newPool.quote.value),
+            token: Number(newPool.token.value),
+            lp: Number(newPool.lp.value),
+          },
+          price: newPool.tokenPrice,
+          volume: {
+            quote: volumeQuote,
+            token: volumeToken,
+          },
+        };
 
-          if (poolTxDetails.commitmentData.methodCall === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
-            volumeQuote = Number(newPool.quote.value);
-            volumeToken = volumeQuote * newPool.tokenPrice;
-          } else {
-            volumeToken = Number(newPool.token.value);
-            volumeQuote = Math.floor(volumeToken / newPool.tokenPrice);
-          }
-
-          const result: BmChart = {
-            time: tx.status.block_time,
-            ptxid: tx.txid,
-            method: poolTxDetails.commitmentData.methodCall as CALL_METHOD,
-            value: {
-              quote: Number(newPool.quote.value),
-              token: Number(newPool.token.value),
-              lp: Number(newPool.lp.value),
-            },
-            price: newPool.tokenPrice,
-            volume: {
-              quote: volumeQuote,
-              token: volumeToken,
-            },
-          };
-
-          await poolTxHistorySave(newPool.id, result);
-        }
+        await poolTxHistorySave(newPool.id, result);
 
         await poolUpdate(newPool);
 

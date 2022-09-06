@@ -11,6 +11,8 @@ export const poolTxWorker = async () => {
 
   const allWaitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
+  console.log("allWaitingTxs", allWaitingTxs);
+
   // const waitingCommitmentList: BitmatrixStoreData[] = allWaitingTxs.filter(
   //   (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
   // );
