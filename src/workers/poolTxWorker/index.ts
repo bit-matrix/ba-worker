@@ -11,16 +11,16 @@ export const poolTxWorker = async () => {
 
   const allWaitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
-  const waitingCommitmentList: BitmatrixStoreData[] = allWaitingTxs.filter(
-    (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
-  );
+  // const waitingCommitmentList: BitmatrixStoreData[] = allWaitingTxs.filter(
+  //   (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
+  // );
 
   //Pool validasyonlarından geçirme
-  if (waitingCommitmentList.length > 0) {
+  if (allWaitingTxs.length > 0) {
     const bitmatrixPools = await pools();
 
     const poolWaitingList = bitmatrixPools.map((pool: Pool) => {
-      const currentPoolNextList = waitingCommitmentList.filter((nl) => nl.commitmentData.poolId === pool.id);
+      const currentPoolNextList = allWaitingTxs.filter((nl) => nl.commitmentData.poolId === pool.id);
       if (currentPoolNextList.length === 0) return;
 
       const todoList = currentPoolNextList
