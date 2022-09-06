@@ -1,10 +1,10 @@
 import { TxDetail } from "@bitmatrix/esplora-api-client";
 import { getAsset } from "../../helper/getAsset";
-import { div, isUniqueArray, lbtcAsset, tickerFinder, usdtAsset } from "../../helper/util";
+import { div, isUniqueArray, tickerFinder } from "../../helper/util";
 import { convertion, taproot, TAPROOT_VERSION } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { pool } from "@bitmatrix/lib";
-import { BmChart, BmTxInfo, CALL_METHOD, PAsset, Pool } from "@bitmatrix/models";
+import { BmChart, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
 import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
@@ -58,15 +58,6 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
 
   const pair1 = newTxDetail.vout[3];
   const pair2 = newTxDetail.vout[1];
-
-  /*
-   *İkinci parite (token covenant) asset ID’ sinin L-BTC ya da USDt olmadığını kontrol et (bu bir L-BTC<>USDt havuzu ise istisna).
-   *
-   */
-
-  if (pair2.asset === lbtcAsset || pair2.asset === usdtAsset) {
-    if (pair1.asset !== lbtcAsset && pair2.asset !== usdtAsset) return false;
-  }
 
   /*
    *
