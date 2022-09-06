@@ -61,7 +61,7 @@ export const broadcastPoolTx = async (
   let totalFee = 0;
   let commitmentDataState: { commitmentData: CTXFinderResult; poolValidationData: PTXFinderResult }[] = [];
 
-  bitmatrixStoreData.forEach((bsd, index) => {
+  bitmatrixStoreData.forEach((bsd) => {
     const poolValidationData = validatePoolTx(bsd.commitmentData, activePool);
 
     commitmentDataState.push({ commitmentData: bsd.commitmentData, poolValidationData });
