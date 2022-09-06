@@ -11,8 +11,6 @@ export const poolTxWorker = async () => {
 
   const allWaitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
-  console.log("allWaitingTxs", allWaitingTxs);
-
   // const waitingCommitmentList: BitmatrixStoreData[] = allWaitingTxs.filter(
   //   (value: BitmatrixStoreData) => value.poolTxInfo?.txId === "" || value.poolTxInfo?.txId === null || value.poolTxInfo?.txId === undefined
   // );
@@ -74,7 +72,11 @@ export const poolTxWorker = async () => {
                 );
               }
 
-              await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+              try {
+                await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+              } catch (error) {
+                console.log("broadcast error", error);
+              }
             }
           }
         }
