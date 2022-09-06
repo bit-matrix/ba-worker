@@ -15,12 +15,12 @@ export const isUniqueArray = (array: Array<any>): boolean => {
 
 export const div = (input1: number, input2: number) => Math.floor(input1 / input2);
 
-export const tickerFinder = async (asset: string): Promise<{ ticker: string; name: string }> => {
+export const tickerFinder = async (asset: string): Promise<{ ticker: string; name: string; precision: number }> => {
   if (asset === LBTC_ASSET) {
-    return { ticker: "tL-BTC", name: "Liquid Bitcoin" };
+    return { ticker: "tL-BTC", name: "Liquid Bitcoin", precision: 8 };
   } else {
     const bsAsset = await getAssetWithBlockstream(asset);
-    return bsAsset.ticker ? { ticker: bsAsset.ticker, name: bsAsset.name } : { ticker: asset.slice(0, 4), name: "unknown" };
+    return bsAsset.ticker ? { ticker: bsAsset.ticker, name: bsAsset.name, precision: bsAsset.precision || 8 } : { ticker: asset.slice(0, 4), name: "unknown", precision: 8 };
   }
 };
 
