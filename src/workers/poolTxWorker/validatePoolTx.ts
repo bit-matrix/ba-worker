@@ -126,7 +126,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     }
 
     //5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / 500);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
 
     //   6-user_supply_total’ dan user_supply_lp_fees’ı çıkar ve sonuca user_supply_available ismini ver.
     result.user_supply_available = Math.floor(result.user_supply_total - result.user_supply_lp_fees);
@@ -195,7 +195,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     result.user_supply_total = new Decimal(commitmentOutput2.value).mul(100000000).toNumber();
 
     // 5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / 500);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
 
     if (result.user_supply_total > pool_pair_2_liquidity) {
       errorMessages.push("Supply overflow");
