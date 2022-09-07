@@ -128,7 +128,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: tokenTicker.name,
     assetHash: pair2.asset || "",
     value: pair2.value?.toString() || "",
-    precision: quoteTicker.precision,
+    precision: tokenTicker.precision,
   };
 
   const lPAsset: PAsset = {

@@ -24,7 +24,8 @@ export const tickerFinder = async (asset: string): Promise<{ ticker: string; nam
     return { ticker: "tL-BTC", name: "Liquid Bitcoin", precision: 8 };
   } else {
     const bsAsset = await getAssetWithBlockstream(asset);
-    return bsAsset.ticker ? { ticker: bsAsset.ticker, name: bsAsset.name, precision: bsAsset.precision || 8 } : { ticker: asset.slice(0, 4), name: "unknown", precision: 8 };
+
+    return { ticker: bsAsset.ticker || asset.slice(0, 4), name: bsAsset.name || "Unknown", precision: bsAsset.precision || 8 };
   }
 };
 
