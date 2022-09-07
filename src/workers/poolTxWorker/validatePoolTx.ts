@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
+import { lpFeeTiers } from "@bitmatrix/lib/pool";
 
 export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool): PTXFinderResult => {
   const cof = commitmentData;
@@ -109,6 +110,8 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
   // 11-pool_pair_1_liquidity_downgraded ile pool_pair_2_liquidity_downgraded ‘I çarp ve sonuca pool_constant ismini ver.
   const pool_constant = Math.floor(pool_pair_1_liquidity_downgraded * pool_pair_2_liquidity_downgraded);
 
+  const lpFeeTier = Object.values(lpFeeTiers)[poolData.lpFeeTierIndex.number];
+
   if (method === "01") {
     //3-Commitment output 2 asset ID’sinin pair_1_asset_id olduğunu kontrol et.
     if (commitmentOutput2AssetId !== pair_1_asset_id) errorMessages.push("Commitment Output 2 AssetId must be equal to pair_1_asset_id");
@@ -126,7 +129,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     }
 
     //5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / lpFeeTier);
 
     //   6-user_supply_total’ dan user_supply_lp_fees’ı çıkar ve sonuca user_supply_available ismini ver.
     result.user_supply_available = Math.floor(result.user_supply_total - result.user_supply_lp_fees);
@@ -195,7 +198,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     result.user_supply_total = new Decimal(commitmentOutput2.value).mul(100000000).toNumber();
 
     // 5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / lpFeeTier);
 
     if (result.user_supply_total > pool_pair_2_liquidity) {
       errorMessages.push("Supply overflow");
