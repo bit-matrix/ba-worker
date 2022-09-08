@@ -181,7 +181,7 @@ export const broadcastPoolTx = async (
   const serviceFeeOutput =
     "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" +
     convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex +
-    "00160014156e0dc932770529a4946433c500611b9ba77871";
+    "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
 
   const txFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 
