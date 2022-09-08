@@ -22,7 +22,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         newPool.lp.value = tx.vout[2].value?.toString();
         newPool.quote.value = tx.vout[3].value?.toString();
         newPool.lastStateTxId = tx.txid;
-        newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote);
+        newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote, bitmatrixPools);
 
         const volumeQuote = Number(newPool.quote.value);
         const volumeToken = volumeQuote * newPool.tokenPrice;
