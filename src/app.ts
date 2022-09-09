@@ -1,9 +1,12 @@
 import { startWorkers } from "./workers";
+import { memoryUsage } from "node:process";
 
 const onExit = async () => {
   console.log("BA WORKER Service stopped.");
 };
+
 process.on("exit", onExit);
+
 process.on("SIGINT", () => {
   console.log("SIGINTTTT");
   process.exit();
