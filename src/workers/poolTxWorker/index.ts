@@ -38,6 +38,8 @@ export const poolTxWorker = async () => {
         if (pwl) {
           if (pwl.todoList.length > 0) {
             const { poolTxId, commitmentDataState } = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
+            let successTxIds = [];
+            let failTxIds = [];
 
             for (let i = 0; i < commitmentDataState.length; i++) {
               const resultData = commitmentDataState[i];
@@ -50,27 +52,9 @@ export const poolTxWorker = async () => {
                 };
 
                 if (poolTxInfo.isSuccess) {
-                  await sendTelegramMessage(
-                    "Pool Tx Id: " +
-                      poolTxId +
-                      "\n" +
-                      "Method Call: <b>Method</b>: <code>" +
-                      resultData.commitmentData.methodCall +
-                      "</code>, <b>Value</b>: <code>" +
-                      resultData.commitmentData.cmtOutput2.value +
-                      "</code>"
-                  );
+                  successTxIds.push(resultData.commitmentData.transaction.txid);
                 } else {
-                  await sendTelegramMessage(
-                    "Pool Tx Id: " +
-                      poolTxId +
-                      "\n" +
-                      "Method Call: <b>Method</b>: <code>" +
-                      resultData.commitmentData.methodCall +
-                      "</code>, <b>Fail swap result : </b>: <code>" +
-                      resultData.poolValidationData.errorMessages.join(", ") +
-                      "</code>"
-                  );
+                  failTxIds.push(resultData.commitmentData.transaction.txid);
                 }
 
                 try {
@@ -79,6 +63,12 @@ export const poolTxWorker = async () => {
                   console.log("broadcast error", error);
                 }
               }
+            }
+
+            if (successTxIds.length > 0) {
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Succesfully Commitment Tx Ids: <b>Method</b>: <code>" + successTxIds.join(",") + "</code>");
+            } else if (failTxIds.length > 0) {
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Failure Commitment Tx Ids: <b>Method</b>: <code>" + failTxIds.join(",") + "</code>");
             }
           }
         }
