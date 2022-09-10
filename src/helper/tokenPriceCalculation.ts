@@ -1,7 +1,7 @@
 import { PAsset, Pool } from "@bitmatrix/models";
 import { lbtcAsset } from "./util";
 
-export const tokenPriceCalculation = (token: PAsset, quote: PAsset, pools?: Pool[]): number => {
+export const tokenPriceCalculation = (token: PAsset, quote: PAsset): number => {
   if (quote.assetHash === lbtcAsset) {
     return Number(token.value) / Number(quote.value);
   }
