@@ -43,7 +43,7 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
         }
       });
 
-      if (synced) {
+      if (synced && txIds.length > 0) {
         await sendTelegramMessage("New Commitment Tx Ids: <code>" + txIds.join(",") + "</code>");
       }
     })
