@@ -56,3 +56,7 @@ export const lexicographical = (aTxid: string, bTxid: string): number => {
 export const hexToNum = (hex: string) => {
   return parseInt(hexLE(hex), 16);
 };
+
+export const delay = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

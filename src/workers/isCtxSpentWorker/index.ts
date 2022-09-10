@@ -25,26 +25,11 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
         };
 
         await ctxHistorySave(txId, commitmentTxHistory);
-
-        if (synced) {
-          await sendTelegramMessage(
-            "Pool Id: " +
-              tx.commitmentData.poolId +
-              "\n" +
-              "Pool Tx Id: " +
-              (tx.poolTxInfo?.txId || "unknown pool id") +
-              "\n" +
-              "Swap Completed for : <code>" +
-              txId +
-              "</code>\n" +
-              "Commitment Data: <b>Method</b>: <code>" +
-              tx.commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              tx.commitmentData.cmtOutput2.value +
-              "</code>"
-          );
-        }
       }
+    }
+
+    if (synced) {
+      await sendTelegramMessage("Swap Completed for : <code>" + waitingTxs.map((wt) => wt.commitmentData.transaction.txid).join(",") + "</code>");
     }
   }
 };
