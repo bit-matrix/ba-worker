@@ -4,7 +4,7 @@ import { redisClient } from "@bitmatrix/redis-client";
 import { pools } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
-import { hexToNum, lexicographical } from "../../helper/util";
+import { delay, hexToNum, lexicographical } from "../../helper/util";
 
 export const poolTxWorker = async () => {
   console.log("-------------------POOL TX WORKER-------------------------");
@@ -66,9 +66,11 @@ export const poolTxWorker = async () => {
             }
 
             if (successTxIds.length > 0) {
-              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Succesfully Commitment Tx Ids: <b>Method</b>: <code>" + successTxIds.join(",") + "</code>");
+              await delay(1000);
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Succesfully Commitment Tx Ids: <code>" + successTxIds.join(",") + "</code>");
             } else if (failTxIds.length > 0) {
-              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Failure Commitment Tx Ids: <b>Method</b>: <code>" + failTxIds.join(",") + "</code>");
+              await delay(1000);
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Failure Commitment Tx Ids: <code>" + failTxIds.join(",") + "</code>");
             }
           }
         }
