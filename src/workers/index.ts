@@ -5,8 +5,9 @@ import * as nodeCron from "node-cron";
 import { bitmatrixWorker } from "./bitmatrixWorker";
 import { redisInit } from "@bitmatrix/redis-client";
 import { ELECTRS_URL, REDIS_URL } from "../env";
+import { setIntervalAsync, clearIntervalAsync, SetIntervalAsyncTimer } from "set-interval-async";
 
-const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
+const getFinalBlockDetail = async (timer: SetIntervalAsyncTimer<[]>) => {
   const appLastState = await getLastAppSyncState();
 
   // app synced state
@@ -18,19 +19,22 @@ const getFinalBlockDetail = async (timer: NodeJS.Timer) => {
 
     // new block found
     if (bestBlockHeight - appLastState.blockHeight === 1) {
-      clearInterval(timer);
       await bitmatrixWorker(bestBlockHash, true);
 
       const newDbState: AppSync = { bestBlockHeight, blockHash: bestBlockHash, blockHeight: bestBlockHeight, synced: true };
       await updateAppSyncState(newDbState);
 
+      await clearIntervalAsync(timer);
+
       console.log("sync completed");
     }
     // synced app restarted
     else if (bestBlockHeight - appLastState.blockHeight > 1) {
-      clearInterval(timer);
       appWorker();
+      await clearIntervalAsync(timer);
     }
+  } else {
+    await clearIntervalAsync(timer);
   }
 };
 
@@ -70,9 +74,9 @@ const appWorker = async () => {
 };
 
 nodeCron.schedule("50 * * * * *", () => {
-  const interval = setInterval(async () => {
+  const interval = setIntervalAsync(async () => {
     await getFinalBlockDetail(interval);
-  }, 2000);
+  }, 1000);
 });
 
 export const startWorkers = async () => {

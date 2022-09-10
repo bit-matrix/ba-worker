@@ -223,8 +223,6 @@ export const broadcastPoolTx = async (
     numberOfWitnessElements = WizData.fromNumber(witnessElementCount).hex;
   }
 
-  console.log("numberOfWitnessElements", numberOfWitnessElements);
-
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
 
   let commitmentoutputtopoolData = "";
