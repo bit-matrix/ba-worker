@@ -213,7 +213,7 @@ export const broadcastPoolTx = async (
 
   // @todo Number of total main covenant  witness elements (2 + 33*s)
 
-  const numberOfWitnessElements = WizData.fromNumber(2 + 4 * bitmatrixStoreData.length).hex;
+  const numberOfWitnessElements = (2 + 4 * bitmatrixStoreData.length).toString(16);
 
   // ---- SLOT N commitmentoutputtopool fields START ---- (33 witness elements per slot)
 
