@@ -60,6 +60,8 @@ const appWorker = async () => {
     } else if (bestBlockHeight === appLastState.blockHeight) {
       const newDbState: AppSync = { ...appLastState, synced: true };
 
+      await bitmatrixWorker(appLastState.blockHash, true);
+
       await updateAppSyncState(newDbState);
     }
   } catch (error) {
