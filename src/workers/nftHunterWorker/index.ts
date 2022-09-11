@@ -1,10 +1,10 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { BmChart, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
-export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: BitmatrixStoreData[], synced: boolean) => {
+export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------NFT HUNTER-------------------------");
 
   const bitmatrixPools = await pools();
