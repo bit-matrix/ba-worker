@@ -1,4 +1,5 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
+import { lpFeeTiers } from "@bitmatrix/lib/pool";
 import { BmChart, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
@@ -40,6 +41,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
             quote: volumeQuote,
             token: volumeToken,
           },
+          lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
         };
 
         await poolTxHistorySave(newPool.id, result);
