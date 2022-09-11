@@ -7,7 +7,7 @@ export const tokenPriceCalculation = (token: PAsset, quote: PAsset): number => {
       return Number(token.value) / Number(quote.value);
     }
 
-    return ((Number(quote.value) * Math.pow(10, 8 - quote.precision)) / Number(token.value)) * Math.pow(10, 8 - token.precision);
+    return (Number(quote.value) * Math.pow(10, 8 - quote.precision)) / (Number(token.value) * Math.pow(10, 8 - token.precision));
   }
 
   return 0;
