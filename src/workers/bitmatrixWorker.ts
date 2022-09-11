@@ -20,9 +20,10 @@ export const bitmatrixWorker = async (newBlockHash: string, synced: boolean) => 
     if (newTxDetails.length > 0) {
       console.log("welcome to new tx ..");
 
+      await nftHunterWorker(newTxDetails, synced);
+
       const waitingTxs = await redisClient.getAllValues<BitmatrixStoreData>();
 
-      await nftHunterWorker(newTxDetails, waitingTxs, synced);
       await isCtxSpentWorker(waitingTxs, synced);
 
       await commitmentWorker(newTxDetails, synced);

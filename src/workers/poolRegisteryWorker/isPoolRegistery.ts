@@ -7,6 +7,7 @@ import { pool } from "@bitmatrix/lib";
 import { BmChart, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
 import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
+import { lpFeeTiers } from "@bitmatrix/lib/pool";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
@@ -162,13 +163,13 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };
 
-  const volumeToken = Number(newPool.token.value);
+  const volumeToken = Number(newPool.token.value) * Math.pow(10, 8 - token.precision);
 
   const result: BmChart = {
     time: newTxDetail.status.block_time,
     ptxid: newPool.lastStateTxId,
     value: {
-      quote: Number(newPool.quote.value),
+      quote: Number(newPool.quote.value) * Math.pow(10, 8 - quote.precision),
       token: volumeToken,
       lp: Number(newPool.lp.value),
     },
@@ -177,6 +178,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
       token: volumeToken,
       quote: Math.floor(volumeToken / newPool.tokenPrice),
     },
+    lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
   };
 
   try {

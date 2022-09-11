@@ -1,10 +1,11 @@
 import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, BmChart, CALL_METHOD, Pool } from "@bitmatrix/models";
+import { lpFeeTiers } from "@bitmatrix/lib/pool";
+import { BmChart, Pool } from "@bitmatrix/models";
 import { pools, poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 
-export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: BitmatrixStoreData[], synced: boolean) => {
+export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean) => {
   console.log("-------------------NFT HUNTER-------------------------");
 
   const bitmatrixPools = await pools();
@@ -24,15 +25,15 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
         newPool.lastStateTxId = tx.txid;
         newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote);
 
-        const volumeQuote = Number(newPool.quote.value);
+        const volumeQuote = Number(newPool.quote.value) * Math.pow(10, 8 - newPool.quote.precision);
         const volumeToken = volumeQuote * newPool.tokenPrice;
 
         const result: BmChart = {
           time: tx.status.block_time,
           ptxid: tx.txid,
           value: {
-            quote: Number(newPool.quote.value),
-            token: Number(newPool.token.value),
+            quote: Number(newPool.quote.value) * Math.pow(10, 8 - newPool.quote.precision),
+            token: Number(newPool.token.value) * Math.pow(10, 8 - newPool.token.precision),
             lp: Number(newPool.lp.value),
           },
           price: newPool.tokenPrice,
@@ -40,6 +41,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], waitingTxs: Bitm
             quote: volumeQuote,
             token: volumeToken,
           },
+          lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
         };
 
         await poolTxHistorySave(newPool.id, result);
