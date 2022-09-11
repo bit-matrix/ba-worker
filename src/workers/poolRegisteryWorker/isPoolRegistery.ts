@@ -163,13 +163,13 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };
 
-  const volumeToken = Number(newPool.token.value);
+  const volumeToken = Number(newPool.token.value) * Math.pow(10, 8 - token.precision);
 
   const result: BmChart = {
     time: newTxDetail.status.block_time,
     ptxid: newPool.lastStateTxId,
     value: {
-      quote: Number(newPool.quote.value),
+      quote: Number(newPool.quote.value) * Math.pow(10, 8 - quote.precision),
       token: volumeToken,
       lp: Number(newPool.lp.value),
     },
