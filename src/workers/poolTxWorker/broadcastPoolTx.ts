@@ -1,8 +1,9 @@
 import { Pool, BitmatrixStoreData, PTXFinderResult, CTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
-import { api, commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
+import { commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
 import { validatePoolTx } from "./validatePoolTx";
+import { sendRawTransaction } from "../../business/api/sendRawTransaction";
 
 export const broadcastPoolTx = async (
   bitmatrixStoreData: BitmatrixStoreData[],
@@ -284,7 +285,7 @@ export const broadcastPoolTx = async (
   let poolTxId = "";
 
   try {
-    poolTxId = await api.sendRawTransaction(rawHex);
+    poolTxId = await sendRawTransaction(rawHex);
   } catch (e) {
     console.log("error:", e);
   }
