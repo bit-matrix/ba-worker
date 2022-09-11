@@ -8,7 +8,7 @@ import { BmChart, BmTxInfo, PAsset, Pool } from "@bitmatrix/models";
 import { poolTxHistorySave, poolUpdate } from "../../business/db-client";
 import { tokenPriceCalculation } from "../../helper/tokenPriceCalculation";
 import { lpFeeTiers } from "@bitmatrix/lib/pool";
-import { INNER_PUBLIC_KEY, LBTC_ASSET, USDT_ASSET } from "../../env";
+import { INNER_PUBLIC_KEY } from "../../env";
 
 export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> => {
   console.log("Is pool registery worker started");
