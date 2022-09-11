@@ -42,3 +42,4 @@ export const REDIS_EXPIRE_TIME = 60000;
 export const INNER_PUBLIC_KEY = "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
 
 export const TEAM_ADDRESS = "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
+export const BITMATRIX_RPC_URL = "https://rpc.basebitmatrix.com/";
