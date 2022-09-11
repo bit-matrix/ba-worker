@@ -16,12 +16,17 @@ const db_port = process.env.DB_PORT || "8001";
 const db_host = process.env.DB_HOST || base_host;
 const db_url = process.env.DB_URL || `http://${db_host}:${db_port}`;
 
+const bitmatrix_rpc_port = process.env.DB_PORT || "8888";
+const bitmatrix_rpc_host = process.env.DB_HOST || base_host;
+const bitmatrix_rpc_url = process.env.DB_URL || `http://${bitmatrix_rpc_host}:${bitmatrix_rpc_port}`;
+
 const telegram_token = "AAGLP1BTJQ9i7Y2Old7MsV3daCWg0RVLqzs";
 const telegram_chat_id = "-707696434";
 
 export const ELECTRS_URL = electrs_url + "/";
 export const DB_URL = db_url + "/";
 export const HISTORY_DB_URL = api_url + "/";
+export const BITMATRIX_RPC_URL = bitmatrix_rpc_url + "/";
 export const REDIS_URL = redis_url;
 
 export const FETCH_ASSET_URL = "https://blockstream.info/liquidtestnet/api/asset/";
@@ -42,4 +47,3 @@ export const REDIS_EXPIRE_TIME = 60000;
 export const INNER_PUBLIC_KEY = "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
 
 export const TEAM_ADDRESS = "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
-export const BITMATRIX_RPC_URL = "https://rpc.basebitmatrix.com/";
