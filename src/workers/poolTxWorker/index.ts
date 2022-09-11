@@ -4,7 +4,7 @@ import { redisClient } from "@bitmatrix/redis-client";
 import { pools } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
 import { broadcastPoolTx } from "./broadcastPoolTx";
-import { hexToNum, lexicographical } from "../../helper/util";
+import { delay, hexToNum, lexicographical } from "../../helper/util";
 
 export const poolTxWorker = async () => {
   console.log("-------------------POOL TX WORKER-------------------------");
@@ -36,47 +36,41 @@ export const poolTxWorker = async () => {
     if (poolWaitingList.length > 0) {
       poolWaitingList.forEach(async (pwl) => {
         if (pwl) {
-          const { poolTxId, commitmentDataState } = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
+          if (pwl.todoList.length > 0) {
+            const { poolTxId, commitmentDataState } = await broadcastPoolTx(pwl.todoList || [], pwl.pool);
+            let successTxIds = [];
+            let failTxIds = [];
 
-          for (let i = 0; i < commitmentDataState.length; i++) {
-            const resultData = commitmentDataState[i];
+            for (let i = 0; i < commitmentDataState.length; i++) {
+              const resultData = commitmentDataState[i];
 
-            if (poolTxId && poolTxId !== "") {
-              const poolTxInfo: poolTxInfo = {
-                txId: poolTxId,
-                isSuccess: resultData.poolValidationData.errorMessages.length === 0,
-                failReason: resultData.poolValidationData.errorMessages.join(", "),
-              };
+              if (poolTxId && poolTxId !== "") {
+                const poolTxInfo: poolTxInfo = {
+                  txId: poolTxId,
+                  isSuccess: resultData.poolValidationData.errorMessages.length === 0,
+                  failReason: resultData.poolValidationData.errorMessages.join(", "),
+                };
 
-              if (poolTxInfo.isSuccess) {
-                await sendTelegramMessage(
-                  "Pool Tx Id: " +
-                    poolTxId +
-                    "\n" +
-                    "Method Call: <b>Method</b>: <code>" +
-                    resultData.commitmentData.methodCall +
-                    "</code>, <b>Value</b>: <code>" +
-                    resultData.commitmentData.cmtOutput2.value +
-                    "</code>"
-                );
-              } else {
-                await sendTelegramMessage(
-                  "Pool Tx Id: " +
-                    poolTxId +
-                    "\n" +
-                    "Method Call: <b>Method</b>: <code>" +
-                    resultData.commitmentData.methodCall +
-                    "</code>, <b>Fail swap result : </b>: <code>" +
-                    resultData.poolValidationData.errorMessages.join(", ") +
-                    "</code>"
-                );
+                if (poolTxInfo.isSuccess) {
+                  successTxIds.push(resultData.commitmentData.transaction.txid);
+                } else {
+                  failTxIds.push(resultData.commitmentData.transaction.txid);
+                }
+
+                try {
+                  await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
+                } catch (error) {
+                  console.log("broadcast error", error);
+                }
               }
+            }
 
-              try {
-                await redisClient.updateField(resultData.commitmentData.transaction.txid, poolTxInfo);
-              } catch (error) {
-                console.log("broadcast error", error);
-              }
+            if (successTxIds.length > 0) {
+              await delay(1000);
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Succesfully Commitment Tx Ids: <code>" + successTxIds.join(",") + "</code>");
+            } else if (failTxIds.length > 0) {
+              await delay(1000);
+              await sendTelegramMessage("Pool Tx Id: " + poolTxId + "\n" + "Failure Commitment Tx Ids: <code>" + failTxIds.join(",") + "</code>");
             }
           }
         }

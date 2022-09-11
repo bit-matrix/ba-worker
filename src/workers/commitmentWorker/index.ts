@@ -19,29 +19,34 @@ export const commitmentWorker = async (newTxDetails: TxDetail[], synced: boolean
 
   return Promise.all(promiseArray)
     .then(async (values: (CTXFinderResult | undefined)[]) => {
+      let txIds: string[] = [];
       values.forEach(async (value: CTXFinderResult | undefined) => {
         if (value) {
           const newStoreData: BitmatrixStoreData = { commitmentData: value };
-
+          txIds.push(value.transaction.txid);
           await redisClient.addKey(value.transaction.txid, REDIS_EXPIRE_TIME, newStoreData);
 
-          if (synced) {
-            await sendTelegramMessage(
-              "Pool: " +
-                value.poolId +
-                "\n" +
-                "New Commitment Tx V2: <code>" +
-                value.transaction.txid +
-                "</code>\n" +
-                "Commitment Data: <b>Method</b>: <code>" +
-                value.methodCall +
-                "</code>, <b>Value</b>: <code>" +
-                value.cmtOutput2.value +
-                "</code>"
-            );
-          }
+          // if (synced) {
+          //   await sendTelegramMessage(
+          //     "Pool: " +
+          //       value.poolId +
+          //       "\n" +
+          //       "New Commitment Tx V2: <code>" +
+          //       value.transaction.txid +
+          //       "</code>\n" +
+          //       "Commitment Data: <b>Method</b>: <code>" +
+          //       value.methodCall +
+          //       "</code>, <b>Value</b>: <code>" +
+          //       value.cmtOutput2.value +
+          //       "</code>"
+          //   );
+          // }
         }
       });
+
+      if (synced && txIds.length > 0) {
+        await sendTelegramMessage("New Commitment Tx Ids: <code>" + txIds.join(",") + "</code>");
+      }
     })
     .catch((err) => {
       console.log(err);

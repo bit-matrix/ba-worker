@@ -79,7 +79,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
   let leafCount = 0;
 
   if (version === "01") {
-    leafCount = 64;
+    leafCount = 32;
   }
 
   const pair1_coefficient = outputHex.slice(20, 28);
@@ -127,7 +127,7 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     name: tokenTicker.name,
     assetHash: pair2.asset || "",
     value: pair2.value?.toString() || "",
-    precision: quoteTicker.precision,
+    precision: tokenTicker.precision,
   };
 
   const lPAsset: PAsset = {

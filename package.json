@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@bitmatrix/esplora-api-client": "^0.0.8",
-    "@bitmatrix/lib": "^0.0.89",
-    "@bitmatrix/models": "^0.1.37",
+    "@bitmatrix/lib": "^0.0.94",
+    "@bitmatrix/models": "^0.1.40",
     "@bitmatrix/redis-client": "^1.0.3",
     "@bitmatrix/sha256streaming": "^1.0.36",
     "@script-wiz/lib-core": "^0.0.59",
@@ -22,6 +22,7 @@
     "bn.js": "^5.2.0",
     "decimal.js": "^10.3.1",
     "node-cron": "^3.0.0",
+    "set-interval-async": "^3.0.2",
     "tiny-secp256k1": "1.1.6",
     "uuid": "^8.3.2"
   },

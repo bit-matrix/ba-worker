@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
+import { lpFeeTiers } from "@bitmatrix/lib/pool";
 
 export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool): PTXFinderResult => {
   const cof = commitmentData;
@@ -109,6 +110,8 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
   // 11-pool_pair_1_liquidity_downgraded ile pool_pair_2_liquidity_downgraded ‘I çarp ve sonuca pool_constant ismini ver.
   const pool_constant = Math.floor(pool_pair_1_liquidity_downgraded * pool_pair_2_liquidity_downgraded);
 
+  const lpFeeTier = Object.values(lpFeeTiers)[poolData.lpFeeTierIndex.number];
+
   if (method === "01") {
     //3-Commitment output 2 asset ID’sinin pair_1_asset_id olduğunu kontrol et.
     if (commitmentOutput2AssetId !== pair_1_asset_id) errorMessages.push("Commitment Output 2 AssetId must be equal to pair_1_asset_id");
@@ -126,7 +129,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     }
 
     //5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / lpFeeTier);
 
     //   6-user_supply_total’ dan user_supply_lp_fees’ı çıkar ve sonuca user_supply_available ismini ver.
     result.user_supply_available = Math.floor(result.user_supply_total - result.user_supply_lp_fees);
@@ -153,7 +156,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     // 16-user_received_pair_2_apx değerinden payout_additional_fees değerini çıkar ve sonuca user_received_pair_2 ismini ver.
     result.user_received_pair_2 = Math.floor(result.user_received_pair_2_apx - result.payout_additional_fees);
 
-    if (result.user_received_pair_2 < Math.floor(10 * pair_2_coefficient)) {
+    if (result.user_received_pair_2 < Math.floor(9 * pair_2_coefficient)) {
       errorMessages.push("Dust payout");
 
       output.assetId = pair_1_asset_id;
@@ -195,7 +198,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     result.user_supply_total = new Decimal(commitmentOutput2.value).mul(100000000).toNumber();
 
     // 5- user_supply_total ‘ı 500’e böl ve bölüm sonucu bir tam sayı olarak ele alıp user_supply_lp_fees ismini ver.
-    result.user_supply_lp_fees = Math.floor(result.user_supply_total / poolData.lpFeeTierIndex.number);
+    result.user_supply_lp_fees = Math.floor(result.user_supply_total / lpFeeTier);
 
     if (result.user_supply_total > pool_pair_2_liquidity) {
       errorMessages.push("Supply overflow");
@@ -231,7 +234,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
     // 16- user_received_pair_1_apx değerinden payout_additional_fees değerini çıkar ve sonuca user_received_pair_1 ismini ver.
     result.user_received_pair_1 = Math.floor(result.user_received_pair_1_apx - result.payout_additional_fees);
 
-    if (result.user_received_pair_1 < Math.floor(10 * pair_1_coefficient)) {
+    if (result.user_received_pair_1 < Math.floor(9 * pair_1_coefficient)) {
       errorMessages.push("Dust payout");
 
       output.assetId = pair_2_asset_id;
@@ -383,9 +386,9 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
 
     // 22 ile pair_1_coefficient değerini çarp ve bu değere pair_1_min_redeem ismini ver.
 
-    result.pair_1_min_redeem = Math.floor(pair_1_coefficient * 10);
+    result.pair_1_min_redeem = Math.floor(pair_1_coefficient * 9);
     // 22 ile pair_2_coefficient değerini çarp ve bu değere pair_2_min_redeem ismini ver.
-    result.pair_2_min_redeem = Math.floor(pair_2_coefficient * 10);
+    result.pair_2_min_redeem = Math.floor(pair_2_coefficient * 9);
 
     // a. pair_1_user_redeem değeri pair_1_min_redeem değerinden küçük ise veya pair_2_user_redeem değeri pair_2_min_redeem değerinden küçük ise “revert” logic’ini çalıştır. Bu erroru “Dust LP payout” olarak etiketle.
     if (result.pair_1_user_redeem < result.pair_1_min_redeem || result.pair_2_user_redeem < result.pair_2_min_redeem) {

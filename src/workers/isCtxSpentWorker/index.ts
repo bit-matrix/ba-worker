@@ -8,6 +8,7 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
 
   if (waitingTxs.length > 0) {
+    let completedTxs = [];
     for (const tx of waitingTxs) {
       const txId = tx.commitmentData.transaction.txid;
 
@@ -15,6 +16,7 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
       if (outspends[0].spent) {
         await redisClient.removeKey(txId);
+        completedTxs.push(txId);
 
         const commitmentTxHistory: CommitmentTxHistory = {
           poolId: tx.commitmentData.poolId,
@@ -25,26 +27,11 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
         };
 
         await ctxHistorySave(txId, commitmentTxHistory);
-
-        if (synced) {
-          await sendTelegramMessage(
-            "Pool Id: " +
-              tx.commitmentData.poolId +
-              "\n" +
-              "Pool Tx Id: " +
-              (tx.poolTxInfo?.txId || "unknown pool id") +
-              "\n" +
-              "Swap Completed for : <code>" +
-              txId +
-              "</code>\n" +
-              "Commitment Data: <b>Method</b>: <code>" +
-              tx.commitmentData.methodCall +
-              "</code>, <b>Value</b>: <code>" +
-              tx.commitmentData.cmtOutput2.value +
-              "</code>"
-          );
-        }
       }
+    }
+
+    if (synced && completedTxs.length > 0) {
+      await sendTelegramMessage("Swap Completed for : <code>" + completedTxs.join(",") + "</code>");
     }
   }
 };
