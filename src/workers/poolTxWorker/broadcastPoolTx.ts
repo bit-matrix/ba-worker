@@ -182,7 +182,7 @@ export const broadcastPoolTx = async (
 
   const serviceFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + TEAM_ADDRESS;
 
-  const txFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
+  const txFeeOutput = "01" + hexLE(lbtcAsset) + "01" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 
   const locktime = "00000000";
 
