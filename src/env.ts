@@ -23,10 +23,14 @@ const bitmatrix_rpc_url = process.env.DB_URL || `http://${bitmatrix_rpc_host}:${
 const telegram_token = "AAGLP1BTJQ9i7Y2Old7MsV3daCWg0RVLqzs";
 const telegram_chat_id = "-707696434";
 
-export const ELECTRS_URL = electrs_url + "/";
+// export const ELECTRS_URL = electrs_url + "/";
+export const ELECTRS_URL = "https://electrs.bitmatrix.voidfile.com" + "/";
+
 export const DB_URL = db_url + "/";
 export const HISTORY_DB_URL = api_url + "/";
-export const BITMATRIX_RPC_URL = bitmatrix_rpc_url + "/";
+
+// export const BITMATRIX_RPC_URL = bitmatrix_rpc_url + "/";
+export const BITMATRIX_RPC_URL = "https://rpc.bitmatrix.voidfile.com/" + "/";
 export const REDIS_URL = redis_url;
 
 export const FETCH_ASSET_URL = "https://blockstream.info/liquid/api/asset/";
