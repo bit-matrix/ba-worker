@@ -30,7 +30,7 @@ export const DB_URL = db_url + "/";
 export const HISTORY_DB_URL = api_url + "/";
 
 // export const BITMATRIX_RPC_URL = bitmatrix_rpc_url + "/";
-export const BITMATRIX_RPC_URL = "https://rpc.bitmatrix.voidfile.com/" + "/";
+export const BITMATRIX_RPC_URL = "https://rpc.bitmatrix.voidfile.com" + "/";
 export const REDIS_URL = redis_url;
 
 export const FETCH_ASSET_URL = "https://blockstream.info/liquid/api/asset/";
