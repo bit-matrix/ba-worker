@@ -4,7 +4,7 @@ import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-cor
 import { commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
 import { validatePoolTx } from "./validatePoolTx";
 import { sendRawTransaction } from "../../business/api/sendRawTransaction";
-import { INNER_PUBLIC_KEY, TEAM_ADDRESS } from "../../env";
+import { INNER_PUBLIC_KEY, LBTC_ASSET, TEAM_ADDRESS } from "../../env";
 
 export const broadcastPoolTx = async (
   bitmatrixStoreData: BitmatrixStoreData[],
@@ -180,9 +180,9 @@ export const broadcastPoolTx = async (
 
   const serviceFee = totalFee - bandwith;
 
-  const serviceFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + TEAM_ADDRESS;
+  const serviceFeeOutput = "01" + hexLE(LBTC_ASSET) + "01" + convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + TEAM_ADDRESS;
 
-  const txFeeOutput = "01" + hexLE(lbtcAsset) + "01" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
+  const txFeeOutput = "01" + hexLE(LBTC_ASSET) + "01" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 
   const locktime = "00000000";
 
