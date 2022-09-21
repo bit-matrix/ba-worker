@@ -1,7 +1,7 @@
 import { getAssetWithBlockstream } from "./getAsset";
 import { arithmetics64 } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
-import { LBTC_ASSET } from "../env";
+import { LBTC_ASSET, LBTC_ASSET_NAME } from "../env";
 
 const onlyUnique = (value: Array<any>, index: number, self: any) => {
   return self.indexOf(value) === index;
@@ -17,7 +17,7 @@ export const div = (input1: number, input2: number) => Math.floor(input1 / input
 
 export const tickerFinder = async (asset: string): Promise<{ ticker: string; name: string; precision: number }> => {
   if (asset === LBTC_ASSET) {
-    return { ticker: "tL-BTC", name: "Liquid Bitcoin", precision: 8 };
+    return { ticker: LBTC_ASSET_NAME, name: "Liquid Bitcoin", precision: 8 };
   } else {
     const bsAsset = await getAssetWithBlockstream(asset);
 
