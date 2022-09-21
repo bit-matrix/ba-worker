@@ -37,10 +37,6 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
             lp: Number(newPool.lp.value),
           },
           price: newPool.tokenPrice,
-          volume: {
-            quote: volumeQuote,
-            token: volumeToken,
-          },
           lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
         };
 
