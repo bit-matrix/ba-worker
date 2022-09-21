@@ -1,6 +1,6 @@
 import axios from "axios";
 import { DB_URL, HISTORY_DB_URL } from "../../env";
-import { BmConfig, Pool, AppSync, BmPtx, BmChart, CommitmentTxHistory } from "@bitmatrix/models";
+import { BmConfig, Pool, AppSync, BmChart, CommitmentTxHistory } from "@bitmatrix/models";
 
 export const pools = (): Promise<Pool[]> => axios.get<Pool[]>(DB_URL + "pools").then((res) => res.data);
 export const pool = (asset: string): Promise<Pool> => axios.get<Pool>(DB_URL + "pools/" + asset).then((res) => res.data);
