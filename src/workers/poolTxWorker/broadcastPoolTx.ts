@@ -1,8 +1,10 @@
 import { Pool, BitmatrixStoreData, PTXFinderResult, CTXFinderResult } from "@bitmatrix/models";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { convertion, taproot, TAPROOT_VERSION, utils } from "@script-wiz/lib-core";
-import { api, commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
+import { commitmentOutput, pool as poolFunc } from "@bitmatrix/lib";
 import { validatePoolTx } from "./validatePoolTx";
+import { sendRawTransaction } from "../../business/api/sendRawTransaction";
+import { lbtcAsset } from "../../helper/util";
 
 export const broadcastPoolTx = async (
   bitmatrixStoreData: BitmatrixStoreData[],
@@ -178,12 +180,10 @@ export const broadcastPoolTx = async (
 
   const serviceFee = totalFee - bandwith;
 
-  const serviceFeeOutput =
-    "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" +
-    convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex +
-    "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
+  const serviceFeeOutput = "01" + hexLE(lbtcAsset) + "01";
+  convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
 
-  const txFeeOutput = "01499a818545f6bae39fc03b637f2a4e1e64e590cac1bc3a6f6d71aa4443654c1401" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
+  const txFeeOutput = "01" + hexLE(lbtcAsset) + "01" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 
   const locktime = "00000000";
 
@@ -284,7 +284,7 @@ export const broadcastPoolTx = async (
   let poolTxId = "";
 
   try {
-    poolTxId = await api.sendRawTransaction(rawHex);
+    poolTxId = await sendRawTransaction(rawHex);
   } catch (e) {
     console.log("error:", e);
   }

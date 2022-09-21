@@ -1,17 +1,18 @@
-import { TxDetail } from "@bitmatrix/esplora-api-client";
-import { api, commitmentOutput } from "@bitmatrix/lib";
+import { esploraClient, TxDetail } from "@bitmatrix/esplora-api-client";
+import { commitmentOutput } from "@bitmatrix/lib";
 import { CTXFinderResult, Pool, TxDetailRPC, TxVInRPC, TxVOutRPC } from "@bitmatrix/models";
 import { convertion } from "@script-wiz/lib-core";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { replaceChar } from "../../helper/util";
 import sha256Streaming from "@bitmatrix/sha256streaming";
+import { decodeRawTransaction } from "../../business/api/decodeRawTransaction";
 
 const lbtcAssest = "144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49";
 
 export const commitmentFinder = async (transaction: TxDetail, pools: Pool[]): Promise<CTXFinderResult | undefined> => {
   // fetch tx details with rpc
-  const rawTransactionHex: string = await api.getRawTransaction(transaction.txid);
-  const decodedTransaction: TxDetailRPC = await api.decodeRawTransaction(rawTransactionHex);
+  const rawTransactionHex: string = await esploraClient.txHex(transaction.txid);
+  const decodedTransaction: TxDetailRPC = await decodeRawTransaction(rawTransactionHex);
 
   const outputs: TxVOutRPC[] = decodedTransaction.vout;
   const inputs: TxVInRPC[] = decodedTransaction.vin;

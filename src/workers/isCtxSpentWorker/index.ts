@@ -13,7 +13,6 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
       const txId = tx.commitmentData.transaction.txid;
 
       const outspends = await esploraClient.txOutspends(txId);
-
       if (outspends[0].spent) {
         await redisClient.removeKey(txId);
         completedTxs.push(txId);
@@ -23,7 +22,9 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
           method: tx.commitmentData.methodCall as CALL_METHOD,
           txId,
           isSuccess: tx.poolTxInfo?.isSuccess || false,
+          timestamp: outspends[0].status?.block_time || 0,
           failReasons: tx.poolTxInfo?.failReason || "",
+          value: tx.commitmentData.cmtOutput2.value.toString(),
         };
 
         await ctxHistorySave(txId, commitmentTxHistory);
