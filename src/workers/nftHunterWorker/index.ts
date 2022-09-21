@@ -41,6 +41,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
             quote: volumeQuote,
             token: volumeToken,
           },
+          lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
         };
 
         await poolTxHistorySave(newPool.id, result);
