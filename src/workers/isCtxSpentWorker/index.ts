@@ -22,8 +22,9 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
           method: tx.commitmentData.methodCall as CALL_METHOD,
           txId,
           isSuccess: tx.poolTxInfo?.isSuccess || false,
+          timestamp: outspends[0].status?.block_time || 0,
           failReasons: tx.poolTxInfo?.failReason || "",
-          timestamp: outspends[0].status?.block_time,
+          value: tx.commitmentData.cmtOutput2.value.toString(),
         };
 
         await ctxHistorySave(txId, commitmentTxHistory);
