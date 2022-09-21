@@ -29,7 +29,7 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
         const volumeToken = volumeQuote * newPool.tokenPrice;
 
         const result: BmChart = {
-          time: tx.status.block_time,
+          timestamp: tx.status.block_time,
           ptxid: tx.txid,
           value: {
             quote: Number(newPool.quote.value) * Math.pow(10, 8 - newPool.quote.precision),
@@ -41,7 +41,6 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
             quote: volumeQuote,
             token: volumeToken,
           },
-          lpFeeTier: Object.values(lpFeeTiers)[newPool.lpFeeTierIndex.number],
         };
 
         await poolTxHistorySave(newPool.id, result);
