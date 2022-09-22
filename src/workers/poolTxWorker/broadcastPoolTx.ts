@@ -284,7 +284,10 @@ export const broadcastPoolTx = async (
   let poolTxId = "";
 
   try {
+    console.log(rawHex);
     poolTxId = await sendRawTransaction(rawHex);
+
+    console.log(poolTxId);
   } catch (e) {
     console.log("error:", e);
   }
