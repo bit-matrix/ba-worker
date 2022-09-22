@@ -30,15 +30,18 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
         const currentOutput = poolTxOutputs.find((output) => output.scriptpubkey === scriptPubKey);
 
         if (currentOutput) {
-          isSuccess = tx.commitmentData.cmtOutput2.asset !== scriptPubKey ? true : false;
+          isSuccess = tx.commitmentData.cmtOutput2.asset !== currentOutput.asset ? true : false;
         } else {
+          isSuccess = false;
+        }
+
+        if (!isSuccess) {
           const currentPool = await pool(poolTx.vout[0].asset || "");
           const poolCurrenState: Pool = { ...currentPool };
           poolCurrenState.token.value = poolTx.vout[1].value?.toString() || "";
           poolCurrenState.quote.value = poolTx.vout[3].value?.toString() || "";
           poolCurrenState.lp.value = poolTx.vout[2].value?.toString() || "";
           errorMessages = validatePoolTx(tx.commitmentData, poolCurrenState).errorMessages;
-          isSuccess = false;
         }
 
         const commitmentTxHistory: CommitmentTxHistory = {
