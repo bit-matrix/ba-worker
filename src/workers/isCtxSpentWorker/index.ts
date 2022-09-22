@@ -1,8 +1,10 @@
 import { esploraClient } from "@bitmatrix/esplora-api-client";
-import { BitmatrixStoreData, CALL_METHOD, CommitmentTxHistory } from "@bitmatrix/models";
+import { BitmatrixStoreData, CALL_METHOD, CommitmentTxHistory, Pool } from "@bitmatrix/models";
 import { redisClient } from "@bitmatrix/redis-client";
-import { ctxHistorySave } from "../../business/db-client";
+import { utils } from "@script-wiz/lib-core";
+import { ctxHistorySave, pool } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { validatePoolTx } from "../poolTxWorker/validatePoolTx";
 
 export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
   console.log("-------------------IS CTX SPENT WORKER-------------------------");
@@ -13,20 +15,45 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
       const txId = tx.commitmentData.transaction.txid;
 
       const outspends = await esploraClient.txOutspends(txId);
+
       if (outspends[0].spent) {
-        await redisClient.removeKey(txId);
-        completedTxs.push(txId);
+        let isSuccess: boolean;
+        let errorMessages: string[] = [];
+
+        const poolTxId = outspends[0].txid || "";
+
+        const poolTx = await esploraClient.tx(poolTxId);
+        const poolTxOutputs = poolTx.vout;
+
+        const scriptPubKey = "0014" + utils.publicKeyToScriptPubkey(tx.commitmentData.publicKey);
+
+        const currentOutput = poolTxOutputs.find((output) => output.scriptpubkey === scriptPubKey);
+
+        if (currentOutput) {
+          isSuccess = tx.commitmentData.cmtOutput2.asset !== scriptPubKey ? true : false;
+        } else {
+          const currentPool = await pool(poolTx.vout[0].asset || "");
+          const poolCurrenState: Pool = { ...currentPool };
+          poolCurrenState.token.value = poolTx.vout[1].value?.toString() || "";
+          poolCurrenState.quote.value = poolTx.vout[3].value?.toString() || "";
+          poolCurrenState.lp.value = poolTx.vout[2].value?.toString() || "";
+          errorMessages = validatePoolTx(tx.commitmentData, poolCurrenState).errorMessages;
+          isSuccess = false;
+        }
 
         const commitmentTxHistory: CommitmentTxHistory = {
           poolId: tx.commitmentData.poolId,
           method: tx.commitmentData.methodCall as CALL_METHOD,
           txId,
-          isSuccess: tx.poolTxInfo?.isSuccess || false,
+          isSuccess,
           timestamp: outspends[0].status?.block_time || 0,
-          failReasons: tx.poolTxInfo?.failReason || "",
+          failReasons: errorMessages.join(", ") || "",
           value: tx.commitmentData.cmtOutput2.value.toString(),
+          poolTxId,
         };
 
+        completedTxs.push(txId);
+        await redisClient.removeKey(txId);
         await ctxHistorySave(txId, commitmentTxHistory);
       }
     }
