@@ -180,8 +180,7 @@ export const broadcastPoolTx = async (
 
   const serviceFee = totalFee - bandwith;
 
-  const serviceFeeOutput = "01" + hexLE(lbtcAsset) + "01";
-  convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
+  const serviceFeeOutput = "01" + hexLE(lbtcAsset) + "01" + convertion.numToLE64LE(WizData.fromNumber(serviceFee)).hex + "001600148f27f0ac00dcfed125ea303fa3c46bd7284ab77d";
 
   const txFeeOutput = "01" + hexLE(lbtcAsset) + "01" + convertion.numToLE64LE(WizData.fromNumber(bandwith)).hex + "0000";
 
