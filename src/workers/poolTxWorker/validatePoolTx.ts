@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { arithmetics64, convertion } from "@script-wiz/lib-core";
 import WizData from "@script-wiz/wiz-data";
 import { CTXFinderResult, CTXPTXResult, Pool, PTXFinderResult } from "@bitmatrix/models";
-import { lpFeeTiers } from "@bitmatrix/lib/pool";
+import { pool } from "@bitmatrix/lib";
 
 export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool): PTXFinderResult => {
   const cof = commitmentData;
@@ -110,7 +110,7 @@ export const validatePoolTx = (commitmentData: CTXFinderResult, poolData: Pool):
   // 11-pool_pair_1_liquidity_downgraded ile pool_pair_2_liquidity_downgraded ‘I çarp ve sonuca pool_constant ismini ver.
   const pool_constant = Math.floor(pool_pair_1_liquidity_downgraded * pool_pair_2_liquidity_downgraded);
 
-  const lpFeeTier = Object.values(lpFeeTiers)[poolData.lpFeeTierIndex.number];
+  const lpFeeTier = Object.values(pool.lpFeeTiers)[poolData.lpFeeTierIndex.number];
 
   if (method === "01") {
     //3-Commitment output 2 asset ID’sinin pair_1_asset_id olduğunu kontrol et.
