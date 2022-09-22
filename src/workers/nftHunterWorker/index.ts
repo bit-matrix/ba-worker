@@ -35,9 +35,12 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
         lpFeeTier: Object.values(pool.lpFeeTiers)[newPool.lpFeeTierIndex.number],
       };
 
-      if (outspends[0].spent === false) {
+      if (!synced && outspends[0].spent === true) {
         await poolUpdate(newPool);
-      } else {
+        await poolTxHistorySave(newPool.id, result);
+      }
+
+      if (outspends[0].spent === false) {
         await poolUpdate(newPool);
         await poolTxHistorySave(newPool.id, result);
       }
