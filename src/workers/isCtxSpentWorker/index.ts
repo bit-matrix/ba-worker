@@ -44,6 +44,16 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
           errorMessages = validatePoolTx(tx.commitmentData, poolCurrenState).errorMessages;
         }
 
+        let value = "";
+
+        if (isSuccess) {
+          if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
+            value = tx.commitmentData.cmtOutput2.value.toString();
+          } else if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE && currentOutput?.value) {
+            value = (currentOutput.value / 100000000).toString() || "";
+          }
+        }
+
         const commitmentTxHistory: CommitmentTxHistory = {
           poolId: tx.commitmentData.poolId,
           method: tx.commitmentData.methodCall as CALL_METHOD,
@@ -51,7 +61,7 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
           isSuccess,
           timestamp: outspends[0].status?.block_time || 0,
           failReasons: errorMessages.join(", ") || "",
-          value: tx.commitmentData.cmtOutput2.value.toString(),
+          value,
           poolTxId,
         };
 
