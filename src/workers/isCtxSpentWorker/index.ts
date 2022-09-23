@@ -48,9 +48,9 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
         if (isSuccess) {
           if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
-            value = tx.commitmentData.cmtOutput2.value.toString();
+            value = (tx.commitmentData.cmtOutput2.value / 100000000).toString();
           } else if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE && currentOutput?.value) {
-            value = (currentOutput.value / 100000000).toString() || "";
+            value = currentOutput.value.toString() || "";
           }
         }
 
