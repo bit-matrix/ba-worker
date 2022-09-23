@@ -4,6 +4,7 @@ import { redisClient } from "@bitmatrix/redis-client";
 import { utils } from "@script-wiz/lib-core";
 import { ctxHistorySave, pool } from "../../business/db-client";
 import { sendTelegramMessage } from "../../helper/sendTelegramMessage";
+import { lbtcAsset } from "../../helper/util";
 import { validatePoolTx } from "../poolTxWorker/validatePoolTx";
 
 export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced: boolean) => {
@@ -48,7 +49,8 @@ export const isCtxSpentWorker = async (waitingTxs: BitmatrixStoreData[], synced:
 
         if (isSuccess) {
           if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_QUOTE_FOR_TOKEN) {
-            value = tx.commitmentData.cmtOutput2.value.toString();
+            const mulConstant = tx.commitmentData.cmtOutput2.asset === lbtcAsset ? 1 : Math.pow(10, 8);
+            value = (tx.commitmentData.cmtOutput2.value * mulConstant).toString();
           } else if (tx.commitmentData.methodCall === CALL_METHOD.SWAP_TOKEN_FOR_QUOTE && currentOutput?.value) {
             value = currentOutput.value.toString() || "";
           }
