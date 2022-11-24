@@ -26,8 +26,8 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
         time: tx.status.block_time,
         ptxid: tx.txid,
         quote: newPool.quote,
-        token: newPool.quote,
-        lp: newPool.quote,
+        token: newPool.token,
+        lp: newPool.lp,
 
         lpFeeTier: Object.values(pool.lpFeeTiers)[newPool.lpFeeTierIndex.number],
       };

@@ -145,8 +145,6 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     block_hash: newTxDetail.status.block_hash,
   };
 
-  const tokenPrice = tokenPriceCalculation(token, quote);
-
   const newPool: Pool = {
     id: mayPoolAssetId,
     quote,
