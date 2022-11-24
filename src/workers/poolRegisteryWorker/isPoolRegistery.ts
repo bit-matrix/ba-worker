@@ -157,7 +157,6 @@ export const isPoolRegistery = async (newTxDetail: TxDetail): Promise<boolean> =
     active: true,
     leafCount,
     pair1_coefficient: { hex: pair1_coefficient, number: pair1_coefficientNumber },
-    tokenPrice,
     version,
     lpFeeTierIndex: { hex: lpTierIndex, number: WizData.fromHex(lpTierIndex).number || 0 },
   };

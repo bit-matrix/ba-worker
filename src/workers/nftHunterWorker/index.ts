@@ -17,21 +17,18 @@ export const nftHunterWorker = async (newTxDetails: TxDetail[], synced: boolean)
 
     if (currentPool) {
       const newPool: Pool = { ...currentPool };
-      newPool.token.value = tx.vout[1].value?.toString();
+      newPool.token.value = (tx.vout[1].value || 0 * Math.pow(10, 8 - newPool.quote.precision)).toString();
+      newPool.quote.value = (tx.vout[3].value || 0 * Math.pow(10, 8 - newPool.quote.precision)).toString();
       newPool.lp.value = tx.vout[2].value?.toString();
-      newPool.quote.value = tx.vout[3].value?.toString();
       newPool.lastStateTxId = tx.txid;
-      newPool.tokenPrice = tokenPriceCalculation(newPool.token, newPool.quote);
 
       const result: BmChart = {
         time: tx.status.block_time,
         ptxid: tx.txid,
-        value: {
-          quote: Number(newPool.quote.value) * Math.pow(10, 8 - newPool.quote.precision),
-          token: Number(newPool.token.value) * Math.pow(10, 8 - newPool.token.precision),
-          lp: Number(newPool.lp.value),
-        },
-        price: newPool.tokenPrice,
+        quote: newPool.quote,
+        token: newPool.quote,
+        lp: newPool.quote,
+
         lpFeeTier: Object.values(pool.lpFeeTiers)[newPool.lpFeeTierIndex.number],
       };
 
